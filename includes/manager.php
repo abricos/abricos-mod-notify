@@ -38,23 +38,20 @@ class NotifyManager extends Notification {
 		$this->userid = $this->user['userid'];
 	}
 	
-	public function SendMail($email, $subject, $message){
-		
+	public function SendMail($email, $subject, $message, $from='', $fromName=''){
 		/*
 		// настройки конфига
 		$config['module']['notify']['type'] = "abricos";
-		
 		/**/
-		
 		switch(CMSRegistry::$instance->config['module']['notify']['type']){
 			case 'abricos':
-				return $this->SendByAbricos($email, $subject, $message);
+				return $this->SendByAbricos($email, $subject, $message, $from, $fromName);
 			default: 
-				return $this->SendByMailer($email, $subject, $message);
+				return $this->SendByMailer($email, $subject, $message, $from, $fromName);
 		}
 	}
 	
-	public function SendByMailer($email, $subject, $message){
+	public function SendByMailer($email, $subject, $message, $from='', $fromName=''){
 		$mailer = new NotifyMailer();
 		if (!$mailer->ValidateAddress($email)){
 			return false;
@@ -62,15 +59,28 @@ class NotifyManager extends Notification {
 		$mailer->Subject = $subject;
 		$mailer->MsgHTML($message);
 		$mailer->AddAddress($email);
+		if (!empty($from)){
+			$mailer->From = $from;
+		}
+		if (!empty($fromName)){
+			$mailer->FromName = $fromName;
+		}
+		
 		$result = $mailer->Send();
 		return $result;
 	}
 	
-	public function SendByAbricos($email, $subject, $message){
+	public function SendByAbricos($email, $subject, $message, $from='', $fromName=''){
 		$mailer = new NotifyAbricos();
 		$mailer->email = $email;
 		$mailer->subject = $subject;
 		$mailer->message = $message;
+		if (!empty($from)){
+			$mailer->from = $from;
+		}
+		if (!empty($fromName)){
+			$mailer->fromName = $fromName;
+		}
 		$mailer->Send();
 	}
 }
