@@ -26,6 +26,7 @@ class NotifyManager extends Notification {
 	
 	public $user = null;
 	public $userid = 0;
+	private $emlcounter = 1;
 	
 	public function NotifyManager(NotifyModule $module){
 		
@@ -43,11 +44,50 @@ class NotifyManager extends Notification {
 		// настройки конфига
 		$config['module']['notify']['type'] = "abricos";
 		/**/
-		switch(CMSRegistry::$instance->config['module']['notify']['type']){
-			case 'abricos':
-				return $this->SendByAbricos($email, $subject, $message, $from, $fromName);
-			default: 
-				return $this->SendByMailer($email, $subject, $message, $from, $fromName);
+		$cfg = &CMSRegistry::$instance->config['module']['notify'];
+		
+		if ($cfg['totestfile']){
+			
+			$filepath = CWD."/cache/eml";
+			@mkdir($filepath);
+			$filename = $filepath."/".date("YmdHis", time())."-".($this->emlcounter++).".htm";
+			
+			$fh = fopen($filename, 'a');
+
+			if (!$fh){ return false; }
+			
+			$str = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru" dir="ltr">
+<head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /></head>
+<body class="yui-skin-sam">
+	<div style="width: 600px; margin: 0 auto;">';
+			
+			$str .= "<p>E-mail: <b>".$email."</b><br />";
+			$str .= "From: ".$from."<br />";
+			$str .= "FromName: ".$fromName."<br />";
+			$str .= "Subject: <b>".$subject."</b><br />";
+			$str .= "Message (html code):</p>";
+			$str .= '<textarea style="width: 100%; height: 300px;">';
+			$str .= htmlspecialchars($message);
+			$str .= '</textarea>';
+			
+			$str .= "<p>Message (preview):</p>";
+			$str .= "<div style='background-color: #F0F0F0;'>".$message."</div>";
+			
+			$str .= '</div></body></html>';
+			
+			fwrite($fh, $str);
+			fflush($fh);
+			fclose($fh);
+			
+			return true;
+		}else{
+			switch($cfg['type']){
+				case 'abricos':
+					return $this->SendByAbricos($email, $subject, $message, $from, $fromName);
+				default: 
+					return $this->SendByMailer($email, $subject, $message, $from, $fromName);
+			}
 		}
 	}
 	
