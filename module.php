@@ -10,9 +10,6 @@
  * @author Alexander Kuzmin (roosit@abricos.org)
  */
 
-$mod = new NotifyModule();
-CMSRegistry::$instance->modules->Register($mod);
-
 class NotifyModule extends CMSModule {
 	
 	private $_manager = null;
@@ -37,5 +34,8 @@ class NotifyModule extends CMSModule {
 		return $this->_manager;
 	}
 }
+
+$mod = new NotifyModule();
+CMSRegistry::$instance->modules->Register($mod);
 
 ?>
