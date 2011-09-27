@@ -91,11 +91,48 @@ class NotifyManager extends Notification {
 		}
 	}
 	
+	
+	/**
+	 * Отправка почты через PHPMailer
+	 * 
+	 * Настройка SMTP в файле config.php
+	 * $config["module"]["notify"] = array(
+	 * 	"SMTP" => true,							// Использовать SMTP
+	 * 	"SMTPHost" => "mail.yourdomain.com",	// SMTP сервер
+	 * 	"SMTPPort" => 26,						// SMTP порт
+	 * 	"SMTPAuth" => true,						// использовать авторизацию SMTP
+	 * 	"SMTPUsername" => "yourname@youdomain",	// имя пользователя SMTP
+	 * 	"SMTPPassword" => "yourpassword"		// пароль пользователя SMTP
+	 * );
+	 * 
+	 * @param string $email
+	 * @param string $subject
+	 * @param string $message
+	 * @param string $from
+	 * @param string $fromName
+	 */
+	
 	public function SendByMailer($email, $subject, $message, $from='', $fromName=''){
+		
+		$cfg = &CMSRegistry::$instance->config['module']['notify'];
+		
 		$mailer = new NotifyMailer();
 		if (!$mailer->ValidateAddress($email)){
 			return false;
 		}
+		
+		if ($cfg['SMTP']){ // использовать SMTP
+			$mailer->IsSMTP();
+			$mailer->Host = $cfg['SMTPHost'];
+			if (intval($cfg['SMTPPort']) > 0){
+				$mailer->Port = intval($cfg['SMTPPort']);
+			}
+			if ($cfg['SMTPAuth']){
+				$mailer->Username = $cfg['SMTPUsername'];
+				$mailer->Password = $cfg['SMTPPassword'];
+			}
+		}
+		
 		$mailer->Subject = $subject;
 		$mailer->MsgHTML($message);
 		$mailer->AddAddress($email);
