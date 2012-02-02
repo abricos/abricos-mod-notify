@@ -8,7 +8,7 @@
  * @author Alexander Kuzmin (roosit@abricos.org)
  */
 
-class NotifyManager extends Notification {
+class NotifyManager extends Ab_Notification {
 	
 	/**
 	 * 
@@ -20,7 +20,7 @@ class NotifyManager extends Notification {
 
 	/**
 	 * 
-	 * @var CMSDatabase
+	 * @var Ab_Database
 	 */
 	public $db = null;
 	

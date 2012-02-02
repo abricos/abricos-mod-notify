@@ -10,12 +10,12 @@
  * @author Alexander Kuzmin (roosit@abricos.org)
  */
 
-class NotifyModule extends CMSModule {
+class NotifyModule extends Ab_Module {
 	
 	private $_manager = null;
 	
 	function __construct(){
-		$this->version = "0.1";
+		$this->version = "0.1.1";
 		$this->name = "notify";
 	}
 	
@@ -35,7 +35,6 @@ class NotifyModule extends CMSModule {
 	}
 }
 
-$mod = new NotifyModule();
-CMSRegistry::$instance->modules->Register($mod);
+Abricos::ModuleRegister(new NotifyModule());
 
 ?>
