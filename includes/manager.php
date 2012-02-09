@@ -102,7 +102,14 @@ class NotifyManager extends Ab_Notification {
 	 * 	"SMTPPort" => 26,						// SMTP порт
 	 * 	"SMTPAuth" => true,						// использовать авторизацию SMTP
 	 * 	"SMTPUsername" => "yourname@youdomain",	// имя пользователя SMTP
-	 * 	"SMTPPassword" => "yourpassword"		// пароль пользователя SMTP
+	 * 	"SMTPPassword" => "yourpassword",		// пароль пользователя SMTP
+	 * 
+	 *  // Если необходима предварительная POP3 авторизация
+	 *  "POPBefore" => false, 					// Использовать POP3
+	 *  "POPHost" => "mail.youdomain.com", 		// POP3 сервер 
+	 *	"POPPort" => 110,						// POP3 порт
+	 *	"POPUsername" => "yourname@youdomain",	// имя пользователя POP3
+	 *	"POPPassword" => "yourpassword"			// пароль пользователя POP3
 	 * );
 	 * 
 	 * @param string $email
@@ -121,13 +128,21 @@ class NotifyManager extends Ab_Notification {
 			return false;
 		}
 		
+		if ($cfg['POPBefore']){ // авторизация POP перед SMTP
+			require_once 'phpmailer/class.pop3.php';
+			$pop = new POP3();
+			$res = $pop->Authorise($cfg['POPHost'], $cfg['POPPort'], 30, $cfg['POPUsername'], $cfg['POPPassword']);
+		}
+		
 		if ($cfg['SMTP']){ // использовать SMTP
 			$mailer->IsSMTP();
 			$mailer->Host = $cfg['SMTPHost'];
 			if (intval($cfg['SMTPPort']) > 0){
 				$mailer->Port = intval($cfg['SMTPPort']);
 			}
-			if ($cfg['SMTPAuth']){
+			
+		if ($cfg['SMTPAuth']){
+				$mailer->SMTPAuth = true;
 				$mailer->Username = $cfg['SMTPUsername'];
 				$mailer->Password = $cfg['SMTPPassword'];
 			}
