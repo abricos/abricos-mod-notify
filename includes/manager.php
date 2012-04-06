@@ -159,6 +159,26 @@ class NotifyManager extends Ab_Notification {
 		}
 		
 		$result = $mailer->Send();
+		
+		if (!$result && $cfg['errorlog']){
+			$filepath = CWD."/cache/eml";
+			@mkdir($filepath);
+			$filename = $filepath."/error.log";
+				
+			$fh = fopen($filename, 'a');
+		
+			if (!$fh){
+				return false;
+			}
+				
+			$str = date("YmdHis", time())." ";
+			$str .=  $mailer->ErrorInfo."\n";
+				
+			fwrite($fh, $str);
+			fflush($fh);
+			fclose($fh);
+		}
+		
 		return $result;
 	}
 	
