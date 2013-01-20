@@ -25,6 +25,7 @@ All settings in the file /includes/config.php
 	);
  
  ### Debug mode
+ 
 If debugging is enabled sends a message, the message is do not go 
 to the post office, but are created as separate files in the 
 folder /cache/eml. 
