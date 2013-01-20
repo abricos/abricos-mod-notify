@@ -14,6 +14,7 @@ Configuration
 All settings in the file /includes/config.php
 
  ### Config SMTP
+ 
 	$config["module"]["notify"] = array(
 		"SMTP" => true,                          // SMTP enable
 		"SMTPHost" => "mail.yourdomain.com",     // SMTP Server
