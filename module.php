@@ -1,6 +1,6 @@
 <?php
 /**
- * Модуль "Сообщения"
+ * Notify Module
  * 
  * @package Abricos
  * @subpackage Notify
