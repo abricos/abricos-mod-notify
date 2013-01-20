@@ -13,7 +13,7 @@ Configuration
 
 All settings in the file /includes/config.php
 
- ### Config SMTP
+### Config SMTP
  
 	$config["module"]["notify"] = array(
 		"SMTP" => true,                          // SMTP enable
@@ -24,7 +24,7 @@ All settings in the file /includes/config.php
 		"SMTPPassword" => "yourpassword"         // SMTP Password
 	);
  
- ### Debug mode
+### Debug mode
  
 If debugging is enabled sends a message, the message is do not go 
 to the post office, but are created as separate files in the 
