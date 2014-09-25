@@ -20,7 +20,8 @@ All settings in the file /includes/config.php
 		"SMTPHost" => "mail.yourdomain.com",     // SMTP Server
 		"SMTPPort" => 26,                        // SMTP Port
 		"SMTPAuth" => true,                      // SMTP use authorise
-		"SMTPUsername" => "yourname@youdomain",  // SMTP Username 
+		"SMTPSecure" => "ssl",                   // SMTP Secure
+		"SMTPUsername" => "yourname@youdomain",  // SMTP Username
 		"SMTPPassword" => "yourpassword"         // SMTP Password
 	);
  
