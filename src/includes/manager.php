@@ -24,8 +24,12 @@ class NotifyManager extends Ab_Notification {
      */
     public $db = null;
 
-    public $user = null;
-    public $userid = 0;
+
+    // TODO: remove
+    private $user = null;
+    // TODO: remove
+    private $userid = 0;
+
     private $emlcounter = 1;
 
     public function NotifyManager(NotifyModule $module) {
@@ -34,9 +38,6 @@ class NotifyManager extends Ab_Notification {
         $core = $module->registry;
         $this->core = $core;
         $this->db = $core->db;
-
-        $this->user = $core->user->info;
-        $this->userid = $this->user['userid'];
     }
 
     public function SendMail($email, $subject, $message, $from = '', $fromName = '') {
@@ -44,7 +45,7 @@ class NotifyManager extends Ab_Notification {
         // настройки конфига
         $config['module']['notify']['type'] = "abricos";
         /**/
-        $cfg = &CMSRegistry::$instance->config['module']['notify'];
+        $cfg = Abricos::$config['module']['notify'];
 
         if ($cfg['totestfile']) {
 
@@ -124,7 +125,7 @@ class NotifyManager extends Ab_Notification {
 
     public function SendByMailer($email, $subject, $message, $from = '', $fromName = '') {
 
-        $cfg = &CMSRegistry::$instance->config['module']['notify'];
+        $cfg = & Abricos::$config['module']['notify'];
 
         $mailer = new NotifyMailer();
         if (!$mailer->ValidateAddress($email)) {
@@ -217,7 +218,7 @@ class NotifyAbricos {
         $this->from = Brick::$builder->phrase->Get('sys', 'admin_mail');
         $this->fromName = Brick::$builder->phrase->Get('sys', 'site_name');
 
-        $cfg = &CMSRegistry::$instance->config['module']['notify'];
+        $cfg = & Abricos::$config['module']['notify'];
         $this->host = $cfg['host'];
         $this->password = $cfg['password'];
     }
