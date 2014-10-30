@@ -16,8 +16,6 @@ class NotifyManager extends Ab_Notification {
      */
     public $module = null;
 
-    public $core = null;
-
     /**
      *
      * @var Ab_Database
@@ -35,9 +33,7 @@ class NotifyManager extends Ab_Notification {
     public function NotifyManager(NotifyModule $module) {
 
         $this->module = $module;
-        $core = $module->registry;
-        $this->core = $core;
-        $this->db = $core->db;
+        $this->db = Abricos::$db;
     }
 
     public function SendMail($email, $subject, $message, $from = '', $fromName = '') {
@@ -266,15 +262,7 @@ class NotifyAbricos {
 
 class NotifyMailer extends PHPMailer {
 
-    /**
-     *
-     * @var CMSRegistry
-     */
-    public $core = null;
-
     public function NotifyMailer() {
-        $this->core = CMSRegistry::$instance;
-
         $this->FromName = Brick::$builder->phrase->Get('sys', 'site_name');
         $this->From = Brick::$builder->phrase->Get('sys', 'admin_mail');
         $this->AltBody = "To view the message, please use an HTML compatible email viewer!";
@@ -288,7 +276,7 @@ class NotifyMailer extends PHPMailer {
     }
 
     public function Send() {
-        if ($this->core->db->readonly) {
+        if (Abricos::$db->readonly) {
             return true;
         }
         return parent::Send();
