@@ -121,7 +121,7 @@ class NotifyManager extends Ab_Notification {
 
     public function SendByMailer($email, $subject, $message, $from = '', $fromName = '') {
 
-        $cfg = & Abricos::$config['module']['notify'];
+        $cfg = &Abricos::$config['module']['notify'];
 
         $mailer = new NotifyMailer();
         if (!$mailer->ValidateAddress($email)) {
@@ -211,10 +211,10 @@ class NotifyAbricos {
 
     public function NotifyAbricos() {
 
-        $this->from = Brick::$builder->phrase->Get('sys', 'admin_mail');
-        $this->fromName = Brick::$builder->phrase->Get('sys', 'site_name');
+        $this->from = SystemModule::$instance->GetPhrases()->Get('admin_mail');
+        $this->fromName = SystemModule::$instance->GetPhrases()->Get('site_name');
 
-        $cfg = & Abricos::$config['module']['notify'];
+        $cfg = &Abricos::$config['module']['notify'];
         $this->host = $cfg['host'];
         $this->password = $cfg['password'];
     }
@@ -263,8 +263,8 @@ class NotifyAbricos {
 class NotifyMailer extends PHPMailer {
 
     public function NotifyMailer() {
-        $this->FromName = Brick::$builder->phrase->Get('sys', 'site_name');
-        $this->From = Brick::$builder->phrase->Get('sys', 'admin_mail');
+        $this->FromName = SystemModule::$instance->GetPhrases()->Get('site_name');
+        $this->From = SystemModule::$instance->GetPhrases()->Get('admin_mail');
         $this->AltBody = "To view the message, please use an HTML compatible email viewer!";
         $this->Priority = 3;
         $this->CharSet = "utf-8";
