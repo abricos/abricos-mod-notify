@@ -13,7 +13,7 @@ class NotifyModule extends Ab_Module {
     private $_manager = null;
 
     function __construct() {
-        $this->version = "0.1.3";
+        $this->version = "{C#VERSION}";
         $this->name = "notify";
     }
 

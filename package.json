@@ -1,0 +1,24 @@
+{
+  "name": "abricos-mod-notify",
+  "description": "Notify Module for Abricos Platform",
+  "version": "0.1.4",
+  "author": {
+    "name": "Alexander Kuzmin",
+    "email": "roosit@abricos.org",
+    "web": "http://abricos.org",
+    "twitter": "roositab"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/abricos/abricos-mod-notify.git"
+  },
+  "keywords": [
+    "abricos",
+    "notify"
+  ],
+  "bugs": {
+    "url": "https://github.com/abricos/abricos-mod-notify/issues"
+  },
+  "homepage": "http://abricos.org/mods/notify/"
+}
