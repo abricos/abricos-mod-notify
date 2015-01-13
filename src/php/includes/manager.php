@@ -20,6 +20,8 @@ class NotifyManager extends Ab_Notification {
      */
     public $db = null;
 
+    public $errorInfo = "";
+
     private $emlcounter = 1;
 
     public function NotifyManager(NotifyModule $module){
@@ -120,21 +122,24 @@ class NotifyManager extends Ab_Notification {
             return false;
         }
 
-        if ($cfg['POPBefore']){ // авторизация POP перед SMTP
+        if (isset($cfg['POPBefore']) && $cfg['POPBefore']){ // авторизация POP перед SMTP
             require_once $scriptPath.'class.pop3.php';
             $pop = new POP3();
             $pop->Authorise($cfg['POPHost'], $cfg['POPPort'], 30, $cfg['POPUsername'], $cfg['POPPassword']);
         }
 
-        if ($cfg['SMTP']){ // использовать SMTP
+        if (isset($cfg['SMTP']) && $cfg['SMTP']){ // использовать SMTP
             require_once $scriptPath.'class.smtp.php';
             $mailer->IsSMTP();
-            $mailer->Host = $cfg['SMTPHost'];
+            if (isset($cfg['SMTPHost'])){
+                $mailer->Host = $cfg['SMTPHost'];
+            }
+
             if (intval($cfg['SMTPPort']) > 0){
                 $mailer->Port = intval($cfg['SMTPPort']);
             }
 
-            if ($cfg['SMTPAuth']){
+            if (isset($cfg['SMTPAuth']) && $cfg['SMTPAuth']){
                 $mailer->SMTPAuth = true;
                 $mailer->Username = $cfg['SMTPUsername'];
                 $mailer->Password = $cfg['SMTPPassword'];
@@ -152,25 +157,12 @@ class NotifyManager extends Ab_Notification {
             $mailer->FromName = $fromName;
         }
 
+        $this->errorInfo = "";
+
         $result = $mailer->Send();
 
-        if (!$result && $cfg['errorlog']){
-            $filepath = CWD."/cache/eml";
-            @mkdir($filepath);
-            $filename = $filepath."/error.log";
-
-            $fh = fopen($filename, 'a');
-
-            if (!$fh){
-                return false;
-            }
-
-            $str = date("YmdHis", time())." ";
-            $str .= $mailer->ErrorInfo."\n";
-
-            fwrite($fh, $str);
-            fflush($fh);
-            fclose($fh);
+        if (!$result){
+            $this->errorInfo = $mailer->ErrorInfo;
         }
 
         return $result;
