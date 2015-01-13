@@ -1,4 +1,16 @@
 {
   "name": "notify",
-  "core": "^0.6.0"
+  "core": "^0.6.0",
+  "vendor": {
+    "PHPMailer": {
+      "endpoint": "https://github.com/PHPMailer/PHPMailer.git#v5.2.9",
+      "build": [
+        "class.phpmailer.php",
+        "class.pop3.php",
+        "class.smtp.php",
+        "README.md",
+        "LICENSE"
+      ]
+    }
+  }
 }

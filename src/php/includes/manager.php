@@ -1,11 +1,9 @@
 <?php
 
 /**
- * @version $Id$
  * @package Abricos
  * @subpackage Notify
  * @copyright Copyright (C) 2008 Abricos. All rights reserved.
- * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
  * @author Alexander Kuzmin (roosit@abricos.org)
  */
 class NotifyManager extends Ab_Notification {
@@ -22,36 +20,25 @@ class NotifyManager extends Ab_Notification {
      */
     public $db = null;
 
-
-    // TODO: remove
-    private $user = null;
-    // TODO: remove
-    private $userid = 0;
-
     private $emlcounter = 1;
 
-    public function NotifyManager(NotifyModule $module) {
-
+    public function NotifyManager(NotifyModule $module){
         $this->module = $module;
         $this->db = Abricos::$db;
     }
 
-    public function SendMail($email, $subject, $message, $from = '', $fromName = '') {
-        /*
-        // настройки конфига
-        $config['module']['notify']['type'] = "abricos";
-        /**/
-        $cfg = Abricos::$config['module']['notify'];
+    public function SendMail($email, $subject, $message, $from = '', $fromName = ''){
+        $cfg = isset(Abricos::$config['module']['notify']) ? Abricos::$config['module']['notify'] : array();
 
-        if ($cfg['totestfile']) {
+        if (isset($cfg['totestfile']) && $cfg['totestfile']){
 
             $filepath = CWD."/cache/eml";
             @mkdir($filepath);
             $filename = $filepath."/".date("YmdHis", time())."-".($this->emlcounter++).".htm";
 
-            $fh = fopen($filename, 'a');
+            $fh = @fopen($filename, 'a');
 
-            if (!$fh) {
+            if (!$fh){
                 return false;
             }
 
@@ -81,15 +68,9 @@ class NotifyManager extends Ab_Notification {
 
             return true;
         } else {
-            switch ($cfg['type']) {
-                case 'abricos':
-                    return $this->SendByAbricos($email, $subject, $message, $from, $fromName);
-                default:
-                    return $this->SendByMailer($email, $subject, $message, $from, $fromName);
-            }
+            return $this->SendByMailer($email, $subject, $message, $from, $fromName);
         }
     }
-
 
     /**
      * Отправка почты через PHPMailer
@@ -119,29 +100,41 @@ class NotifyManager extends Ab_Notification {
      * @param string $fromName
      */
 
-    public function SendByMailer($email, $subject, $message, $from = '', $fromName = '') {
+    public function SendByMailer($email, $subject, $message, $from = '', $fromName = ''){
 
         $cfg = &Abricos::$config['module']['notify'];
 
-        $mailer = new NotifyMailer();
-        if (!$mailer->ValidateAddress($email)) {
+        $scriptPath = CWD."/vendor/PHPMailer/";
+
+        require_once $scriptPath.'class.phpmailer.php';
+
+        $mailer = new PHPMailer();
+
+        $mailer->FromName = SystemModule::$instance->GetPhrases()->Get('site_name');
+        $mailer->From = SystemModule::$instance->GetPhrases()->Get('admin_mail');
+        $mailer->AltBody = "To view the message, please use an HTML compatible email viewer!";
+        $mailer->Priority = 3;
+        $mailer->CharSet = "utf-8";
+
+        if (!$mailer->ValidateAddress($email)){
             return false;
         }
 
-        if ($cfg['POPBefore']) { // авторизация POP перед SMTP
-            require_once 'phpmailer/class.pop3.php';
+        if ($cfg['POPBefore']){ // авторизация POP перед SMTP
+            require_once $scriptPath.'class.pop3.php';
             $pop = new POP3();
-            $res = $pop->Authorise($cfg['POPHost'], $cfg['POPPort'], 30, $cfg['POPUsername'], $cfg['POPPassword']);
+            $pop->Authorise($cfg['POPHost'], $cfg['POPPort'], 30, $cfg['POPUsername'], $cfg['POPPassword']);
         }
 
-        if ($cfg['SMTP']) { // использовать SMTP
+        if ($cfg['SMTP']){ // использовать SMTP
+            require_once $scriptPath.'class.smtp.php';
             $mailer->IsSMTP();
             $mailer->Host = $cfg['SMTPHost'];
-            if (intval($cfg['SMTPPort']) > 0) {
+            if (intval($cfg['SMTPPort']) > 0){
                 $mailer->Port = intval($cfg['SMTPPort']);
             }
 
-            if ($cfg['SMTPAuth']) {
+            if ($cfg['SMTPAuth']){
                 $mailer->SMTPAuth = true;
                 $mailer->Username = $cfg['SMTPUsername'];
                 $mailer->Password = $cfg['SMTPPassword'];
@@ -152,23 +145,23 @@ class NotifyManager extends Ab_Notification {
         $mailer->Subject = $subject;
         $mailer->MsgHTML($message);
         $mailer->AddAddress($email);
-        if (!empty($from)) {
+        if (!empty($from)){
             $mailer->From = $from;
         }
-        if (!empty($fromName)) {
+        if (!empty($fromName)){
             $mailer->FromName = $fromName;
         }
 
         $result = $mailer->Send();
 
-        if (!$result && $cfg['errorlog']) {
+        if (!$result && $cfg['errorlog']){
             $filepath = CWD."/cache/eml";
             @mkdir($filepath);
             $filename = $filepath."/error.log";
 
             $fh = fopen($filename, 'a');
 
-            if (!$fh) {
+            if (!$fh){
                 return false;
             }
 
@@ -182,106 +175,6 @@ class NotifyManager extends Ab_Notification {
 
         return $result;
     }
-
-    public function SendByAbricos($email, $subject, $message, $from = '', $fromName = '') {
-        $mailer = new NotifyAbricos();
-        $mailer->email = $email;
-        $mailer->subject = $subject;
-        $mailer->message = $message;
-        if (!empty($from)) {
-            $mailer->from = $from;
-        }
-        if (!empty($fromName)) {
-            $mailer->fromName = $fromName;
-        }
-        $mailer->Send();
-    }
 }
-
-class NotifyAbricos {
-
-    public $fromName = "";
-    public $from = "";
-    public $email = "";
-    public $subject = "";
-    public $message = "";
-
-    private $host = "";
-    private $password = "";
-
-    public function NotifyAbricos() {
-
-        $this->from = SystemModule::$instance->GetPhrases()->Get('admin_mail');
-        $this->fromName = SystemModule::$instance->GetPhrases()->Get('site_name');
-
-        $cfg = &Abricos::$config['module']['notify'];
-        $this->host = $cfg['host'];
-        $this->password = $cfg['password'];
-    }
-
-    private function EncodeParam($arr) {
-        $data = array();
-        foreach ($arr as $name => $value) {
-            array_push($data, $name."=".urlencode($value));
-        }
-        return implode("&", $data);
-    }
-
-    public function Send() {
-        $data = $this->EncodeParam(array(
-            "from" => $this->from,
-            "fromname" => $this->fromName,
-            "body" => $this->message,
-            "subject" => $this->subject,
-            "to" => $this->email,
-            "password" => $this->password
-        ));
-
-        $fp = fsockopen($this->host, 80, $errno, $errstr, 10);
-        if ($fp) {
-
-            $out = "POST /mailer/send/ HTTP/1.1\r\n";
-            $out .= "Host: ".$this->host."\r\n";
-            $out .= "User-Agent: Opera/8.50 (Windows NT 5.1; U; ru)\r\n";
-            $out .= "Content-Type: application/x-www-form-urlencoded\r\n";
-            $out .= "Content-Length: ".strlen($data)."\r\n\r\n";
-            $out .= $data."\r\n\r\n";
-
-            fputs($fp, $out); // отправляем данные
-
-            /*
-            while($gets=fgets($fp,2048)){
-                // print $gets;
-            }
-            /**/
-            fclose($fp);
-        }
-        return true;
-    }
-}
-
-class NotifyMailer extends PHPMailer {
-
-    public function NotifyMailer() {
-        $this->FromName = SystemModule::$instance->GetPhrases()->Get('site_name');
-        $this->From = SystemModule::$instance->GetPhrases()->Get('admin_mail');
-        $this->AltBody = "To view the message, please use an HTML compatible email viewer!";
-        $this->Priority = 3;
-        $this->CharSet = "utf-8";
-    }
-
-    public function MsgHTML($message, $basedir = '') {
-        $message = "<html><body>".$message."</body></html>";
-        parent::MsgHTML($message, $basedir);
-    }
-
-    public function Send() {
-        if (Abricos::$db->readonly) {
-            return true;
-        }
-        return parent::Send();
-    }
-}
-
 
 ?>

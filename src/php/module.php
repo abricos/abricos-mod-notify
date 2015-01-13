@@ -24,7 +24,6 @@ class NotifyModule extends Ab_Module {
      */
     public function GetManager() {
         if (is_null($this->_manager)) {
-            require_once 'includes/phpmailer/class.phpmailer.php';
             require_once 'includes/manager.php';
 
             $this->_manager = new NotifyManager($this);
