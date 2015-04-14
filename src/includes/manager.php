@@ -49,7 +49,7 @@ class NotifyManager extends Ab_Notification {
             @mkdir($filepath);
             $filename = $filepath."/".date("YmdHis", time())."-".($this->emlcounter++).".htm";
 
-            $fh = fopen($filename, 'a');
+            $fh = @fopen($filename, 'a');
 
             if (!$fh) {
                 return false;
