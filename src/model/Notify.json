@@ -1,0 +1,66 @@
+{
+  "version": "0.1.0",
+  "type": "model",
+  "fields": {
+    "id": {
+      "type": "int",
+      "dbField": "notifyid"
+    },
+    "module": {
+      "type": "string",
+      "json": "m"
+    },
+    "type": {
+      "type": "string",
+      "json": "t"
+    },
+    "ownerid": {
+      "type": "int",
+      "json": "i"
+    },
+    "userid": {
+      "type": "int",
+      "json": "uid"
+    },
+
+    "emailSubject": {
+      "type": "string",
+      "json": "emlsbj"
+    },
+    "emailBody": {
+      "type": "string",
+      "json": "emlbd"
+    },
+    "emailURI": {
+      "type": "string",
+      "json": "emluri"
+    },
+    "emailDate": {
+      "type": "date",
+      "json": "emldt"
+    },
+
+    "bosSubject": {
+      "type": "string",
+      "json": "bossbj"
+    },
+    "bosBody": {
+      "type": "string",
+      "json": "bosbd"
+    },
+    "bosURI": {
+      "type": "string",
+      "json": "bosuri"
+    },
+    "bosDate": {
+      "type": "date",
+      "json": "bosdt"
+    },
+
+
+    "dateline": {
+      "type": "date",
+      "json": "dl"
+    }
+  }
+}

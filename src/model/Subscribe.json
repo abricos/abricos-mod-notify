@@ -1,0 +1,42 @@
+{
+  "version": "0.1.0",
+  "type": "model",
+  "fields": {
+    "id": {
+      "type": "int",
+      "dbField": "subscribeid"
+    },
+    "module": {
+      "type": "string",
+      "json": "m"
+    },
+    "type": {
+      "type": "string",
+      "json": "t"
+    },
+    "ownerid": {
+      "type": "int",
+      "json": "i"
+    },
+    "userid": {
+      "type": "int",
+      "json": "uid"
+    },
+    "emailStatus": {
+      "type": "int",
+      "json": "emlst"
+    },
+    "bosStatus": {
+      "type": "int",
+      "json": "bosst"
+    },
+    "pubkey": {
+      "type": "string",
+      "json": "pkey"
+    },
+    "dateline": {
+      "type": "date",
+      "json": "dl"
+    }
+  }
+}

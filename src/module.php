@@ -1,37 +1,56 @@
 <?php
-
 /**
- * Notify Module
- * 
  * @package Abricos
  * @subpackage Notify
- * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
+ * @copyright 2008-2015 Alexander Kuzmin
+ * @license http://opensource.org/licenses/mit-license.php MIT License
  * @author Alexander Kuzmin <roosit@abricos.org>
+ */
+
+/**
+ * Class NotifyModule
+ *
+ * @method NotifyManager GetManager()
  */
 class NotifyModule extends Ab_Module {
 
-    private $_manager = null;
-
-    function __construct() {
-        $this->version = "0.1.3";
+    function __construct(){
+        $this->version = "0.1.4";
         $this->name = "notify";
+
+        $this->permission = new NotifyPermission($this);
     }
 
-    /**
-     * Получить менеджер
-     *
-     * @return NotifyManager
-     */
-    public function GetManager() {
-        if (is_null($this->_manager)) {
-            require_once 'includes/phpmailer/class.phpmailer.php';
-            require_once 'includes/manager.php';
+}
 
-            $this->_manager = new NotifyManager($this);
-        }
-        return $this->_manager;
+class NotifyAction {
+    const ADMIN = 50;
+    const WRITE = 30;
+    const VIEW = 10;
+}
+
+class NotifyPermission extends Ab_UserPermission {
+
+    public function NotifyPermission(NotifyModule $module){
+        $defRoles = array(
+            new Ab_UserRole(NotifyAction::VIEW, Ab_UserGroup::REGISTERED),
+            new Ab_UserRole(NotifyAction::VIEW, Ab_UserGroup::ADMIN),
+
+            new Ab_UserRole(NotifyAction::WRITE, Ab_UserGroup::REGISTERED),
+            new Ab_UserRole(NotifyAction::WRITE, Ab_UserGroup::ADMIN),
+
+            new Ab_UserRole(NotifyAction::ADMIN, Ab_UserGroup::ADMIN)
+        );
+        parent::__construct($module, $defRoles);
     }
 
+    public function GetRoles(){
+        return array(
+            NotifyAction::VIEW => $this->CheckAction(NotifyAction::VIEW),
+            NotifyAction::WRITE => $this->CheckAction(NotifyAction::WRITE),
+            NotifyAction::ADMIN => $this->CheckAction(NotifyAction::ADMIN)
+        );
+    }
 }
 
 Abricos::ModuleRegister(new NotifyModule());

@@ -36,3 +36,7 @@ In this folder /cache/eml should have write access (chmod 777).
 		"totestfile" => true
 	);
  
+## License
+Copyright (c) 2008-2015 Alexander Kuzmin
+
+Licensed under the MIT License (MIT)
