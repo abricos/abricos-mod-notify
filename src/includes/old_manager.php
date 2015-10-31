@@ -12,7 +12,7 @@
  *
  * @property NotifyModule $module
  */
-class NotifyManager extends Ab_Notification {
+class old_NotifyManager extends Ab_Notification {
 
     private $emlcounter = 1;
 

@@ -19,7 +19,7 @@ class NotifyManager extends Ab_ModuleManager {
     }
 
     public function IsWriteRole(){
-        if ($this->IsModerRole()){
+        if ($this->IsAdminRole()){
             return true;
         }
         return $this->IsRoleEnable(NotifyAction::WRITE);

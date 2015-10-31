@@ -13,6 +13,32 @@
  */
 class NotifyQuery {
 
+    public static function Subscribe(NotifyApp $app, NotifyOwner $owner, $userid = 0){
+        $userid = $userid > 0 ? $userid : Abricos::$user->id;
+        $db = $app->db;
+        $sql = "
+			SELECT *
+			FROM ".$db->prefix."notify_subscribe
+			WHERE userid=".bkint($userid)."
+			    AND ownerModule='".bkstr($owner->module)."'
+			    AND ownerType='".bkstr($owner->type)."'
+			    AND ownerid=".intval($owner->ownerid)."
+			LIMIT 1
+		";
+        return $db->query_first($sql);
+    }
+
+    public static function SubscribeList(NotifyApp $app, $userid = 0){
+        $userid = $userid > 0 ? $userid : Abricos::$user->id;
+        $db = $app->db;
+        $sql = "
+			SELECT *
+			FROM ".$db->prefix."notify_subscribe
+			WHERE userid=".bkint($userid)."
+		";
+        return $db->query_read($sql);
+    }
+
 }
 
 ?>
