@@ -17,24 +17,39 @@ if ($updateManager->isUpdate('0.1.4')){
     Abricos::GetModule('notify')->permission->Install();
 
     $db->query_write("
-        CREATE TABLE IF NOT EXISTS ".$pfx."notify_subscribe (
-            subscribeid int(10) UNSIGNED NOT NULL auto_increment,
+        CREATE TABLE IF NOT EXISTS ".$pfx."notify_owner (
+            ownerid int(10) UNSIGNED NOT NULL auto_increment,
 
             ownerModule VARCHAR(32) NOT NULL DEFAULT '' COMMENT 'Owner Module Name',
             ownerType VARCHAR(16) NOT NULL DEFAULT '' COMMENT 'Owner Type',
-            ownerid int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Owner ID',
+            ownerMethod VARCHAR(16) NOT NULL DEFAULT '' COMMENT 'Owner Method',
+            ownerItemId int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Owner Item ID',
+
+			status ENUM('on', 'off') DEFAULT 'on' COMMENT '',
+
+			dateline int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Create Date',
+
+            PRIMARY KEY (ownerid),
+            UNIQUE KEY owner (ownerModule, ownerType, ownerMethod, ownerItemId)
+        )".$charset
+    );
+
+    $db->query_write("
+        CREATE TABLE IF NOT EXISTS ".$pfx."notify_subscribe (
+            subscribeid int(10) UNSIGNED NOT NULL auto_increment,
 
             userid int(10) UNSIGNED NOT NULL COMMENT 'User ID',
+            ownerid int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Owner ID',
 
-			emailStatus tinyint(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT '0-unsubscribe, 1-subscribe',
-			bosStatus tinyint(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT '0-unsubscribe, 1-subscribe',
+			status ENUM('unset', 'on', 'off') DEFAULT 'unset' COMMENT '',
+			emailStatus ENUM('unset', 'on', 'off') DEFAULT 'unset' COMMENT '',
 
 			pubkey char(32) NOT NULL DEFAULT '' COMMENT 'Public Key',
 
 			dateline int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Create Date',
 
             PRIMARY KEY (subscribeid),
-            UNIQUE KEY subscribe (userid, ownerModule, ownerType, ownerid),
+            UNIQUE KEY subscribe (userid, ownerid),
             KEY userid (userid)
         )".$charset
     );
@@ -43,11 +58,8 @@ if ($updateManager->isUpdate('0.1.4')){
         CREATE TABLE IF NOT EXISTS ".$pfx."notify (
             notifyid int(10) UNSIGNED NOT NULL auto_increment,
 
-            ownerModule VARCHAR(32) NOT NULL DEFAULT '' COMMENT 'Owner Module Name',
-            ownerType VARCHAR(16) NOT NULL DEFAULT '' COMMENT 'Owner Type',
-            ownerid int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Owner ID',
-
             userid int(10) UNSIGNED NOT NULL COMMENT 'User ID',
+            ownerid int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Owner ID',
 
             emailSubject VARCHAR(255) NOT NULL DEFAULT '' COMMENT '',
 			emailBody text NOT NULL COMMENT '',
@@ -62,7 +74,7 @@ if ($updateManager->isUpdate('0.1.4')){
 			dateline int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Create Date',
 
             PRIMARY KEY (notifyid),
-            UNIQUE KEY notify (userid, ownerModule, ownerType, ownerid),
+            UNIQUE KEY notify (userid, ownerid),
             KEY userid (userid)
         )".$charset
     );

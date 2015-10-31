@@ -27,12 +27,16 @@ class NotifyOwner extends AbricosModel {
  * @property string $type
  * @property int $ownerid
  * @property int $userid
- * @property int $emailStatus
- * @property int $bosStatus
+ * @property string $emailStatus
+ * @property string $bosStatus
  * @property string $pubkey
  * @property int $dateline
  */
 class NotifySubscribe extends AbricosModel {
+    const STATUS_UNSET = 'unset';
+    const STATUS_ON = 'on';
+    const STATUS_OFF = 'off';
+    
     protected $_structModule = 'notify';
     protected $_structName = 'Subscribe';
 }
@@ -44,4 +48,5 @@ class NotifySubscribe extends AbricosModel {
  */
 class NotifySubscribeList extends AbricosModelList {
 }
+
 ?>

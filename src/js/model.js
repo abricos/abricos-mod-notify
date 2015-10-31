@@ -44,6 +44,21 @@ Component.entryPoint = function(NS){
 
     NS.Subscribe = Y.Base.create('subscribe', SYS.AppModel, [], {
         structureName: 'Subscribe'
+    }, {
+        STATUS_UNSET: 'unset',
+        STATUS_ON: 'on',
+        STATUS_OFF: 'off',
+        isUnset: function(subscribe){
+            if (!subscribe){
+                return NS.Subscribe.STATUS_UNSET;
+            }
+        },
+        isOn: function(subscribe){
+            if (!subscribe){
+                return false;
+            }
+
+        }
     });
 
     NS.SubscribeList = Y.Base.create('subscribeList', SYS.AppModelList, [], {

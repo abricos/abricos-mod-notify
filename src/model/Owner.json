@@ -2,6 +2,10 @@
   "version": "0.1.0",
   "type": "model",
   "fields": {
+    "id": {
+      "type": "int",
+      "dbField": "ownerid"
+    },
     "module": {
       "type": "string",
       "json": "m"
@@ -10,9 +14,14 @@
       "type": "string",
       "json": "t"
     },
-    "ownerid": {
+    "itemid": {
       "type": "int",
       "json": "i"
+    },
+    "status": {
+      "type": "int",
+      "valid": "on,off",
+      "json": "st"
     }
   }
 }
