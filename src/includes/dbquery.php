@@ -32,9 +32,12 @@ class NotifyQuery {
         $userid = $userid > 0 ? $userid : Abricos::$user->id;
         $db = $app->db;
         $sql = "
-			SELECT *
-			FROM ".$db->prefix."notify_subscribe
-			WHERE userid=".bkint($userid)."
+			SELECT
+			  s.*,
+			  o.*
+			FROM ".$db->prefix."notify_subscribe s
+			INNER JOIN ".$db->prefix."notify_owner o ON s.ownerid=o.ownerid
+			WHERE s.userid=".bkint($userid)."
 		";
         return $db->query_read($sql);
     }

@@ -41,13 +41,18 @@ Component.entryPoint = function(NS){
     }, [], {
         ATTRS: {
             Owner: {value: NS.Owner},
+            OwnerList: {value: NS.OwnerList},
             Subscribe: {value: NS.Subscribe},
             SubscribeList: {value: NS.SubscribeList},
             Config: {value: NS.Config}
         },
         REQS: {
+            ownerList: {
+                // attribute: true,
+                type: 'modelList:OwnerList',
+            },
             subscribeList: {
-                attribute: true,
+                // attribute: true,
                 type: 'modelList:SubscribeList',
             },
             config: {

@@ -12,23 +12,35 @@
  *
  * @property string $module
  * @property string $type
+ * @property string $method
  * @property int $ownerid
+ * @property string $status
  */
 class NotifyOwner extends AbricosModel {
+    const STATUS_ON = 'on';
+    const STATUS_OFF = 'off';
+
     protected $_structModule = 'notify';
     protected $_structName = 'Owner';
 }
+
+/**
+ * Class NotifyOwnerList
+ * @method NotifyOwner Get($id)
+ * @method NotifyOwner GetByIndex($index)
+ */
+class NotifyOwnerList extends AbricosModelList {
+}
+
 
 
 /**
  * Class NotifySubscribe
  *
- * @property string $module
- * @property string $type
  * @property int $ownerid
  * @property int $userid
+ * @property string $status
  * @property string $emailStatus
- * @property string $bosStatus
  * @property string $pubkey
  * @property int $dateline
  */
@@ -47,6 +59,11 @@ class NotifySubscribe extends AbricosModel {
  * @method NotifySubscribe GetByIndex($index)
  */
 class NotifySubscribeList extends AbricosModelList {
+
+    /**
+     * @var NotifyOwnerList
+     */
+    public $ownerList;
 }
 
 ?>

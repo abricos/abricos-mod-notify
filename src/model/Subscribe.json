@@ -6,31 +6,22 @@
       "type": "int",
       "dbField": "subscribeid"
     },
-    "module": {
-      "type": "string",
-      "dbField": "ownerModule",
-      "json": "m"
-    },
-    "type": {
-      "type": "string",
-      "dbField": "ownerType",
-      "json": "t"
-    },
     "ownerid": {
       "type": "int",
-      "json": "i"
+      "json": "oid"
     },
     "userid": {
       "type": "int",
       "json": "uid"
     },
+    "status": {
+      "type": "string",
+      "valid": "unset,on,off",
+      "json": "st"
+    },
     "emailStatus": {
       "type": "string",
       "json": "emlst"
-    },
-    "bosStatus": {
-      "type": "string",
-      "json": "bosst"
     },
     "pubkey": {
       "type": "string",

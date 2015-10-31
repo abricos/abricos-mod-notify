@@ -8,18 +8,27 @@
     },
     "module": {
       "type": "string",
-      "json": "m"
+      "dbField": "ownerModule",
+      "json": "md"
     },
     "type": {
       "type": "string",
-      "json": "t"
+      "dbField": "ownerType",
+      "json": "tp"
+    },
+    "method": {
+      "type": "string",
+      "dbField": "ownerMethod",
+      "json": "mt"
     },
     "itemid": {
       "type": "int",
+      "dbField": "ownerItemId",
       "json": "i"
     },
     "status": {
-      "type": "int",
+      "type": "string",
+      "dbField": "ownerStatus",
       "valid": "on,off",
       "json": "st"
     }

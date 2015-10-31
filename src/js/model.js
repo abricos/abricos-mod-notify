@@ -21,6 +21,7 @@ Component.entryPoint = function(NS){
 
     NS.Owner = Y.Base.create('owner', SYS.AppModel, [], {
         structureName: 'Owner',
+        /*
         compare: function(val){
             if (!NS.Owner.isOwner(val)){
                 return false;
@@ -29,6 +30,7 @@ Component.entryPoint = function(NS){
                 && val.get('type') === this.get('type')
                 && val.get('ownerid') === this.get('ownerid');
         }
+        /**/
     }, {
         ATTRIBUTE: {
             validator: isOwner,
@@ -40,6 +42,10 @@ Component.entryPoint = function(NS){
             }
         },
         isOwner: isOwner
+    });
+
+    NS.OwnerList = Y.Base.create('ownerList', SYS.AppModelList, [], {
+        appItem: NS.Owner
     });
 
     NS.Subscribe = Y.Base.create('subscribe', SYS.AppModel, [], {

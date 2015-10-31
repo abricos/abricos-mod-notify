@@ -25,9 +25,7 @@ if ($updateManager->isUpdate('0.1.4')){
             ownerMethod VARCHAR(16) NOT NULL DEFAULT '' COMMENT 'Owner Method',
             ownerItemId int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Owner Item ID',
 
-			status ENUM('on', 'off') DEFAULT 'on' COMMENT '',
-
-			dateline int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Create Date',
+			ownerStatus ENUM('on', 'off') DEFAULT 'on' COMMENT '',
 
             PRIMARY KEY (ownerid),
             UNIQUE KEY owner (ownerModule, ownerType, ownerMethod, ownerItemId)
@@ -38,8 +36,8 @@ if ($updateManager->isUpdate('0.1.4')){
         CREATE TABLE IF NOT EXISTS ".$pfx."notify_subscribe (
             subscribeid int(10) UNSIGNED NOT NULL auto_increment,
 
-            userid int(10) UNSIGNED NOT NULL COMMENT 'User ID',
             ownerid int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Owner ID',
+            userid int(10) UNSIGNED NOT NULL COMMENT 'User ID',
 
 			status ENUM('unset', 'on', 'off') DEFAULT 'unset' COMMENT '',
 			emailStatus ENUM('unset', 'on', 'off') DEFAULT 'unset' COMMENT '',
@@ -49,7 +47,7 @@ if ($updateManager->isUpdate('0.1.4')){
 			dateline int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Create Date',
 
             PRIMARY KEY (subscribeid),
-            UNIQUE KEY subscribe (userid, ownerid),
+            UNIQUE KEY subscribe (ownerid, userid),
             KEY userid (userid)
         )".$charset
     );
@@ -58,8 +56,8 @@ if ($updateManager->isUpdate('0.1.4')){
         CREATE TABLE IF NOT EXISTS ".$pfx."notify (
             notifyid int(10) UNSIGNED NOT NULL auto_increment,
 
-            userid int(10) UNSIGNED NOT NULL COMMENT 'User ID',
             ownerid int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Owner ID',
+            userid int(10) UNSIGNED NOT NULL COMMENT 'User ID',
 
             emailSubject VARCHAR(255) NOT NULL DEFAULT '' COMMENT '',
 			emailBody text NOT NULL COMMENT '',
@@ -74,7 +72,7 @@ if ($updateManager->isUpdate('0.1.4')){
 			dateline int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Create Date',
 
             PRIMARY KEY (notifyid),
-            UNIQUE KEY notify (userid, ownerid),
+            UNIQUE KEY notify (ownerid, userid),
             KEY userid (userid)
         )".$charset
     );

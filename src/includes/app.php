@@ -19,13 +19,15 @@ class NotifyApp extends AbricosApplication {
 
     protected function GetClasses(){
         return array(
+            'Owner' => 'NotifyOwner',
+            'OwnerList' => 'NotifyOwnerList',
             'Subscribe' => 'NotifySubscribe',
             'SubscribeList' => 'NotifySubscribeList',
         );
     }
 
     protected function GetStructures(){
-        return 'Subscribe';
+        return 'Owner,Subscribe';
     }
 
     public function ResponseToJSON($d){
@@ -73,8 +75,15 @@ class NotifyApp extends AbricosApplication {
     }
 
     public function SubscribeListToJSON(){
-        $ret = $this->SubscribeList();
-        return $this->ResultToJSON('subscribeList', $ret);
+        $res = $this->SubscribeList();
+        $ret = $this->ResultToJSON('subscribeList', $res);
+        if (!AbricosResponse::IsError($res)){
+            $ret = $this->ImplodeJSON(
+                $this->ResultToJSON('ownerList', $res->ownerList),
+                $ret
+            );
+        }
+        return $ret;
     }
 
     public function SubscribeList(){
@@ -82,12 +91,23 @@ class NotifyApp extends AbricosApplication {
             return AbricosResponse::ERR_FORBIDDEN;
         }
 
-        /** @var SubscribeList $list */
+        /** @var NotifySubscribeList $list */
         $list = $this->InstanceClass('SubscribeList');
-        $rows = NotifyQuery::SubscribeList($this);
 
+        /** @var NotifyOwnerList $ownerList */
+        $ownerList = $this->InstanceClass('OwnerList');
+
+        $list->ownerList = $ownerList;
+
+        $rows = NotifyQuery::SubscribeList($this);
         while (($d = $this->db->fetch_array($rows))){
-            /** @var Subscribe $subscribe */
+
+            /** @var NotifyOwner $owner */
+            $owner = $this->InstanceClass('Owner', $d);
+
+            $ownerList->Add($owner);
+
+            /** @var NotifySubscribe $subscribe */
             $subscribe = $this->InstanceClass('Subscribe', $d);
             $list->Add($subscribe);
         }
