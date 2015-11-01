@@ -31,7 +31,7 @@ Component.entryPoint = function(NS){
         ATTRS: {
             component: {value: COMPONENT},
             templateBlockName: {value: 'widget'},
-            owner: NS.Owner.ATTRIBUTE,
+            owner: {},
             subscribe: {value: null},
             changeDisable: {value: false}
         },

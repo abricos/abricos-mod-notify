@@ -35,7 +35,7 @@ class NotifyApp extends AbricosApplication {
             case 'ownerBaseList':
                 return $this->OwnerBaseListToJSON();
             case 'subscribeList':
-                return $this->SubscribeListToJSON();
+                return $this->SubscribeListToJSON($d->module);
         }
         return null;
     }
@@ -112,8 +112,8 @@ class NotifyApp extends AbricosApplication {
         return $subscribe;
     }
 
-    public function SubscribeListToJSON(){
-        $res = $this->SubscribeList();
+    public function SubscribeListToJSON($module){
+        $res = $this->SubscribeList($module);
         $ret = $this->ResultToJSON('subscribeList', $res);
         if (!AbricosResponse::IsError($res)){
             $ret = $this->ImplodeJSON(
@@ -124,7 +124,7 @@ class NotifyApp extends AbricosApplication {
         return $ret;
     }
 
-    public function SubscribeList(){
+    public function SubscribeList($module){
         if (!$this->manager->IsViewRole()){
             return AbricosResponse::ERR_FORBIDDEN;
         }
@@ -137,7 +137,7 @@ class NotifyApp extends AbricosApplication {
 
         $list->ownerList = $ownerList;
 
-        $rows = NotifyQuery::SubscribeList($this);
+        $rows = NotifyQuery::SubscribeList($this, $module);
         while (($d = $this->db->fetch_array($rows))){
 
             /** @var NotifyOwner $owner */

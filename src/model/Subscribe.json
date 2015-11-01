@@ -16,16 +16,20 @@
     },
     "status": {
       "type": "string",
+      "default": "unset",
       "valid": "unset,on,off",
       "json": "st"
     },
     "emailStatus": {
       "type": "string",
+      "default": "unset",
+      "valid": "unset,on,off",
+      "notNULL": true,
       "json": "emlst"
     },
     "pubkey": {
       "type": "string",
-      "json": "pkey"
+      "json": "pk"
     },
     "dateline": {
       "type": "date",

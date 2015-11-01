@@ -58,7 +58,7 @@ class NotifyQuery {
         return $db->query_first($sql);
     }
 
-    public static function SubscribeList(NotifyApp $app, $userid = 0){
+    public static function SubscribeList(NotifyApp $app, $module, $userid = 0){
         $userid = $userid > 0 ? $userid : Abricos::$user->id;
         $db = $app->db;
         $sql = "
@@ -67,7 +67,7 @@ class NotifyQuery {
 			  o.*
 			FROM ".$db->prefix."notify_subscribe s
 			INNER JOIN ".$db->prefix."notify_owner o ON s.ownerid=o.ownerid
-			WHERE s.userid=".bkint($userid)."
+			WHERE o.ownerModule='".bkstr($module)."' AND s.userid=".bkint($userid)."
 		";
         return $db->query_read($sql);
     }

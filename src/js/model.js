@@ -8,36 +8,11 @@ Component.entryPoint = function(NS){
     var Y = Brick.YUI,
         SYS = Brick.mod.sys;
 
-
-    var isOwner = function(val){
-        if (!val){
-            return false;
-        }
-        if (!Y.Lang.isFunction(val.get)){
-            return false;
-        }
-        return true;
-    };
-
     NS.Owner = Y.Base.create('owner', SYS.AppModel, [], {
         structureName: 'Owner',
-        /*
-         compare: function(val){
-         if (!NS.Owner.isOwner(val)){
-         return false;
-         }
-         return val.get('module') === this.get('module')
-         && val.get('type') === this.get('type')
-         && val.get('ownerid') === this.get('ownerid');
-         }
-         /**/
-        isEnable: function(){
-            console.log('-------------');
-            var parent = this.get('parent');
-            console.log('!!!!!!!!!!!!!!!!!!!');
-            return this.get('status') === NS.Owner.STATUS_ON;
-        }
     }, {
+        STATUS_ON: 'on',
+        STATUS_OFF: 'off',
         ATTRS: {
             parent: {
                 readOnly: true,
@@ -50,23 +25,26 @@ Component.entryPoint = function(NS){
                             val = this.appInstance.get('ownerBaseList').getById(parentid);
                         }
                     }
-
+                    return val;
+                }
+            },
+            enable: {
+                readOnly: true,
+                getter: function(val){
+                    if (Y.Lang.isUndefined(val)){
+                        var parent = this;
+                        while (parent){
+                            val = parent.get('status') === NS.Owner.STATUS_ON;
+                            if (!val){
+                                break;
+                            }
+                            parent = parent.get('parent');
+                        }
+                    }
                     return val;
                 }
             }
         },
-        ATTRIBUTE: {
-            validator: isOwner,
-            setter: function(val){
-                if (val.module && val.type && val.ownerid){
-                    return this.get('appInstance').ownerCreate(val.module, val.type, val.ownerid);
-                }
-                return val;
-            }
-        },
-        isOwner: isOwner,
-        STATUS_ON: 'on',
-        STATUS_OFF: 'off',
     });
 
     NS.OwnerList = Y.Base.create('ownerList', SYS.AppModelList, [], {
@@ -91,7 +69,6 @@ Component.entryPoint = function(NS){
             }, this);
             return ret;
         }
-
     });
 
     NS.Subscribe = Y.Base.create('subscribe', SYS.AppModel, [], {
@@ -100,21 +77,60 @@ Component.entryPoint = function(NS){
         STATUS_UNSET: 'unset',
         STATUS_ON: 'on',
         STATUS_OFF: 'off',
-        isUnset: function(subscribe){
-            if (!subscribe){
-                return NS.Subscribe.STATUS_UNSET;
+        ATTRS: {
+            owner: {
+                readOnly: true,
+                getter: function(val){
+                    if (Y.Lang.isUndefined(val)){
+                        var ownerid = this.get('ownerid');
+                        val = this.appInstance.get('ownerList').getById(ownerid);
+                    }
+                    return val;
+                }
             }
-        },
-        isOn: function(subscribe){
-            if (!subscribe){
-                return false;
-            }
-
         }
     });
 
     NS.SubscribeList = Y.Base.create('subscribeList', SYS.AppModelList, [], {
-        appItem: NS.Subscribe
+        appItem: NS.Subscribe,
+        getSubscribe: function(options){
+            options = Y.merge({
+                owner: {},
+                subscribe: {}
+            }, options || {});
+
+            var app = this.appInstance,
+                ownerList = app.get('ownerList'),
+                owner = ownerList.findOwner(options.owner);
+
+            if (!owner){
+                var parent = ownerList.findOwner(Y.merge(options.owner, {itemid: 0}));
+                if (!parent){
+                    return null;
+                }
+                var Owner = app.get('Owner');
+                owner = new Owner(Y.merge(options.owner, {
+                    appInstance: app,
+                    parentid: parent.get('id'),
+                    id: NS.SubscribeList._idCounter--
+                }));
+            }
+            var ownerid = owner.get('id'),
+                subscribe = this.getBy('ownerid', ownerid);
+
+            if (subscribe){
+                return subscribe;
+            }
+            var Subscribe = app.get('Subscribe');
+            subscribe = new Subscribe(Y.merge(options.subscribe, {
+                appInstance: app,
+                ownerid: ownerid,
+                id: NS.SubscribeList._idCounter--
+            }));
+            return subscribe;
+        }
+    }, {
+        _idCounter: -1
     });
 
     NS.Config = Y.Base.create('config', SYS.AppModel, [], {

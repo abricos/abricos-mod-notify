@@ -17,19 +17,6 @@ Component.entryPoint = function(NS){
     });
 
     SYS.Application.build(COMPONENT, {}, {
-        ownerCreate: function(module, type, ownerid){
-            var Owner = this.get('Owner');
-
-            if (Y.Lang.isObject(module)){
-                return new Owner(Y.merge(module, {appInstance: this}));
-            }
-
-            var owner = new Owner({appInstance: this});
-            owner.set('module', module);
-            owner.set('type', type);
-            owner.set('ownerid', ownerid);
-            return owner;
-        },
         initializer: function(){
             var instance = this;
             this.ownerBaseList(function(){
@@ -45,22 +32,37 @@ Component.entryPoint = function(NS){
             OwnerList: {value: NS.OwnerList},
             Subscribe: {value: NS.Subscribe},
             SubscribeList: {value: NS.SubscribeList},
-            Config: {value: NS.Config}
+            Config: {value: NS.Config},
+            ownerList: {
+                readOnly: true,
+                getter:function(){
+                    return this.get('ownerBaseList');
+                }
+            }
         },
         REQS: {
             ownerBaseList: {
                 attribute: true,
                 type: 'modelList:OwnerList',
-                onResponse: function(){
-                    console.log(arguments);
-                }
             },
             ownerList: {
-                // attribute: true,
+                attribute: false,
                 type: 'modelList:OwnerList',
+                onResponse: function(ownerList){
+                    var ownerBaseList = this.get('ownerList'),
+                        ownerid;
+
+                    ownerList.each(function(owner){
+                        ownerid = owner.get('id');
+                        if (ownerBaseList.getById(ownerid)){
+                            ownerBaseList.removeById(ownerid);
+                        }
+                        ownerBaseList.add(owner);
+                    }, this);
+                }
             },
             subscribeList: {
-                // attribute: true,
+                args: ['module'],
                 type: 'modelList:SubscribeList',
             },
             config: {
