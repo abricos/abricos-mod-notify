@@ -13,6 +13,36 @@
  */
 class NotifyQuery {
 
+    public static function OwnerBaseList(NotifyApp $app){
+        $db = $app->db;
+        $sql = "
+			SELECT o.*
+			FROM ".$db->prefix."notify_owner o
+			WHERE o.isBase=1
+		";
+        return $db->query_read($sql);
+    }
+
+    public static function OwnerSave(NotifyApp $app, NotifyOwner $owner){
+        $db = $app->db;
+        $sql = "
+			INSERT INTO ".$db->prefix."notify_owner (
+			    parentid, ownerModule, ownerType, ownerMethod, ownerItemId, ownerStatus, isBase
+			) VALUES (
+			    ".intval($owner->parentid).",
+			    '".bkstr($owner->module)."',
+			    '".bkstr($owner->type)."',
+			    '".bkstr($owner->method)."',
+			    ".intval($owner->itemid).",
+			    '".bkstr($owner->status)."',
+			    ".intval($owner->isBase)."
+			) ON DUPLICATE KEY UPDATE
+			    ownerStatus='".bkstr($owner->status)."'
+		";
+        $db->query_write($sql);
+        return $db->insert_id();
+    }
+
     public static function Subscribe(NotifyApp $app, NotifyOwner $owner, $userid = 0){
         $userid = $userid > 0 ? $userid : Abricos::$user->id;
         $db = $app->db;

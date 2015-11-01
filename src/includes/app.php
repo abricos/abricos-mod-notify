@@ -32,6 +32,8 @@ class NotifyApp extends AbricosApplication {
 
     public function ResponseToJSON($d){
         switch ($d->do){
+            case 'ownerBaseList':
+                return $this->OwnerBaseListToJSON();
             case 'subscribeList':
                 return $this->SubscribeListToJSON();
         }
@@ -54,6 +56,42 @@ class NotifyApp extends AbricosApplication {
         }
 
         return $this->InstanceClass('Owner', $owner);
+    }
+
+    public function OwnerBaseListToJSON(){
+        $res = $this->OwnerBaseList();
+        return $this->ResultToJSON('ownerBaseList', $res);
+    }
+
+    public function OwnerBaseList(){
+        if (isset($this->_cache['OwnerBaseList'])){
+            return $this->_cache['OwnerBaseList'];
+        }
+        if (!$this->manager->IsViewRole()){
+            return AbricosResponse::ERR_FORBIDDEN;
+        }
+
+        /** @var NotifyOwnerList $list */
+        $list = $this->InstanceClass('OwnerList');
+
+        $rows = NotifyQuery::OwnerBaseList($this);
+        while (($d = $this->db->fetch_array($rows))){
+
+            /** @var NotifyOwner $owner */
+            $owner = $this->InstanceClass('Owner', $d);
+
+            $list->Add($owner);
+        }
+
+        return $this->_cache['OwnerBaseList'] = $list;
+    }
+
+    public function OwnerSave($d){
+        /** @var NotifyOwner $owner */
+        $owner = $this->InstanceClass('Owner', $d);
+
+        $ownerid = NotifyQuery::OwnerSave($this, $owner);
+        return $ownerid;
     }
 
     /**
@@ -113,6 +151,7 @@ class NotifyApp extends AbricosApplication {
         }
         return $list;
     }
+
 }
 
 ?>

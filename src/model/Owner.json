@@ -6,6 +6,10 @@
       "type": "int",
       "dbField": "ownerid"
     },
+    "parentid": {
+      "type": "int",
+      "json": "pid"
+    },
     "module": {
       "type": "string",
       "dbField": "ownerModule",
@@ -24,13 +28,17 @@
     "itemid": {
       "type": "int",
       "dbField": "ownerItemId",
-      "json": "i"
+      "json": "iid"
     },
     "status": {
       "type": "string",
       "dbField": "ownerStatus",
       "valid": "on,off",
       "json": "st"
+    },
+    "isBase": {
+      "type": "bool",
+      "json": "isb"
     }
   }
 }

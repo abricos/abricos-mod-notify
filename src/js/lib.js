@@ -32,7 +32,7 @@ Component.entryPoint = function(NS){
         },
         initializer: function(){
             var instance = this;
-            this.appStructure(function(){
+            this.ownerBaseList(function(){
                 NS.roles.load(function(){
                     instance.initCallbackFire();
                 });
@@ -40,6 +40,7 @@ Component.entryPoint = function(NS){
         }
     }, [], {
         ATTRS: {
+            isLoadAppStructure: {value: true},
             Owner: {value: NS.Owner},
             OwnerList: {value: NS.OwnerList},
             Subscribe: {value: NS.Subscribe},
@@ -47,6 +48,13 @@ Component.entryPoint = function(NS){
             Config: {value: NS.Config}
         },
         REQS: {
+            ownerBaseList: {
+                attribute: true,
+                type: 'modelList:OwnerList',
+                onResponse: function(){
+                    console.log(arguments);
+                }
+            },
             ownerList: {
                 // attribute: true,
                 type: 'modelList:OwnerList',

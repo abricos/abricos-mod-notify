@@ -18,33 +18,38 @@ if ($updateManager->isUpdate('0.1.4')){
 
     $db->query_write("
         CREATE TABLE IF NOT EXISTS ".$pfx."notify_owner (
-            ownerid int(10) UNSIGNED NOT NULL auto_increment,
+            ownerid INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+
+            parentid INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Parent Owner ID',
 
             ownerModule VARCHAR(32) NOT NULL DEFAULT '' COMMENT 'Owner Module Name',
             ownerType VARCHAR(16) NOT NULL DEFAULT '' COMMENT 'Owner Type',
             ownerMethod VARCHAR(16) NOT NULL DEFAULT '' COMMENT 'Owner Method',
-            ownerItemId int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Owner Item ID',
+            ownerItemId INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Owner Item ID',
 
 			ownerStatus ENUM('on', 'off') DEFAULT 'on' COMMENT '',
 
+			isBase TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT '',
+
             PRIMARY KEY (ownerid),
-            UNIQUE KEY owner (ownerModule, ownerType, ownerMethod, ownerItemId)
+            UNIQUE KEY owner (ownerModule, ownerType, ownerMethod, ownerItemId),
+            KEY isBase (isBase)
         )".$charset
     );
 
     $db->query_write("
         CREATE TABLE IF NOT EXISTS ".$pfx."notify_subscribe (
-            subscribeid int(10) UNSIGNED NOT NULL auto_increment,
+            subscribeid INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 
-            ownerid int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Owner ID',
-            userid int(10) UNSIGNED NOT NULL COMMENT 'User ID',
+            ownerid INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Owner ID',
+            userid INT(10) UNSIGNED NOT NULL COMMENT 'User ID',
 
 			status ENUM('unset', 'on', 'off') DEFAULT 'unset' COMMENT '',
 			emailStatus ENUM('unset', 'on', 'off') DEFAULT 'unset' COMMENT '',
 
-			pubkey char(32) NOT NULL DEFAULT '' COMMENT 'Public Key',
+			pubkey CHAR(32) NOT NULL DEFAULT '' COMMENT 'Public Key',
 
-			dateline int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Create Date',
+			dateline INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Create Date',
 
             PRIMARY KEY (subscribeid),
             UNIQUE KEY subscribe (ownerid, userid),
@@ -54,22 +59,22 @@ if ($updateManager->isUpdate('0.1.4')){
 
     $db->query_write("
         CREATE TABLE IF NOT EXISTS ".$pfx."notify (
-            notifyid int(10) UNSIGNED NOT NULL auto_increment,
+            notifyid INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 
-            ownerid int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Owner ID',
-            userid int(10) UNSIGNED NOT NULL COMMENT 'User ID',
+            ownerid INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Owner ID',
+            userid INT(10) UNSIGNED NOT NULL COMMENT 'User ID',
 
             emailSubject VARCHAR(255) NOT NULL DEFAULT '' COMMENT '',
-			emailBody text NOT NULL COMMENT '',
+			emailBody TEXT NOT NULL COMMENT '',
             emailURI VARCHAR(255) NOT NULL DEFAULT '' COMMENT '',
-			emailDate int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Send email date',
+			emailDate INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Send email date',
 
             bosSubject VARCHAR(255) NOT NULL DEFAULT '' COMMENT '',
-			bosBody text NOT NULL COMMENT '',
+			bosBody TEXT NOT NULL COMMENT '',
             bosURI VARCHAR(255) NOT NULL DEFAULT '' COMMENT '',
-			bosDate int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Read notify date in BosUI',
+			bosDate INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Read notify date in BosUI',
 
-			dateline int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Create Date',
+			dateline INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Create Date',
 
             PRIMARY KEY (notifyid),
             UNIQUE KEY notify (ownerid, userid),

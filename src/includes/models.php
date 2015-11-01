@@ -10,11 +10,13 @@
 /**
  * Class NotifyOwner
  *
+ * @property int $parentid
  * @property string $module
  * @property string $type
  * @property string $method
- * @property int $ownerid
+ * @property int $itemid
  * @property string $status
+ * @property boolean $isBase
  */
 class NotifyOwner extends AbricosModel {
     const STATUS_ON = 'on';

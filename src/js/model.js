@@ -22,16 +22,39 @@ Component.entryPoint = function(NS){
     NS.Owner = Y.Base.create('owner', SYS.AppModel, [], {
         structureName: 'Owner',
         /*
-        compare: function(val){
-            if (!NS.Owner.isOwner(val)){
-                return false;
-            }
-            return val.get('module') === this.get('module')
-                && val.get('type') === this.get('type')
-                && val.get('ownerid') === this.get('ownerid');
+         compare: function(val){
+         if (!NS.Owner.isOwner(val)){
+         return false;
+         }
+         return val.get('module') === this.get('module')
+         && val.get('type') === this.get('type')
+         && val.get('ownerid') === this.get('ownerid');
+         }
+         /**/
+        isEnable: function(){
+            console.log('-------------');
+            var parent = this.get('parent');
+            console.log('!!!!!!!!!!!!!!!!!!!');
+            return this.get('status') === NS.Owner.STATUS_ON;
         }
-        /**/
     }, {
+        ATTRS: {
+            parent: {
+                readOnly: true,
+                getter: function(val){
+                    if (Y.Lang.isUndefined(val)){
+                        var parentid = this.get('parentid');
+                        if (parentid === 0){
+                            val = null;
+                        } else {
+                            val = this.appInstance.get('ownerBaseList').getById(parentid);
+                        }
+                    }
+
+                    return val;
+                }
+            }
+        },
         ATTRIBUTE: {
             validator: isOwner,
             setter: function(val){
@@ -41,11 +64,34 @@ Component.entryPoint = function(NS){
                 return val;
             }
         },
-        isOwner: isOwner
+        isOwner: isOwner,
+        STATUS_ON: 'on',
+        STATUS_OFF: 'off',
     });
 
     NS.OwnerList = Y.Base.create('ownerList', SYS.AppModelList, [], {
-        appItem: NS.Owner
+        appItem: NS.Owner,
+        findOwner: function(options){
+            options = Y.merge({
+                module: '',
+                type: '',
+                method: '',
+                itemid: 0
+            }, options || {});
+
+            var ret = null;
+            this.some(function(owner){
+                if (options.module === owner.get('module')
+                    && options.type === owner.get('type')
+                    && options.method === owner.get('method')
+                    && options.itemid === owner.get('itemid')){
+                    ret = owner;
+                    return true;
+                }
+            }, this);
+            return ret;
+        }
+
     });
 
     NS.Subscribe = Y.Base.create('subscribe', SYS.AppModel, [], {
