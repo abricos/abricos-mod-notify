@@ -13,6 +13,17 @@
  */
 class NotifyQuery {
 
+    public static function OwnerRoot(NotifyApp $app){
+        $db = $app->db;
+        $sql = "
+			SELECT o.*
+			FROM ".$db->prefix."notify_owner o
+			WHERE o.ownerModule='' AND o.ownerType='' AND o.ownerMethod='' AND o.ownerItemId=0
+			LIMIT 1
+		";
+        return $db->query_first($sql);
+    }
+
     public static function OwnerBaseList(NotifyApp $app){
         $db = $app->db;
         $sql = "

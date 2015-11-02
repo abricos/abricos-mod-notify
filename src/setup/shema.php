@@ -17,27 +17,6 @@ if ($updateManager->isUpdate('0.1.4')){
     Abricos::GetModule('notify')->permission->Install();
 
     $db->query_write("
-        CREATE TABLE IF NOT EXISTS ".$pfx."notify_owner (
-            ownerid INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-
-            parentid INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Parent Owner ID',
-
-            ownerModule VARCHAR(32) NOT NULL DEFAULT '' COMMENT 'Owner Module Name',
-            ownerType VARCHAR(16) NOT NULL DEFAULT '' COMMENT 'Owner Type',
-            ownerMethod VARCHAR(16) NOT NULL DEFAULT '' COMMENT 'Owner Method',
-            ownerItemId INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Owner Item ID',
-
-			ownerStatus ENUM('on', 'off') DEFAULT 'on' COMMENT '',
-
-			isBase TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT '',
-
-            PRIMARY KEY (ownerid),
-            UNIQUE KEY owner (ownerModule, ownerType, ownerMethod, ownerItemId),
-            KEY isBase (isBase)
-        )".$charset
-    );
-
-    $db->query_write("
         CREATE TABLE IF NOT EXISTS ".$pfx."notify_subscribe (
             subscribeid INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 
@@ -81,6 +60,33 @@ if ($updateManager->isUpdate('0.1.4')){
             KEY userid (userid)
         )".$charset
     );
+
+    $db->query_write("
+        CREATE TABLE IF NOT EXISTS ".$pfx."notify_owner (
+            ownerid INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+
+            parentid INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Parent Owner ID',
+
+            ownerModule VARCHAR(32) NOT NULL DEFAULT '' COMMENT 'Owner Module Name',
+            ownerType VARCHAR(16) NOT NULL DEFAULT '' COMMENT 'Owner Type',
+            ownerMethod VARCHAR(16) NOT NULL DEFAULT '' COMMENT 'Owner Method',
+            ownerItemId INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Owner Item ID',
+
+			ownerStatus ENUM('on', 'off') DEFAULT 'on' COMMENT '',
+
+			isBase TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT '',
+
+            PRIMARY KEY (ownerid),
+            UNIQUE KEY owner (ownerModule, ownerType, ownerMethod, ownerItemId),
+            KEY isBase (isBase)
+        )".$charset
+    );
+
+    $db->query_write("
+        INSERT INTO ".$pfx."notify_owner (
+            ownerModule, ownerType, ownerMethod, ownerItemId, ownerStatus, isBase
+        ) VALUES ('', '', '', 0, 'on', 1)
+    ");
 
 }
 ?>

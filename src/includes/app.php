@@ -86,9 +86,28 @@ class NotifyApp extends AbricosApplication {
         return $this->_cache['OwnerBaseList'] = $list;
     }
 
+    /**
+     * @return NotifyOwner
+     */
+    public function OwnerRoot(){
+        if (isset($this->_cache['OwnerRoot'])){
+            return $this->_cache['OwnerRoot'];
+        }
+        $d = NotifyQuery::OwnerRoot($this);
+
+        /** @var NotifyOwner $owner */
+        $owner = $this->InstanceClass('Owner', $d);
+        return $this->_cache['OwnerRoot'] = $owner;
+    }
+
     public function OwnerSave($d){
         /** @var NotifyOwner $owner */
         $owner = $this->InstanceClass('Owner', $d);
+
+        if ($owner->parentid === 0){
+            $root = $this->OwnerRoot();
+            $owner->parentid = $root->id;
+        }
 
         $ownerid = NotifyQuery::OwnerSave($this, $owner);
         return $ownerid;
