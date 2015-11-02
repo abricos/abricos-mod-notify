@@ -1,11 +1,17 @@
 <!--{widget}-->
 <div class="subscribeRowButton">
     <button id="{i#on}" data-click="on"
-            type="button" class="btn btn-default btn-xs">
+            type="button" class="btn btn-default btn-xs"
+            disabled="disabled">
         Включить
     </button>
+    <button id="{i#off}" data-click="off"
+            type="button" class="btn btn-default btn-xs hide"
+            disabled="disabled">
+        Отключить
+    </button>
 
-    <div id="{i#buttons}" class="row hide">
+    <div id="{i#buttons1}" class="row hide">
         <div class="col-sm-3 text-right">
             EMail
         </div>

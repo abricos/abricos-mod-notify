@@ -10,6 +10,17 @@ Component.entryPoint = function(NS){
 
     NS.Owner = Y.Base.create('owner', SYS.AppModel, [], {
         structureName: 'Owner',
+        isEnable: function(){
+            var parent = this, val;
+            while (parent){
+                val = parent.get('status') === NS.Owner.STATUS_ON;
+                if (!val){
+                    break;
+                }
+                parent = parent.get('parent');
+            }
+            return val;
+        }
     }, {
         STATUS_ON: 'on',
         STATUS_OFF: 'off',
@@ -23,22 +34,6 @@ Component.entryPoint = function(NS){
                             val = null;
                         } else {
                             val = this.appInstance.get('ownerBaseList').getById(parentid);
-                        }
-                    }
-                    return val;
-                }
-            },
-            enable: {
-                readOnly: true,
-                getter: function(val){
-                    if (Y.Lang.isUndefined(val)){
-                        var parent = this;
-                        while (parent){
-                            val = parent.get('status') === NS.Owner.STATUS_ON;
-                            if (!val){
-                                break;
-                            }
-                            parent = parent.get('parent');
                         }
                     }
                     return val;

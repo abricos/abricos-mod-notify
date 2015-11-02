@@ -10,6 +10,9 @@ Component.entryPoint = function(NS){
         COMPONENT = this,
         SYS = Brick.mod.sys;
 
+    var SST_ON = NS.Subscribe.STATUS_ON,
+        SST_OFF = NS.Subscribe.STATUS_OFF;
+
     NS.SubscribeRowButtonWidget = Y.Base.create('subscribeRowButtonWidget', SYS.AppWidget, [], {
         onInitAppWidget: function(err, appInstance){
             this.renderStatus();
@@ -19,23 +22,43 @@ Component.entryPoint = function(NS){
         renderStatus: function(){
             var tp = this.template,
                 subscribe = this.get('subscribe'),
-                changeDisable = this.get('changeDisable');
+                owner = subscribe ? subscribe.get('owner') : null,
+                disable = !subscribe || !owner || !owner.isEnable();
 
-            tp.toggleView(!subscribe, 'on', 'buttons')
-            tp.each('on,emailOn,emailOff,bosOn,bosOff', function(node){
-                console.log(changeDisable);
-                node.set('disabled', changeDisable);
+            tp.each('on,off,emailOn,emailOff,bosOn,bosOff', function(node){
+                node.set('disabled', disable);
             }, this);
+
+            if (!subscribe || !owner){
+                tp.toggleView(true, 'on', 'buttons')
+                return;
+            }
+
+            var sst = subscribe.get('status');
+
+            tp.toggleView(sst === SST_ON, 'buttons,off', 'on')
+
+            console.log(subscribe.toJSON());
         },
+        switchToOn: function(){
+            this.get('subscribe').set('status', SST_ON);
+            this.renderStatus();
+        },
+        switchToOff: function(){
+            this.get('subscribe').set('status', SST_ON);
+            this.renderStatus();
+        }
     }, {
         ATTRS: {
             component: {value: COMPONENT},
             templateBlockName: {value: 'widget'},
             owner: {},
-            subscribe: {value: null},
-            changeDisable: {value: false}
+            subscribe: {value: null}
         },
-        CLICKS: {}
+        CLICKS: {
+            on: 'switchToOn',
+            off: 'switchToOff'
+        }
     });
 
 };
