@@ -13,6 +13,17 @@
  */
 class NotifyQuery {
 
+    public static function Owner(NotifyApp $app, $ownerid){
+        $db = $app->db;
+        $sql = "
+			SELECT o.*
+			FROM ".$db->prefix."notify_owner o
+			WHERE o.ownerid=".intval($ownerid)."
+			LIMIT 1
+		";
+        return $db->query_first($sql);
+    }
+
     public static function OwnerRoot(NotifyApp $app){
         $db = $app->db;
         $sql = "
@@ -55,35 +66,46 @@ class NotifyQuery {
         return $db->insert_id();
     }
 
+    public static function SubscribeUpdate(NotifyApp $app, NotifyOwner $owner, NotifySubscribe $subscribe){
+        $db = $app->db;
+        $sql = "
+			INSERT INTO ".$db->prefix."notify_subscribe (
+			    ownerid, userid, status, dateline
+			) VALUES (
+			    ".intval($owner->id).",
+			    ".intval(Abricos::$user->id).",
+			    '".bkstr($subscribe->status)."',
+			    ".intval(TIMENOW)."
+			) ON DUPLICATE KEY UPDATE
+			    status='".bkstr($subscribe->status)."'
+		";
+        $db->query_write($sql);
+        return $db->insert_id();
+    }
+
     public static function Subscribe(NotifyApp $app, NotifyOwner $owner, $userid = 0){
         $userid = $userid > 0 ? $userid : Abricos::$user->id;
         $db = $app->db;
         $sql = "
-			SELECT *
-			FROM ".$db->prefix."notify_subscribe
-			WHERE userid=".bkint($userid)."
-			    AND ownerModule='".bkstr($owner->module)."'
-			    AND ownerType='".bkstr($owner->type)."'
-			    AND ownerid=".intval($owner->ownerid)."
+			SELECT s.*
+			FROM ".$db->prefix."notify_subscribe s
+			WHERE s.userid=".bkint($userid)." AND s.ownerid=".intval($owner->id)."
 			LIMIT 1
 		";
         return $db->query_first($sql);
     }
 
-    public static function SubscribeList(NotifyApp $app, $module, $userid = 0){
-        $userid = $userid > 0 ? $userid : Abricos::$user->id;
+    public static function SubscribeBaseList(NotifyApp $app){
         $db = $app->db;
         $sql = "
-			SELECT
-			  s.*,
-			  o.*
+			SELECT s.*
 			FROM ".$db->prefix."notify_subscribe s
 			INNER JOIN ".$db->prefix."notify_owner o ON s.ownerid=o.ownerid
-			WHERE o.ownerModule='".bkstr($module)."' AND s.userid=".bkint($userid)."
+			WHERE o.isBase=1 AND s.userid=".bkint(Abricos::$user->id)."
 		";
         return $db->query_read($sql);
     }
-
 }
+
 
 ?>

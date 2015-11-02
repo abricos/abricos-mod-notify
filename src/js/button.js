@@ -39,15 +39,24 @@ Component.entryPoint = function(NS){
             tp.toggleView(sst === SST_ON, 'buttons,off', 'on')
 
             console.log(subscribe.toJSON());
+            console.log(owner.isEnable());
         },
         switchToOn: function(){
             this.get('subscribe').set('status', SST_ON);
             this.renderStatus();
+            this.subscribeSave();
         },
         switchToOff: function(){
             this.get('subscribe').set('status', SST_OFF);
             this.renderStatus();
-        }
+            this.subscribeSave();
+        },
+        subscribeSave: function(){
+            var subscribe = this.get('subscribe'),
+                owner = subscribe.get('owner');
+
+            this.get('appInstance').subscribeSave(owner.get('id'), subscribe.toJSON(true));
+        },
     }, {
         ATTRS: {
             component: {value: COMPONENT},

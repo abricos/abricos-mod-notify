@@ -42,8 +42,13 @@ Component.entryPoint = function(NS){
         },
         REQS: {
             ownerBaseList: {
+                attach: 'subscribeBaseList',
                 attribute: true,
                 type: 'modelList:OwnerList',
+            },
+            subscribeBaseList: {
+                attribute: true,
+                type: 'modelList:SubscribeList',
             },
             ownerList: {
                 attribute: false,
@@ -60,6 +65,9 @@ Component.entryPoint = function(NS){
                         ownerBaseList.add(owner);
                     }, this);
                 }
+            },
+            subscribeSave: {
+                args: ['ownerid', 'subscribe'],
             },
             subscribeList: {
                 args: ['module'],

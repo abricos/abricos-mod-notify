@@ -34,8 +34,10 @@ class NotifyApp extends AbricosApplication {
         switch ($d->do){
             case 'ownerBaseList':
                 return $this->OwnerBaseListToJSON();
-            case 'subscribeList':
-                return $this->SubscribeListToJSON($d->module);
+            case 'subscribeSave':
+                return $this->SubscribeSaveToJSON($d->ownerid, $d->subscribe);
+            case 'subscribeBaseList':
+                return $this->SubscribeBaseListToJSON();
         }
         return null;
     }
@@ -56,6 +58,38 @@ class NotifyApp extends AbricosApplication {
         }
 
         return $this->InstanceClass('Owner', $owner);
+    }
+
+    private function GetOwnerApp($moduleName){
+        if (!isset($this->_cache['app'])){
+            $this->_cache['app'] = array();
+        }
+        if (isset($this->_cache['app'][$moduleName])){
+            return $this->_cache['app'][$moduleName];
+        }
+        $module = Abricos::GetModule($moduleName);
+        if (empty($module)){
+            return null;
+        }
+        $manager = $module->GetManager();
+        if (empty($manager)){
+            return null;
+        }
+        if (!method_exists($manager, 'GetApp')){
+            return null;
+        }
+        return $this->_cache['app'][$moduleName] = $manager->GetApp();
+    }
+
+    private function OwnerAppFunctionExist($module, $fn){
+        $ownerApp = $this->GetOwnerApp($module);
+        if (empty($ownerApp)){
+            return false;
+        }
+        if (!method_exists($ownerApp, $fn)){
+            return false;
+        }
+        return true;
     }
 
     public function OwnerBaseListToJSON(){
@@ -87,16 +121,28 @@ class NotifyApp extends AbricosApplication {
     }
 
     /**
+     * @param $ownerid
+     * @return NotifyOwner
+     */
+    public function Owner($ownerid){
+        $d = NotifyQuery::Owner($this, $ownerid);
+        if (empty($d)){
+            return AbricosResponse::ERR_NOT_FOUND;
+        }
+        /** @var NotifyOwner $owner */
+        $owner = $this->InstanceClass('Owner', $d);
+        return $owner;
+    }
+
+    /**
      * @return NotifyOwner
      */
     public function OwnerRoot(){
         if (isset($this->_cache['OwnerRoot'])){
             return $this->_cache['OwnerRoot'];
         }
-        $d = NotifyQuery::OwnerRoot($this);
 
-        /** @var NotifyOwner $owner */
-        $owner = $this->InstanceClass('Owner', $d);
+        $owner = $this->Owner(1);
         return $this->_cache['OwnerRoot'] = $owner;
     }
 
@@ -111,6 +157,37 @@ class NotifyApp extends AbricosApplication {
 
         $ownerid = NotifyQuery::OwnerSave($this, $owner);
         return $ownerid;
+    }
+
+    public function SubscribeSaveToJSON($ownerid, $d){
+        $res = $this->SubscribeSave($ownerid, $d);
+        return $this->ResultToJSON('subscribe', $res);
+    }
+
+    public function SubscribeSave($ownerid, $d){
+        if (!$this->manager->IsWriteRole()){
+            return AbricosResponse::ERR_FORBIDDEN;
+        }
+        $owner = $this->Owner($ownerid);
+
+        if (AbricosResponse::IsError($owner)){
+            return AbricosResponse::ERR_BAD_REQUEST;
+        }
+
+        if (!$this->OwnerAppFunctionExist($owner->module, 'Notify_IsSubscribeUpdate')){
+            return AbricosResponse::ERR_SERVER_ERROR;
+        }
+
+        /** @var NotifySubscribe $subscribe */
+        $subscribe = $this->InstanceClass('Subscribe', $d);
+
+        $ownerApp = $this->GetOwnerApp($owner->module);
+        if (!$ownerApp->Notify_IsSubscribeUpdate($owner, $subscribe)){
+            return AbricosResponse::ERR_FORBIDDEN;
+        }
+
+        NotifyQuery::SubscribeUpdate($this, $owner, $subscribe);
+        return $this->Subscribe($owner);
     }
 
     /**
@@ -131,19 +208,15 @@ class NotifyApp extends AbricosApplication {
         return $subscribe;
     }
 
-    public function SubscribeListToJSON($module){
-        $res = $this->SubscribeList($module);
-        $ret = $this->ResultToJSON('subscribeList', $res);
-        if (!AbricosResponse::IsError($res)){
-            $ret = $this->ImplodeJSON(
-                $this->ResultToJSON('ownerList', $res->ownerList),
-                $ret
-            );
-        }
-        return $ret;
+    public function SubscribeBaseListToJSON(){
+        $res = $this->SubscribeBaseList();
+        return $this->ResultToJSON('subscribeBaseList', $res);
     }
 
-    public function SubscribeList($module){
+    public function SubscribeBaseList(){
+        if (isset($this->_cache['SubscribeBaseList'])){
+            return $this->_cache['SubscribeBaseList'];
+        }
         if (!$this->manager->IsViewRole()){
             return AbricosResponse::ERR_FORBIDDEN;
         }
@@ -151,24 +224,13 @@ class NotifyApp extends AbricosApplication {
         /** @var NotifySubscribeList $list */
         $list = $this->InstanceClass('SubscribeList');
 
-        /** @var NotifyOwnerList $ownerList */
-        $ownerList = $this->InstanceClass('OwnerList');
-
-        $list->ownerList = $ownerList;
-
-        $rows = NotifyQuery::SubscribeList($this, $module);
+        $rows = NotifyQuery::SubscribeBaseList($this);
         while (($d = $this->db->fetch_array($rows))){
-
-            /** @var NotifyOwner $owner */
-            $owner = $this->InstanceClass('Owner', $d);
-
-            $ownerList->Add($owner);
-
             /** @var NotifySubscribe $subscribe */
             $subscribe = $this->InstanceClass('Subscribe', $d);
             $list->Add($subscribe);
         }
-        return $list;
+        return $this->_cache['SubscribeBaseList'] = $list;
     }
 
 }
