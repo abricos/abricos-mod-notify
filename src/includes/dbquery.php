@@ -38,7 +38,7 @@ class NotifyQuery {
         $db = $app->db;
         $sql = "
 			INSERT INTO ".$db->prefix."notify_owner (
-			    parentid, ownerModule, ownerType, ownerMethod, ownerItemId, ownerStatus, isBase
+			    parentid, ownerModule, ownerType, ownerMethod, ownerItemId, ownerStatus, isBase, isContainer
 			) VALUES (
 			    ".intval($owner->parentid).",
 			    '".bkstr($owner->module)."',
@@ -46,7 +46,8 @@ class NotifyQuery {
 			    '".bkstr($owner->method)."',
 			    ".intval($owner->itemid).",
 			    '".bkstr($owner->status)."',
-			    ".intval($owner->isBase)."
+			    ".intval($owner->isBase).",
+			    ".intval($owner->isContainer)."
 			) ON DUPLICATE KEY UPDATE
 			    ownerStatus='".bkstr($owner->status)."'
 		";

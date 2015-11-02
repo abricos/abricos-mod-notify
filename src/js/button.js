@@ -45,7 +45,7 @@ Component.entryPoint = function(NS){
             this.renderStatus();
         },
         switchToOff: function(){
-            this.get('subscribe').set('status', SST_ON);
+            this.get('subscribe').set('status', SST_OFF);
             this.renderStatus();
         }
     }, {

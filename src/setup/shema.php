@@ -75,6 +75,7 @@ if ($updateManager->isUpdate('0.1.4')){
 			ownerStatus ENUM('on', 'off') DEFAULT 'on' COMMENT '',
 
 			isBase TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT '',
+			isContainer TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT '',
 
             PRIMARY KEY (ownerid),
             UNIQUE KEY owner (ownerModule, ownerType, ownerMethod, ownerItemId),

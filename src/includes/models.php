@@ -17,6 +17,7 @@
  * @property int $itemid
  * @property string $status
  * @property boolean $isBase
+ * @property boolean $isContainer
  */
 class NotifyOwner extends AbricosModel {
     const STATUS_ON = 'on';
