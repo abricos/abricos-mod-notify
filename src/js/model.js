@@ -38,26 +38,45 @@ Component.entryPoint = function(NS){
                     }
                     return val;
                 }
+            },
+            key: {
+                readOnly: true,
+                getter: function(val){
+                    if (val){
+                        return val;
+                    }
+
+                    var a = [
+                        this.get('module'), this.get('type'),
+                        this.get('method'), this.get('itemid')
+                    ];
+                    val = a.join(':');
+
+                    return val;
+                }
             }
         },
+        normalizeKey: function(key, itemid){
+            if (!Y.Lang.isString(key)){
+                key = '';
+            }
+            itemid = itemid | 0;
+            key = key.replace('{v#itemid}', itemid);
+
+            var a = [], aa = key.split(':');
+            for (var i = 0; i < 4; i++){
+                a[a.length] = i < 3 ? aa[i] || '' : aa[i] | 0;
+            }
+            return a.join(':');
+        }
     });
 
     NS.OwnerList = Y.Base.create('ownerList', SYS.AppModelList, [], {
         appItem: NS.Owner,
-        findOwner: function(options){
-            options = Y.merge({
-                module: '',
-                type: '',
-                method: '',
-                itemid: 0
-            }, options || {});
-
+        getByKey: function(key){
             var ret = null;
             this.some(function(owner){
-                if (options.module === owner.get('module')
-                    && options.type === owner.get('type')
-                    && options.method === owner.get('method')
-                    && options.itemid === owner.get('itemid')){
+                if (key === owner.get('key')){
                     ret = owner;
                     return true;
                 }
@@ -88,44 +107,16 @@ Component.entryPoint = function(NS){
 
     NS.SubscribeList = Y.Base.create('subscribeList', SYS.AppModelList, [], {
         appItem: NS.Subscribe,
-        getSubscribe: function(options){
-            options = Y.merge({
-                owner: {},
-                subscribe: {}
-            }, options || {});
-
+        getByKey: function(key){
             var app = this.appInstance,
                 ownerList = app.get('ownerList'),
-                owner = ownerList.findOwner(options.owner);
+                owner = ownerList.getByKey(key);
 
             if (!owner){
-                var parent = ownerList.findOwner(Y.merge(options.owner, {itemid: 0}));
-                if (!parent){
-                    return null;
-                }
-                var Owner = app.get('Owner');
-                owner = new Owner(Y.merge(options.owner, {
-                    appInstance: app,
-                    parentid: parent.get('id'),
-                    id: NS.SubscribeList._idCounter--
-                }));
+                return null;
             }
-            var ownerid = owner.get('id'),
-                subscribe = this.getBy('ownerid', ownerid);
-
-            if (subscribe){
-                return subscribe;
-            }
-            var Subscribe = app.get('Subscribe');
-            subscribe = new Subscribe(Y.merge(options.subscribe, {
-                appInstance: app,
-                ownerid: ownerid,
-                id: NS.SubscribeList._idCounter--
-            }));
-            return subscribe;
+            return this.getBy('ownerid', owner.get('id'));
         }
-    }, {
-        _idCounter: -1
     });
 
     NS.Config = Y.Base.create('config', SYS.AppModel, [], {

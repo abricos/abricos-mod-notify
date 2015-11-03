@@ -25,11 +25,25 @@ Component.entryPoint = function(NS){
             if (!ownerList){
                 return;
             }
-            var ownerid = owner.get('id');
-            if (ownerList.getById(ownerid)){
+            var id = owner.get('id');
+            if (ownerList.getById(id)){
                 return;
             }
             ownerList.add(owner);
+        },
+        registerSubscribe: function(subscribe){
+            if (!subscribe || !Y.Lang.isFunction(subscribe.get)){
+                return;
+            }
+            var subscribeList = this.get('subscribeList');
+            if (!subscribeList){
+                return;
+            }
+            var id = subscribe.get('id');
+            if (subscribeList.getById(id)){
+                return;
+            }
+            subscribeList.add(subscribe);
         },
         initializer: function(){
             var instance = this;
@@ -51,6 +65,12 @@ Component.entryPoint = function(NS){
                 readOnly: true,
                 getter: function(){
                     return this.get('ownerBaseList');
+                }
+            },
+            subscribeList: {
+                readOnly: true,
+                getter: function(){
+                    return this.get('subscribeBaseList');
                 }
             }
         },
@@ -83,10 +103,12 @@ Component.entryPoint = function(NS){
             subscribeSave: {
                 args: ['ownerid', 'subscribe'],
             },
-            subscribeList: {
-                args: ['module'],
-                type: 'modelList:SubscribeList',
-            },
+            /*
+             subscribeList: {
+             args: ['module'],
+             type: 'modelList:SubscribeList',
+             },
+             /**/
             config: {
                 attribute: true,
                 type: 'model:Config'

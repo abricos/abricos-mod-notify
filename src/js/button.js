@@ -33,22 +33,48 @@ Component.entryPoint = function(NS){
                 return appInstance.getApp('notify');
             }
         },
-        subscribeDefine: {},
+        ownerItemId: {writeOnce: true},
+        ownerDefine: {writeOnce: true},
+        ownerKey: {
+            readOnly: true,
+            getter: function(val){
+                if (Y.Lang.isString(val)){
+                    return val;
+                }
+                var define = this.get('ownerDefine'),
+                    itemid = this.get('ownerItemId');
+
+                return NS.Owner.normalizeKey(define, itemid);
+            }
+        },
+        owner: {
+            readOnly: true,
+            getter: function(val){
+                if (val){
+                    return val;
+                }
+                var app = this.get('notifyApp'),
+                    ownerList = app.get('ownerList');
+
+                return ownerList.getByKey(this.get('ownerKey'));
+            }
+        },
         subscribe: {
             getter: function(val){
                 if (val){
                     return val;
                 }
                 var app = this.get('notifyApp'),
-                    subscribeList = app.get('subscribeBaseList'),
-                    define = this.get('subscribeDefine'),
-                    subscribe = subscribeList.getSubscribe(define);
+                    key = this.get('ownerKey');
 
-                return subscribe;
+                return app.get('subscribeList').getByKey(key);
             }
         }
     };
     SwitcherStatusExt.prototype = {
+        onInitAppWidget: function(err, appInstance){
+            this.renderSwitcher();
+        },
         renderSwitcher: function(){
             var tp = this.template,
                 subscribe = this.get('subscribe');
@@ -85,7 +111,7 @@ Component.entryPoint = function(NS){
             this.get('notifyApp').subscribeSave(owner.get('id'), subscribe.toJSON(true));
         },
         onClick: function(e){
-            switch(e.dataClick){
+            switch (e.dataClick) {
                 case 'on':
                     this.switchToOn();
                     return true;
@@ -95,9 +121,7 @@ Component.entryPoint = function(NS){
             }
         }
     };
-
     NS.SwitcherStatusExt = SwitcherStatusExt;
-
 
     NS.SubscribeRowButtonWidget = Y.Base.create('subscribeRowButtonWidget', SYS.AppWidget, [], {
         onInitAppWidget: function(err, appInstance){
@@ -143,9 +167,7 @@ Component.entryPoint = function(NS){
     }, {
         ATTRS: {
             component: {value: COMPONENT},
-            templateBlockName: {value: 'widget'},
-            owner: {},
-            subscribe: {value: null}
+            templateBlockName: {value: 'widget'}
         },
         CLICKS: {
             on: 'switchToOn',
