@@ -13,6 +13,92 @@ Component.entryPoint = function(NS){
     var SST_ON = NS.Subscribe.STATUS_ON,
         SST_OFF = NS.Subscribe.STATUS_OFF;
 
+    var SwitcherStatusExt = function(){
+    };
+    SwitcherStatusExt.NAME = 'switcherStatusExt';
+    SwitcherStatusExt.ATTRS = {
+        notifyApp: {
+            readOnly: true,
+            getter: function(val){
+                if (val){
+                    return val;
+                }
+                var appInstance = this.get('appInstance');
+                if (!appInstance){
+                    return;
+                } else if (appInstance.name === 'notifyApp'){
+                    return appInstance;
+                }
+
+                return appInstance.getApp('notify');
+            }
+        },
+        subscribeDefine: {},
+        subscribe: {
+            getter: function(val){
+                if (val){
+                    return val;
+                }
+                var app = this.get('notifyApp'),
+                    subscribeList = app.get('subscribeBaseList'),
+                    define = this.get('subscribeDefine'),
+                    subscribe = subscribeList.getSubscribe(define);
+
+                return subscribe;
+            }
+        }
+    };
+    SwitcherStatusExt.prototype = {
+        renderSwitcher: function(){
+            var tp = this.template,
+                subscribe = this.get('subscribe');
+
+            if (!subscribe || !subscribe.get('owner')){
+                tp.hide('buttonOn,buttonOff');
+                return;
+            }
+
+            var owner = subscribe.get('owner'),
+                sst = subscribe.get('status'),
+                disable = !owner.isEnable();
+
+            tp.each('buttonOn,buttonOff', function(node){
+                node.set('disabled', disable);
+            }, this);
+
+            tp.toggleView(sst === SST_ON, 'buttonOff', 'buttonOn')
+        },
+        switchToOn: function(){
+            this.get('subscribe').set('status', SST_ON);
+            this.renderSwitcher();
+            this.subscribeSave();
+        },
+        switchToOff: function(){
+            this.get('subscribe').set('status', SST_OFF);
+            this.renderSwitcher();
+            this.subscribeSave();
+        },
+        subscribeSave: function(){
+            var subscribe = this.get('subscribe'),
+                owner = subscribe.get('owner');
+
+            this.get('notifyApp').subscribeSave(owner.get('id'), subscribe.toJSON(true));
+        },
+        onClick: function(e){
+            switch(e.dataClick){
+                case 'on':
+                    this.switchToOn();
+                    return true;
+                case 'off':
+                    this.switchToOff();
+                    return true;
+            }
+        }
+    };
+
+    NS.SwitcherStatusExt = SwitcherStatusExt;
+
+
     NS.SubscribeRowButtonWidget = Y.Base.create('subscribeRowButtonWidget', SYS.AppWidget, [], {
         onInitAppWidget: function(err, appInstance){
             this.renderStatus();
@@ -37,9 +123,6 @@ Component.entryPoint = function(NS){
             var sst = subscribe.get('status');
 
             tp.toggleView(sst === SST_ON, 'buttons,off', 'on')
-
-            console.log(subscribe.toJSON());
-            console.log(owner.isEnable());
         },
         switchToOn: function(){
             this.get('subscribe').set('status', SST_ON);
