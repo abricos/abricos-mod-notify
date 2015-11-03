@@ -223,6 +223,8 @@ class NotifyApp extends AbricosApplication {
         return $this->ResultToJSON('subscribeBaseList', $res);
     }
 
+    private $_isSubscribeBaseListUpdate = false;
+
     public function SubscribeBaseList(){
         if (isset($this->_cache['SubscribeBaseList'])){
             return $this->_cache['SubscribeBaseList'];
@@ -234,12 +236,38 @@ class NotifyApp extends AbricosApplication {
         /** @var NotifySubscribeList $list */
         $list = $this->InstanceClass('SubscribeList');
 
+        if (Abricos::$user->id === 0){
+            return $list;
+        }
+
         $rows = NotifyQuery::SubscribeBaseList($this);
         while (($d = $this->db->fetch_array($rows))){
             /** @var NotifySubscribe $subscribe */
             $subscribe = $this->InstanceClass('Subscribe', $d);
             $list->Add($subscribe);
         }
+
+        $ownerBaseList = $this->OwnerBaseList();
+        $ownerCount = $ownerBaseList->Count();
+        if ($list->Count() != $ownerCount){
+
+            if ($this->_isSubscribeBaseListUpdate){
+                return AbricosResponse::ERR_SERVER_ERROR;
+            }
+
+            $this->_isSubscribeBaseListUpdate = true;
+            for ($i = 0; $i < $ownerCount; $i++){
+                $owner = $ownerBaseList->GetByIndex($i);
+                $subscribe = $list->GetBy('ownerid', $owner->id);
+                if (empty($subscribe)){
+                    $subscribe = $this->InstanceClass('Subscribe');
+                    // create base subscribe
+                    NotifyQuery::SubscribeUpdate($this, $owner, $subscribe);
+                }
+            }
+            return $this->SubscribeBaseList();
+        }
+
         return $this->_cache['SubscribeBaseList'] = $list;
     }
 
