@@ -48,18 +48,6 @@ class NotifyApp extends AbricosApplication {
         $this->_cache = array();
     }
 
-    /**
-     * @param $owner
-     * @return NotifyOwner
-     */
-    public function OwnerNormalize($owner){
-        if ($owner instanceof NotifyOwner){
-            return $owner;
-        }
-
-        return $this->InstanceClass('Owner', $owner);
-    }
-
     private function GetOwnerApp($moduleName){
         if (!isset($this->_cache['app'])){
             $this->_cache['app'] = array();
@@ -137,8 +125,27 @@ class NotifyApp extends AbricosApplication {
         }
         /** @var NotifyOwner $owner */
         $owner = $this->InstanceClass('Owner', $d);
-        $this->_cache['Owner'][$ownerid] = $owner;
-        return $owner;
+
+        return $this->_cache['Owner'][$ownerid] = $owner;;
+    }
+
+    public function OwnerByKey($key, $itemid = 0){
+        $key = NotifyOwner::NormalizeKey($key, $itemid);
+
+        if (!isset($this->_cache['OwnerByKey'])){
+            $this->_cache['OwnerByKey'] = array();
+        }
+        if (isset($this->_cache['OwnerByKey'][$key])){
+            return $this->_cache['OwnerByKey'][$key];
+        }
+        $d = NotifyQuery::OwnerByKey($this, $key);
+        if (empty($d)){
+            return AbricosResponse::ERR_NOT_FOUND;
+        }
+        /** @var NotifyOwner $owner */
+        $owner = $this->InstanceClass('Owner', $d);
+
+        return $this->_cache['OwnerByKey'][$key] = $owner;
     }
 
     /**
@@ -162,8 +169,34 @@ class NotifyApp extends AbricosApplication {
             $owner->parentid = $root->id;
         }
 
-        $ownerid = NotifyQuery::OwnerSave($this, $owner);
-        return $ownerid;
+        NotifyQuery::OwnerSave($this, $owner);
+
+        $this->CacheClear();
+
+        return $this->OwnerByKey($owner->GetKey());
+    }
+
+    /**
+     * @param $key
+     * @param $parentKey
+     * @return NotifyOwner|int
+     */
+    public function OwnerAppendByKey($parentKey, $key){
+        $parentOwner = $this->OwnerBaseList()->GetByKey($parentKey);
+        if (empty($parentOwner) || !$parentOwner->isBase){
+            return AbricosResponse::ERR_BAD_REQUEST;
+        }
+
+        $key = NotifyOwner::ParseKey($key);
+
+        $arr = array(
+            "module" => $key->module,
+            "type" => $key->type,
+            "method" => $key->method,
+            "itemid" => $key->itemid,
+            "parentid" => $parentOwner->id
+        );
+        return $this->OwnerSave($arr);
     }
 
     public function SubscribeSaveToJSON($ownerid, $d){
@@ -175,10 +208,13 @@ class NotifyApp extends AbricosApplication {
         if (!$this->manager->IsWriteRole()){
             return AbricosResponse::ERR_FORBIDDEN;
         }
-        $owner = $this->OwnerById($ownerid);
-
-        if (AbricosResponse::IsError($owner)){
-            return AbricosResponse::ERR_BAD_REQUEST;
+        if ($ownerid instanceof NotifyOwner){
+            $owner = $ownerid;
+        } else {
+            $owner = $this->OwnerById($ownerid);
+            if (AbricosResponse::IsError($owner)){
+                return AbricosResponse::ERR_BAD_REQUEST;
+            }
         }
 
         if (!$this->OwnerAppFunctionExist($owner->module, 'Notify_IsSubscribeUpdate')){
@@ -198,8 +234,28 @@ class NotifyApp extends AbricosApplication {
     }
 
     /**
-     * @param NotifyOwner $owner
-     * @return int
+     * @param $parentKey
+     * @param $key
+     * @param $itemid
+     * @return NotifyOwner|int
+     */
+    public function SubscribeItemAppend($parentKey, $key, $itemid){
+        $parentKey = NotifyOwner::NormalizeKey($parentKey);
+        $key = NotifyOwner::NormalizeKey($key, $itemid);
+
+        $owner = $this->OwnerAppendByKey($parentKey, $key);
+
+        $subscribe = $this->Subscribe($owner);
+        $subscribe->status = NotifySubscribe::STATUS_ON;
+
+        NotifyQuery::SubscribeUpdate($this, $owner, $subscribe);
+
+        return $owner;
+    }
+
+    /**
+     * @param $owner
+     * @return int|NotifySubscribe
      */
     public function Subscribe($owner){
         if (!$this->manager->IsViewRole()){
@@ -214,6 +270,7 @@ class NotifyApp extends AbricosApplication {
         if (empty($d)){
             return $this->SubscribeSave($owner->id, array());
         }
+        /** @var NotifySubscribe $subscribe */
         $subscribe = $this->InstanceClass('Subscribe', $d);
         return $subscribe;
     }

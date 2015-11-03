@@ -24,6 +24,22 @@ class NotifyQuery {
         return $db->query_first($sql);
     }
 
+    public static function OwnerByKey(NotifyApp $app, $key, $itemid = 0){
+        $key = NotifyOwner::ParseKey($key, $itemid);
+
+        $db = $app->db;
+        $sql = "
+			SELECT o.*
+			FROM ".$db->prefix."notify_owner o
+			WHERE o.ownerModule='".bkstr($key->module)."'
+			    AND o.ownerType='".bkstr($key->type)."'
+			    AND o.ownerMethod='".bkstr($key->method)."'
+			    AND o.ownerItemId=".intval($key->itemid)."
+			LIMIT 1
+		";
+        return $db->query_first($sql);
+    }
+
     public static function OwnerRoot(NotifyApp $app){
         $db = $app->db;
         $sql = "
