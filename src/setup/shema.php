@@ -23,8 +23,8 @@ if ($updateManager->isUpdate('0.1.4')){
             ownerid INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Owner ID',
             userid INT(10) UNSIGNED NOT NULL COMMENT 'User ID',
 
-			status ENUM('unset', 'on', 'off') DEFAULT 'unset' COMMENT '',
-			emailStatus ENUM('unset', 'on', 'off') DEFAULT 'unset' COMMENT '',
+			status ENUM('off', 'on') DEFAULT 'off' COMMENT '',
+			emailStatus ENUM('off', 'on') DEFAULT 'off' COMMENT '',
 
 			pubkey CHAR(32) NOT NULL DEFAULT '' COMMENT 'Public Key',
 
@@ -72,7 +72,7 @@ if ($updateManager->isUpdate('0.1.4')){
             ownerMethod VARCHAR(16) NOT NULL DEFAULT '' COMMENT 'Owner Method',
             ownerItemId INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Owner Item ID',
 
-			ownerStatus ENUM('on', 'off') DEFAULT 'on' COMMENT '',
+			ownerStatus ENUM('off', 'on') DEFAULT 'on' COMMENT 'Enable/Disable User subscribe',
 
 			isBase TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT '',
 			isContainer TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT '',

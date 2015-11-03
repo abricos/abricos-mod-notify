@@ -17,6 +17,20 @@ Component.entryPoint = function(NS){
     });
 
     SYS.Application.build(COMPONENT, {}, {
+        registerOwner: function(owner){
+            if (!owner || !Y.Lang.isFunction(owner.get) || owner.get('isBase')){
+                return;
+            }
+            var ownerList = this.get('ownerList');
+            if (!ownerList){
+                return;
+            }
+            var ownerid = owner.get('id');
+            if (ownerList.getById(ownerid)){
+                return;
+            }
+            ownerList.add(owner);
+        },
         initializer: function(){
             var instance = this;
             this.ownerBaseList(function(){
@@ -35,7 +49,7 @@ Component.entryPoint = function(NS){
             Config: {value: NS.Config},
             ownerList: {
                 readOnly: true,
-                getter:function(){
+                getter: function(){
                     return this.get('ownerBaseList');
                 }
             }

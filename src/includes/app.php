@@ -124,13 +124,20 @@ class NotifyApp extends AbricosApplication {
      * @param $ownerid
      * @return NotifyOwner
      */
-    public function Owner($ownerid){
-        $d = NotifyQuery::Owner($this, $ownerid);
+    public function OwnerById($ownerid){
+        if (!isset($this->_cache['Owner'])){
+            $this->_cache['Owner'] = array();
+        }
+        if (isset($this->_cache['Owner'][$ownerid])){
+            return $this->_cache['Owner'][$ownerid];
+        }
+        $d = NotifyQuery::OwnerById($this, $ownerid);
         if (empty($d)){
             return AbricosResponse::ERR_NOT_FOUND;
         }
         /** @var NotifyOwner $owner */
         $owner = $this->InstanceClass('Owner', $d);
+        $this->_cache['Owner'][$ownerid] = $owner;
         return $owner;
     }
 
@@ -142,7 +149,7 @@ class NotifyApp extends AbricosApplication {
             return $this->_cache['OwnerRoot'];
         }
 
-        $owner = $this->Owner(1);
+        $owner = $this->OwnerById(1);
         return $this->_cache['OwnerRoot'] = $owner;
     }
 
@@ -168,7 +175,7 @@ class NotifyApp extends AbricosApplication {
         if (!$this->manager->IsWriteRole()){
             return AbricosResponse::ERR_FORBIDDEN;
         }
-        $owner = $this->Owner($ownerid);
+        $owner = $this->OwnerById($ownerid);
 
         if (AbricosResponse::IsError($owner)){
             return AbricosResponse::ERR_BAD_REQUEST;
@@ -191,18 +198,21 @@ class NotifyApp extends AbricosApplication {
     }
 
     /**
-     * @param $owner
-     * @return NotifySubscribe|int
+     * @param NotifyOwner $owner
+     * @return int
      */
     public function Subscribe($owner){
         if (!$this->manager->IsViewRole()){
             return AbricosResponse::ERR_FORBIDDEN;
         }
-        $owner = $this->OwnerNormalize($owner);
+
+        if (!($owner instanceof NotifyOwner)){
+            return AbricosResponse::ERR_BAD_REQUEST;
+        }
 
         $d = NotifyQuery::Subscribe($this, $owner);
         if (empty($d)){
-            return AbricosResponse::ERR_NOT_FOUND;
+            return $this->SubscribeSave($owner->id, array());
         }
         $subscribe = $this->InstanceClass('Subscribe', $d);
         return $subscribe;

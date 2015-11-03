@@ -13,7 +13,7 @@
  */
 class NotifyQuery {
 
-    public static function Owner(NotifyApp $app, $ownerid){
+    public static function OwnerById(NotifyApp $app, $ownerid){
         $db = $app->db;
         $sql = "
 			SELECT o.*
@@ -83,13 +83,23 @@ class NotifyQuery {
         return $db->insert_id();
     }
 
-    public static function Subscribe(NotifyApp $app, NotifyOwner $owner, $userid = 0){
-        $userid = $userid > 0 ? $userid : Abricos::$user->id;
+    public static function Subscribe(NotifyApp $app, NotifyOwner $owner){
         $db = $app->db;
         $sql = "
 			SELECT s.*
 			FROM ".$db->prefix."notify_subscribe s
-			WHERE s.userid=".bkint($userid)." AND s.ownerid=".intval($owner->id)."
+			WHERE s.userid=".bkint(Abricos::$user->id)." AND s.ownerid=".intval($owner->id)."
+			LIMIT 1
+		";
+        return $db->query_first($sql);
+    }
+
+    public static function SubscribeByOwnerId(NotifyApp $app, $ownerid){
+        $db = $app->db;
+        $sql = "
+			SELECT s.*
+			FROM ".$db->prefix."notify_subscribe s
+			WHERE s.userid=".bkint(Abricos::$user->id)." AND s.ownerid=".intval($ownerid)."
 			LIMIT 1
 		";
         return $db->query_first($sql);

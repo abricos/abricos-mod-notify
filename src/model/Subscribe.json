@@ -16,14 +16,14 @@
     },
     "status": {
       "type": "string",
-      "default": "unset",
-      "valid": "unset,on,off",
+      "default": "off",
+      "valid": "off,on",
       "json": "st"
     },
     "emailStatus": {
       "type": "string",
-      "default": "unset",
-      "valid": "unset,on,off",
+      "default": "off",
+      "valid": "off,on",
       "notNULL": true,
       "json": "emlst"
     },

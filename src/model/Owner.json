@@ -33,7 +33,7 @@
     "status": {
       "type": "string",
       "dbField": "ownerStatus",
-      "valid": "on,off",
+      "valid": "off,on",
       "json": "st"
     },
     "isBase": {

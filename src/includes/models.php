@@ -48,7 +48,6 @@ class NotifyOwnerList extends AbricosModelList {
  * @property int $dateline
  */
 class NotifySubscribe extends AbricosModel {
-    const STATUS_UNSET = 'unset';
     const STATUS_ON = 'on';
     const STATUS_OFF = 'off';
     
