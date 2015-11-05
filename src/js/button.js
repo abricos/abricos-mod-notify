@@ -74,25 +74,51 @@ Component.entryPoint = function(NS){
     SwitcherStatusExt.prototype = {
         onInitAppWidget: function(err, appInstance){
             this.renderSwitcher();
+            appInstance.on('appResponses', this._onAppResponses, this);
+        },
+        destructor: function(){
+            this.get('appInstance').detach('appResponses', this._onAppResponses, this);
+        },
+        _onAppResponses: function(e){
+            if (e.err || !e.result.subscribeSave){
+                return;
+            }
+            this.renderSwitcher();
         },
         renderSwitcher: function(){
             var tp = this.template,
                 subscribe = this.get('subscribe');
 
             if (!subscribe || !subscribe.get('owner')){
-                tp.hide('buttonOn,buttonOff');
                 return;
             }
 
             var owner = subscribe.get('owner'),
                 sst = subscribe.get('status'),
-                disable = !owner.isEnable();
+                disable = !subscribe.isEnable();
 
-            tp.each('buttonOn,buttonOff', function(node){
+            tp.each('buttonOn,buttonOff,emailStatus', function(node){
                 node.set('disabled', disable);
             }, this);
 
-            tp.toggleView(sst === SST_ON, 'buttonOff', 'buttonOn')
+            tp.setValue('emailStatus', subscribe.get('emailStatus'));
+
+            var srcNode = this.get('boundingBox');
+            srcNode.all('.statusOn').each(function(node){
+                if (sst === SST_ON){
+                    node.removeClass('hide');
+                } else {
+                    node.addClass('hide');
+                }
+            });
+
+            srcNode.all('.statusOff').each(function(node){
+                if (sst === SST_OFF){
+                    node.removeClass('hide');
+                } else {
+                    node.addClass('hide');
+                }
+            });
         },
         switchToOn: function(){
             this.get('subscribe').set('status', SST_ON);

@@ -86,9 +86,22 @@ Component.entryPoint = function(NS){
     });
 
     NS.Subscribe = Y.Base.create('subscribe', SYS.AppModel, [], {
-        structureName: 'Subscribe'
+        structureName: 'Subscribe',
+        isEnable: function(){
+            if (!this.get('owner').isEnable()){
+                return false;
+            }
+            var parent = this.get('parent'), val = true;
+            while (parent){
+                val = parent.get('status') === NS.Subscribe.STATUS_ON;
+                if (!val){
+                    break;
+                }
+                parent = parent.get('parent');
+            }
+            return val;
+        }
     }, {
-        STATUS_UNSET: 'unset',
         STATUS_ON: 'on',
         STATUS_OFF: 'off',
         ATTRS: {
@@ -100,6 +113,23 @@ Component.entryPoint = function(NS){
                         val = this.appInstance.get('ownerList').getById(ownerid);
                     }
                     return val;
+                }
+            },
+            parent: {
+                readOnly: true,
+                getter: function(val){
+                    if (!Y.Lang.isUndefined(val)){
+                        return val;
+                    }
+                    var parentOwner = this.get('owner').get('parent');
+
+                    if (!parentOwner){
+                        return null;
+                    }
+
+                    var parentKey = parentOwner.get('key');
+
+                    return this.appInstance.get('subscribeList').getByKey(parentKey);
                 }
             }
         }

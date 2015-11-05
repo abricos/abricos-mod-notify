@@ -1,26 +1,31 @@
 <!--{configButton}-->
 <div class="aw-notify subscribeConfig">
     <ul class="list-inline">
-        <li>
+        <li class="statusOn">
             <i>Оповещения разрешены</i>
         </li>
-        <li>
-            <button id="{i#buttonOn}" data-click="on" type="button"
-                    class="btn btn-default btn-sm hide"
-                    title="">
-                Включить
-            </button>
+        <li class="statusOn">
             <button id="{i#buttonOff}" data-click="off" type="button"
-                    class="btn btn-default btn-sm hide"
+                    class="btn btn-default btn-sm"
                     title="">
                 Отключить
             </button>
         </li>
+        <li class="statusOff">
+            <i>Оповещения отключены</i>
+        </li>
+        <li class="statusOff">
+            <button id="{i#buttonOn}" data-click="on" type="button"
+                    class="btn btn-default btn-sm"
+                    title="">
+                Включить
+            </button>
+        </li>
     </ul>
-    <div class="form-inline">
+    <div class="form-inline statusOn">
         <div class="form-group">
             Оповещение по электронной почте (EMail):
-            <select class="form-control input-sm">
+            <select id="{i#emailStatus}" class="form-control input-sm">
                 <option value="off">Отключено</option>
                 <option value="parent">Использовать настройки родителя</option>
                 <option value="always">Немедленно</option>
@@ -30,5 +35,4 @@
             </select>
         </div>
     </div>
-
 </div>

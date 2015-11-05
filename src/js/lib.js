@@ -102,13 +102,8 @@ Component.entryPoint = function(NS){
             },
             subscribeSave: {
                 args: ['ownerid', 'subscribe'],
+                type: 'model:Subscribe',
             },
-            /*
-             subscribeList: {
-             args: ['module'],
-             type: 'modelList:SubscribeList',
-             },
-             /**/
             config: {
                 attribute: true,
                 type: 'model:Config'

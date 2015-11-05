@@ -201,7 +201,7 @@ class NotifyApp extends AbricosApplication {
 
     public function SubscribeSaveToJSON($ownerid, $d){
         $res = $this->SubscribeSave($ownerid, $d);
-        return $this->ResultToJSON('subscribe', $res);
+        return $this->ResultToJSON('subscribeSave', $res);
     }
 
     public function SubscribeSave($ownerid, $d){
@@ -217,16 +217,18 @@ class NotifyApp extends AbricosApplication {
             }
         }
 
-        if (!$this->OwnerAppFunctionExist($owner->module, 'Notify_IsSubscribeUpdate')){
-            return AbricosResponse::ERR_SERVER_ERROR;
-        }
-
         /** @var NotifySubscribe $subscribe */
         $subscribe = $this->InstanceClass('Subscribe', $d);
 
-        $ownerApp = $this->GetOwnerApp($owner->module);
-        if (!$ownerApp->Notify_IsSubscribeUpdate($owner, $subscribe)){
-            return AbricosResponse::ERR_FORBIDDEN;
+        if ($owner->parentid > 0){
+            if (!$this->OwnerAppFunctionExist($owner->module, 'Notify_IsSubscribeUpdate')){
+                return AbricosResponse::ERR_SERVER_ERROR;
+            }
+
+            $ownerApp = $this->GetOwnerApp($owner->module);
+            if (!$ownerApp->Notify_IsSubscribeUpdate($owner, $subscribe)){
+                return AbricosResponse::ERR_FORBIDDEN;
+            }
         }
 
         NotifyQuery::SubscribeUpdate($this, $owner, $subscribe);
