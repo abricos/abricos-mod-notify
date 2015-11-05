@@ -75,6 +75,14 @@ Component.entryPoint = function(NS){
         onInitAppWidget: function(err, appInstance){
             this.renderSwitcher();
             appInstance.on('appResponses', this._onAppResponses, this);
+
+            var tp = this.template,
+                emlNode = tp.one('emailStatus');
+
+            if (emlNode){
+                emlNode.on('change', this._onEmailStatusChange, this);
+            }
+
         },
         destructor: function(){
             this.get('appInstance').detach('appResponses', this._onAppResponses, this);
@@ -84,6 +92,12 @@ Component.entryPoint = function(NS){
                 return;
             }
             this.renderSwitcher();
+        },
+        _onEmailStatusChange: function(e){
+            if (this._disableEmlStEvent){
+                return;
+            }
+            this.subscribeSave();
         },
         renderSwitcher: function(){
             var tp = this.template,
@@ -101,8 +115,6 @@ Component.entryPoint = function(NS){
                 node.set('disabled', disable);
             }, this);
 
-            tp.setValue('emailStatus', subscribe.get('emailStatus'));
-
             var srcNode = this.get('boundingBox');
             srcNode.all('.statusOn').each(function(node){
                 if (sst === SST_ON){
@@ -119,6 +131,10 @@ Component.entryPoint = function(NS){
                     node.addClass('hide');
                 }
             });
+
+            this._disableEmlStEvent = true;
+            tp.setValue('emailStatus', subscribe.get('emailStatus'));
+            this._disableEmlStEvent = false;
         },
         switchToOn: function(){
             this.get('subscribe').set('status', SST_ON);
@@ -131,8 +147,14 @@ Component.entryPoint = function(NS){
             this.subscribeSave();
         },
         subscribeSave: function(){
-            var subscribe = this.get('subscribe'),
+            var tp = this.template,
+                emlStNode = tp.one('emailStatus'),
+                subscribe = this.get('subscribe'),
                 owner = subscribe.get('owner');
+
+            if (emlStNode){
+                subscribe.set('emailStatus', tp.getValue('emailStatus'));
+            }
 
             this.get('notifyApp').subscribeSave(owner.get('id'), subscribe.toJSON(true));
         },
