@@ -1,7 +1,9 @@
 <!--{widget}-->
 <div class="row form-group">
     <div class="col-sm-4 text-right">
-        Глобальная настройка всех уведомлений
+        <label>
+            Глобальная настройка уведомлений
+        </label>
     </div>
     <div class="col-sm-8">
         <div id="{i#rootButton}"></div>
@@ -9,13 +11,35 @@
 </div>
 
 <!--{rootButton}-->
-<button id="{i#buttonOn}" data-click="on" type="button"
-        class="btn btn-default btn-xs hide"
-        title="">
-    Включить
-</button>
-<button id="{i#buttonOff}" data-click="off" type="button"
-        class="btn btn-default btn-xs hide"
-        title="">
-    Отключить
-</button>
+<div class="aw-notify subscribeConfig">
+    <ul class="list-inline">
+        <li>
+            <i>Оповещения разрешены</i>
+        </li>
+        <li>
+            <button id="{i#buttonOn}" data-click="on" type="button"
+                    class="btn btn-default btn-sm hide"
+                    title="">
+                Включить
+            </button>
+            <button id="{i#buttonOff}" data-click="off" type="button"
+                    class="btn btn-default btn-sm hide"
+                    title="">
+                Отключить
+            </button>
+        </li>
+    </ul>
+    <div class="form-inline">
+        <div class="form-group">
+            Оповещение по электронной почте (EMail):
+            <select class="form-control input-sm">
+                <option>Отключено</option>
+                <option>Немеделнно</option>
+                <option>Немеделнно, но только о первом непрочитанном сообщении</option>
+                <option>Ежедневно</option>
+                <option>Еженедельно</option>
+            </select>
+        </div>
+    </div>
+
+</div>
