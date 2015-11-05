@@ -1,4 +1,25 @@
-<!--{configButton}-->
+<!--{widget}-->
+<div class="profileConfigWidget">
+    <div class="row form-group">
+        <div class="col-sm-4 text-right">
+            <label>
+                Глобальная настройка уведомлений
+            </label>
+        </div>
+        <div class="col-sm-8">
+            <div id="{i#rootButton}"></div>
+        </div>
+    </div>
+
+    <div class="text-center" data-wait="show">
+        <hr />
+        <img src="/images/loading.gif" /> Инициализация модулей
+    </div>
+
+    <div id="{i#list}"></div>
+</div>
+
+<!--{rootButton}-->
 <div class="aw-notify subscribeConfig">
     <ul class="list-inline">
         <li>
@@ -22,7 +43,6 @@
             Оповещение по электронной почте (EMail):
             <select class="form-control input-sm">
                 <option value="off">Отключено</option>
-                <option value="parent">Использовать настройки родителя</option>
                 <option value="always">Немедленно</option>
                 <option value="first">Немедленно, но только о первом непрочитанном сообщении</option>
                 <option value="daily">Ежедневно</option>
@@ -30,5 +50,4 @@
             </select>
         </div>
     </div>
-
 </div>

@@ -247,6 +247,7 @@ class NotifyApp extends AbricosApplication {
 
         $subscribe = $this->Subscribe($owner);
         $subscribe->status = $owner->defaultStatus;
+        $subscribe->emailStatus = $owner->defaultEmailStatus;
 
         NotifyQuery::SubscribeUpdate($this, $owner, $subscribe);
 

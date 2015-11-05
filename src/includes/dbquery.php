@@ -66,7 +66,7 @@ class NotifyQuery {
         $sql = "
 			INSERT INTO ".$db->prefix."notify_owner (
 			    parentid, ownerModule, ownerType, ownerMethod, ownerItemId, ownerStatus,
-			    defaultStatus, isBase, isContainer
+			    defaultStatus, defaultEmailStatus, isBase, isContainer
 			) VALUES (
 			    ".intval($owner->parentid).",
 			    '".bkstr($owner->module)."',
@@ -75,6 +75,7 @@ class NotifyQuery {
 			    ".intval($owner->itemid).",
 			    '".bkstr($owner->status)."',
 			    '".bkstr($owner->defaultStatus)."',
+			    '".bkstr($owner->defaultEmailStatus)."',
 			    ".intval($owner->isBase).",
 			    ".intval($owner->isContainer)."
 			) ON DUPLICATE KEY UPDATE
@@ -88,14 +89,16 @@ class NotifyQuery {
         $db = $app->db;
         $sql = "
 			INSERT INTO ".$db->prefix."notify_subscribe (
-			    ownerid, userid, status, dateline
+			    ownerid, userid, status, emailStatus, dateline
 			) VALUES (
 			    ".intval($owner->id).",
 			    ".intval(Abricos::$user->id).",
 			    '".bkstr($owner->defaultStatus)."',
+			    '".bkstr($owner->defaultEmailStatus)."',
 			    ".intval(TIMENOW)."
 			) ON DUPLICATE KEY UPDATE
-			    status='".bkstr($subscribe->status)."'
+			    status='".bkstr($subscribe->status)."',
+			    emailStatus='".bkstr($subscribe->emailStatus)."'
 		";
         $db->query_write($sql);
         return $db->insert_id();

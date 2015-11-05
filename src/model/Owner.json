@@ -39,7 +39,14 @@
     "defaultStatus": {
       "type": "string",
       "valid": "off,on",
-      "json": "st"
+      "json": "defst"
+    },
+    "defaultEmailStatus": {
+      "type": "string",
+      "default": "off",
+      "valid": "off,parent,always,first,daily,weekly",
+      "notNULL": true,
+      "json": "defemlst"
     },
     "isBase": {
       "type": "bool",

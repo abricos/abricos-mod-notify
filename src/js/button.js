@@ -78,7 +78,7 @@ Component.entryPoint = function(NS){
         renderSwitcher: function(){
             var tp = this.template,
                 subscribe = this.get('subscribe');
-console.log(subscribe.toJSON());
+
             if (!subscribe || !subscribe.get('owner')){
                 tp.hide('buttonOn,buttonOff');
                 return;
@@ -123,33 +123,12 @@ console.log(subscribe.toJSON());
     };
     NS.SwitcherStatusExt = SwitcherStatusExt;
 
-    NS.SubscribeConfigWidget = Y.Base.create('subscribeConfigWidget', SYS.AppWidget, [], {
-        onInitAppWidget: function(err, appInstance){
-            var tp = this.template;
-
-            this.rootButton = new NS.RootSubscribeButtonWidget({
-                srcNode: tp.one('rootButton')
-            });
-        },
-        destructor: function(){
-
-        },
-    }, {
-        ATTRS: {
-            component: {value: COMPONENT},
-            templateBlockName: {value: 'widget'}
-        },
-        CLICKS: {}
-    });
-
-
-    NS.RootSubscribeButtonWidget = Y.Base.create('rootSubscribeButtonWidget', SYS.AppWidget, [
+    NS.SubscribeConfigButtonWidget = Y.Base.create('subscribeConfigButtonWidget', SYS.AppWidget, [
         NS.SwitcherStatusExt
     ], {}, {
         ATTRS: {
             component: {value: COMPONENT},
-            templateBlockName: {value: 'rootButton'},
-            ownerDefine: {value: {}}
+            templateBlockName: {value: 'configButton'}
         }
     });
 };

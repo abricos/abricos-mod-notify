@@ -23,7 +23,7 @@
     "emailStatus": {
       "type": "string",
       "default": "off",
-      "valid": "off,on",
+      "valid": "off,parent,always,first,daily,weekly",
       "notNULL": true,
       "json": "emlst"
     },

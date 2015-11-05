@@ -34,6 +34,7 @@ class NotifyOwnerKey {
  * @property int $itemid
  * @property string $status
  * @property string $defaultStatus Default status for User Subscribe
+ * @property string $defaultEmailStatus Default EMail Status for User Subscribe
  * @property boolean $isBase
  * @property boolean $isContainer
  */
@@ -123,6 +124,13 @@ class NotifyOwnerList extends AbricosModelList {
 class NotifySubscribe extends AbricosModel {
     const STATUS_ON = 'on';
     const STATUS_OFF = 'off';
+
+    const EML_STATUS_OFF = 'off';
+    const EML_STATUS_PARENT = 'parent';
+    const EML_STATUS_ALWAYS = 'always';
+    const EML_STATUS_FIRST = 'first';
+    const EML_STATUS_DAILY = 'daily';
+    const EML_STATUS_WEEKLY = 'weekly';
 
     protected $_structModule = 'notify';
     protected $_structName = 'Subscribe';
