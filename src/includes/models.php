@@ -27,6 +27,8 @@ class NotifyOwnerKey {
 /**
  * Class NotifyOwner
  *
+ * @property NotifyApp $app
+ *
  * @property int $parentid
  * @property string $module
  * @property string $type
@@ -88,6 +90,32 @@ class NotifyOwner extends AbricosModel {
 
         return $this->_ownerKey = implode(":", $arr);
     }
+
+    private $_parent;
+
+    /**
+     * @return NotifyOwner|null
+     */
+    public function GetParent(){
+        if (!empty($this->_parent)){
+            return $this->_parent;
+        }
+        if ($this->parentid === 0){
+            return null;
+        }
+
+        return $this->parentid = $this->app->OwnerBaseList()->Get($this->parentid);
+    }
+
+    public function IsEnable(){
+        $parent = $this;
+        while (!empty($parent)){
+            if ($this->status !== NotifyOwner::STATUS_ON){
+                return false;
+            }
+        }
+        return true;
+    }
 }
 
 /**
@@ -134,6 +162,8 @@ class NotifySubscribe extends AbricosModel {
 
     protected $_structModule = 'notify';
     protected $_structName = 'Subscribe';
+
+
 }
 
 /**

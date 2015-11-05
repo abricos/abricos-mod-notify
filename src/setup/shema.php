@@ -29,6 +29,8 @@ if ($updateManager->isUpdate('0.1.4')){
 
 			ownerStatus ENUM('off', 'on') DEFAULT 'on' COMMENT 'Enable/Disable User subscribe',
 
+            isEnable TINYINT(1) UNSIGNED NOT NULL DEFAULT 1 COMMENT 'The calculated value based on the parent`s value',
+
 			defaultStatus ENUM('off', 'on') DEFAULT 'off' COMMENT '',
 			defaultEmailStatus ENUM('off', 'parent', 'always', 'first', 'daily', 'weekly') DEFAULT 'off' COMMENT '',
 
@@ -58,13 +60,16 @@ if ($updateManager->isUpdate('0.1.4')){
 			status ENUM('off', 'on') DEFAULT 'off' COMMENT '',
 			emailStatus ENUM('off', 'parent', 'always', 'first', 'daily', 'weekly') DEFAULT 'off' COMMENT '',
 
+            isEnable TINYINT(1) UNSIGNED NOT NULL DEFAULT 1 COMMENT 'The calculated value based on the parent`s value',
+
 			pubkey CHAR(32) NOT NULL DEFAULT '' COMMENT 'Public Key',
 
 			dateline INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Create Date',
 
             PRIMARY KEY (subscribeid),
             UNIQUE KEY subscribe (ownerid, userid),
-            KEY userid (userid)
+            KEY userid (userid),
+            KEY isEnable (isEnable)
         )".$charset
     );
 

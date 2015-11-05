@@ -331,6 +331,11 @@ class NotifyApp extends AbricosApplication {
         return $this->_cache['SubscribeBaseList'] = $list;
     }
 
+    public function NotifyAppend($key, $itemid = 0){
+        $key = NotifyOwner::NormalizeKey($key, $itemid);
+
+    }
+
 }
 
 ?>
