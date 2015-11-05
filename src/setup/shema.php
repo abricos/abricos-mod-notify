@@ -73,6 +73,7 @@ if ($updateManager->isUpdate('0.1.4')){
             ownerItemId INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Owner Item ID',
 
 			ownerStatus ENUM('off', 'on') DEFAULT 'on' COMMENT 'Enable/Disable User subscribe',
+			defaultStatus ENUM('off', 'on') DEFAULT 'off' COMMENT '',
 
 			isBase TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT '',
 			isContainer TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT '',
@@ -85,8 +86,8 @@ if ($updateManager->isUpdate('0.1.4')){
 
     $db->query_write("
         INSERT INTO ".$pfx."notify_owner (
-            ownerModule, ownerType, ownerMethod, ownerItemId, ownerStatus, isBase
-        ) VALUES ('', '', '', 0, 'on', 1)
+            ownerModule, ownerType, ownerMethod, ownerItemId, ownerStatus, defaultStatus, isBase
+        ) VALUES ('', '', '', 0, 'on', 'on', 1)
     ");
 
 }

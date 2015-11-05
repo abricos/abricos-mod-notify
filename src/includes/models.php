@@ -33,6 +33,7 @@ class NotifyOwnerKey {
  * @property string $method
  * @property int $itemid
  * @property string $status
+ * @property string $defaultStatus Default status for User Subscribe
  * @property boolean $isBase
  * @property boolean $isContainer
  */

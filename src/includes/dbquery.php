@@ -65,7 +65,8 @@ class NotifyQuery {
         $db = $app->db;
         $sql = "
 			INSERT INTO ".$db->prefix."notify_owner (
-			    parentid, ownerModule, ownerType, ownerMethod, ownerItemId, ownerStatus, isBase, isContainer
+			    parentid, ownerModule, ownerType, ownerMethod, ownerItemId, ownerStatus,
+			    defaultStatus, isBase, isContainer
 			) VALUES (
 			    ".intval($owner->parentid).",
 			    '".bkstr($owner->module)."',
@@ -73,6 +74,7 @@ class NotifyQuery {
 			    '".bkstr($owner->method)."',
 			    ".intval($owner->itemid).",
 			    '".bkstr($owner->status)."',
+			    '".bkstr($owner->defaultStatus)."',
 			    ".intval($owner->isBase).",
 			    ".intval($owner->isContainer)."
 			) ON DUPLICATE KEY UPDATE
@@ -90,7 +92,7 @@ class NotifyQuery {
 			) VALUES (
 			    ".intval($owner->id).",
 			    ".intval(Abricos::$user->id).",
-			    '".bkstr($subscribe->status)."',
+			    '".bkstr($owner->defaultStatus)."',
 			    ".intval(TIMENOW)."
 			) ON DUPLICATE KEY UPDATE
 			    status='".bkstr($subscribe->status)."'

@@ -36,6 +36,11 @@
       "valid": "off,on",
       "json": "st"
     },
+    "defaultStatus": {
+      "type": "string",
+      "valid": "off,on",
+      "json": "st"
+    },
     "isBase": {
       "type": "bool",
       "json": "isb"

@@ -246,7 +246,7 @@ class NotifyApp extends AbricosApplication {
         $owner = $this->OwnerAppendByKey($parentKey, $key);
 
         $subscribe = $this->Subscribe($owner);
-        $subscribe->status = NotifySubscribe::STATUS_ON;
+        $subscribe->status = $owner->defaultStatus;
 
         NotifyQuery::SubscribeUpdate($this, $owner, $subscribe);
 
