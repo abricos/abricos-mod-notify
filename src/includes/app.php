@@ -80,11 +80,43 @@ class NotifyApp extends AbricosApplication {
         return true;
     }
 
+    /* * * * * * * * * * * * * Owner * * * * * * * * * * * * */
+
+    public function OwnerBaseAppend($d){
+        /** @var NotifyOwner $owner */
+        $owner = $this->InstanceClass('Owner', $d);
+
+        switch ($owner->recordType){
+            case NotifyOwner::TYPE_MODULE:
+                $owner->parentid = 1;
+                $owner->type = '';
+                $owner->method = '';
+                $owner->itemid = 0;
+                break;
+            case NotifyOwner::TYPE_CONTAINER:
+                $owner->method = '';
+                $owner->itemid = 0;
+                $owner->defaultStatus = NotifySubscribe::STATUS_ON;
+                $owner->defaultEmailStatus = NotifySubscribe::EML_STATUS_PARENT;
+                break;
+            case NotifyOwner::TYPE_METHOD:
+                $owner->itemid = 0;
+                break;
+            default:
+                throw new ErrorException('Owner is not base');
+        }
+
+        return NotifyQuery::OwnerAppend($this, $owner);
+    }
+
     public function OwnerBaseListToJSON(){
         $res = $this->OwnerBaseList();
         return $this->ResultToJSON('ownerBaseList', $res);
     }
 
+    /**
+     * @return NotifyOwnerList|int
+     */
     public function OwnerBaseList(){
         if (isset($this->_cache['OwnerBaseList'])){
             return $this->_cache['OwnerBaseList'];
@@ -109,27 +141,53 @@ class NotifyApp extends AbricosApplication {
     }
 
     /**
+     * @return NotifyOwnerList
+     */
+    private function OwnerCacheList(){
+        if (isset($this->_cache['OwnerList'])){
+            return $this->_cache['OwnerList'];
+        }
+
+        /** @var NotifyOwnerList $list */
+        $list = $this->InstanceClass('OwnerList');
+
+        return $this->_cache['OwnerList'] = $list;
+    }
+
+    /**
      * @param $ownerid
      * @return NotifyOwner
      */
     public function OwnerById($ownerid){
-        if (!isset($this->_cache['Owner'])){
-            $this->_cache['Owner'] = array();
+        if (!$this->manager->IsViewRole()){
+            return AbricosResponse::ERR_FORBIDDEN;
         }
-        if (isset($this->_cache['Owner'][$ownerid])){
-            return $this->_cache['Owner'][$ownerid];
+
+        $owner = $this->OwnerBaseList()->Get($ownerid);
+        if (!empty($owner)){
+            return $owner;
         }
+
+        $ownerList = $this->OwnerCacheList();
+
+        $owner = $ownerList->Get($ownerid);
+        if (!empty($owner)){
+            return $owner;
+        }
+
         $d = NotifyQuery::OwnerById($this, $ownerid);
         if (empty($d)){
             return AbricosResponse::ERR_NOT_FOUND;
         }
+
         /** @var NotifyOwner $owner */
         $owner = $this->InstanceClass('Owner', $d);
+        $ownerList->Add($owner);
 
-        return $this->_cache['Owner'][$ownerid] = $owner;;
+        return $owner;
     }
 
-    public function OwnerByKey($key, $itemid = 0){
+    public function old_OwnerByKey($key, $itemid = 0){
         $key = NotifyOwner::NormalizeKey($key, $itemid);
 
         if (!isset($this->_cache['OwnerByKey'])){
@@ -148,25 +206,12 @@ class NotifyApp extends AbricosApplication {
         return $this->_cache['OwnerByKey'][$key] = $owner;
     }
 
-    /**
-     * @return NotifyOwner
-     */
-    public function OwnerRoot(){
-        if (isset($this->_cache['OwnerRoot'])){
-            return $this->_cache['OwnerRoot'];
-        }
-
-        $owner = $this->OwnerById(1);
-        return $this->_cache['OwnerRoot'] = $owner;
-    }
-
-    public function OwnerSave($d){
+    public function old_OwnerSave($d){
         /** @var NotifyOwner $owner */
         $owner = $this->InstanceClass('Owner', $d);
 
         if ($owner->parentid === 0){
-            $root = $this->OwnerRoot();
-            $owner->parentid = $root->id;
+            $owner->parentid = 1;
         }
 
         NotifyQuery::OwnerSave($this, $owner);
@@ -176,12 +221,13 @@ class NotifyApp extends AbricosApplication {
         return $this->OwnerByKey($owner->GetKey());
     }
 
+
     /**
      * @param $key
      * @param $parentKey
      * @return NotifyOwner|int
      */
-    public function OwnerAppendByKey($parentKey, $key){
+    public function old_OwnerAppendByKey($parentKey, $key){
         $parentOwner = $this->OwnerBaseList()->GetByKey($parentKey);
         if (empty($parentOwner) || !$parentOwner->isBase){
             return AbricosResponse::ERR_BAD_REQUEST;
@@ -199,84 +245,7 @@ class NotifyApp extends AbricosApplication {
         return $this->OwnerSave($arr);
     }
 
-    public function SubscribeSaveToJSON($ownerid, $d){
-        $res = $this->SubscribeSave($ownerid, $d);
-        return $this->ResultToJSON('subscribeSave', $res);
-    }
-
-    public function SubscribeSave($ownerid, $d){
-        if (!$this->manager->IsWriteRole()){
-            return AbricosResponse::ERR_FORBIDDEN;
-        }
-        if ($ownerid instanceof NotifyOwner){
-            $owner = $ownerid;
-        } else {
-            $owner = $this->OwnerById($ownerid);
-            if (AbricosResponse::IsError($owner)){
-                return AbricosResponse::ERR_BAD_REQUEST;
-            }
-        }
-
-        /** @var NotifySubscribe $subscribe */
-        $subscribe = $this->InstanceClass('Subscribe', $d);
-
-        if ($owner->parentid > 0){
-            if (!$this->OwnerAppFunctionExist($owner->module, 'Notify_IsSubscribeUpdate')){
-                return AbricosResponse::ERR_SERVER_ERROR;
-            }
-
-            $ownerApp = $this->GetOwnerApp($owner->module);
-            if (!$ownerApp->Notify_IsSubscribeUpdate($owner, $subscribe)){
-                return AbricosResponse::ERR_FORBIDDEN;
-            }
-        }
-
-        NotifyQuery::SubscribeUpdate($this, $owner, $subscribe);
-        return $this->Subscribe($owner);
-    }
-
-    /**
-     * @param $parentKey
-     * @param $key
-     * @param $itemid
-     * @return NotifyOwner|int
-     */
-    public function SubscribeItemAppend($parentKey, $key, $itemid){
-        $parentKey = NotifyOwner::NormalizeKey($parentKey);
-        $key = NotifyOwner::NormalizeKey($key, $itemid);
-
-        $owner = $this->OwnerAppendByKey($parentKey, $key);
-
-        $subscribe = $this->Subscribe($owner);
-        $subscribe->status = $owner->defaultStatus;
-        $subscribe->emailStatus = $owner->defaultEmailStatus;
-
-        NotifyQuery::SubscribeUpdate($this, $owner, $subscribe);
-
-        return $owner;
-    }
-
-    /**
-     * @param $owner
-     * @return int|NotifySubscribe
-     */
-    public function Subscribe($owner){
-        if (!$this->manager->IsViewRole()){
-            return AbricosResponse::ERR_FORBIDDEN;
-        }
-
-        if (!($owner instanceof NotifyOwner)){
-            return AbricosResponse::ERR_BAD_REQUEST;
-        }
-
-        $d = NotifyQuery::Subscribe($this, $owner);
-        if (empty($d)){
-            return $this->SubscribeSave($owner->id, array());
-        }
-        /** @var NotifySubscribe $subscribe */
-        $subscribe = $this->InstanceClass('Subscribe', $d);
-        return $subscribe;
-    }
+    /* * * * * * * * * * * * * Subscribe * * * * * * * * * * * * */
 
     public function SubscribeBaseListToJSON(){
         $res = $this->SubscribeBaseList();
@@ -320,9 +289,7 @@ class NotifyApp extends AbricosApplication {
                 $owner = $ownerBaseList->GetByIndex($i);
                 $subscribe = $list->GetBy('ownerid', $owner->id);
                 if (empty($subscribe)){
-                    $subscribe = $this->InstanceClass('Subscribe');
-                    // create base subscribe
-                    NotifyQuery::SubscribeUpdate($this, $owner, $subscribe);
+                    NotifyQuery::SubscribeAppend($this, $owner);
                 }
             }
             return $this->SubscribeBaseList();
@@ -331,10 +298,116 @@ class NotifyApp extends AbricosApplication {
         return $this->_cache['SubscribeBaseList'] = $list;
     }
 
-    public function NotifyAppend($key, $itemid = 0){
+    private function SubscribeCacheList(){
+        if (isset($this->_cache['SubscribeList'])){
+            return $this->_cache['SubscribeList'];
+        }
+
+        /** @var NotifySubscribeList $list */
+        $list = $this->InstanceClass('SubscribeList');
+
+        return $this->_cache['SubscribeList'] = $list;
+    }
+
+    /**
+     * @param NotifyOwner $owner
+     * @return int|NotifySubscribe
+     */
+    public function Subscribe(NotifyOwner $owner){
+        if (!$this->manager->IsViewRole()){
+            return AbricosResponse::ERR_FORBIDDEN;
+        }
+
+        if ($owner->IsBase()){
+            $subscribe = $this->SubscribeBaseList()->GetByOwner($owner);
+        } else {
+            $subscribeCacheList = $this->SubscribeCacheList();
+            $subscribe = $subscribeCacheList->GetByOwner($owner);
+
+            if (empty($subscribe)){
+                $d = NotifyQuery::Subscribe($this, $owner);
+                if (!empty($d)){
+                    /** @var NotifySubscribe $subscribe */
+                    $subscribe = $this->InstanceClass('Subscribe', $d);
+                    $subscribeCacheList->Add($subscribe);
+                }
+            }
+        }
+        if (!empty($subscribe)){
+            return $subscribe;
+        }
+
+        if ($owner->recordType !== NotifyOwner::TYPE_ROOT){
+            if ($this->OwnerAppFunctionExist($owner->module, 'Notify_IsSubscribeAppend')){
+                $ownerApp = $this->GetOwnerApp($owner->module);
+                if (!$ownerApp->Notify_IsSubscribeAppend($owner)){
+                    return AbricosResponse::ERR_FORBIDDEN;
+                }
+            }
+        }
+        $subscribeid = NotifyQuery::SubscribeAppend($this, $owner);
+        if ($subscribeid === 0){
+            return AbricosResponse::ERR_SERVER_ERROR;
+        }
+
+        return $this->Subscribe($owner);
+    }
+
+    public function SubscribeSaveToJSON($ownerid, $d){
+        $res = $this->SubscribeSave($ownerid, $d);
+        return $this->ResultToJSON('subscribeSave', $res);
+    }
+
+    public function SubscribeSave($ownerid, $d){
+        if (!$this->manager->IsWriteRole()){
+            return AbricosResponse::ERR_FORBIDDEN;
+        }
+        if ($ownerid instanceof NotifyOwner){
+            $owner = $ownerid;
+        } else {
+            $owner = $this->OwnerById($ownerid);
+            if (AbricosResponse::IsError($owner)){
+                return AbricosResponse::ERR_BAD_REQUEST;
+            }
+        }
+
+        $curSubscribe = $this->Subscribe($owner);
+        if (AbricosResponse::IsError($curSubscribe)){
+            return AbricosResponse::ERR_BAD_REQUEST;
+        }
+
+        /** @var NotifySubscribe $subscribe */
+        $subscribe = $this->InstanceClass('Subscribe', $d);
+
+        $curSubscribe->status = $subscribe->status;
+        $curSubscribe->emailStatus = $subscribe->emailStatus;
+
+        NotifyQuery::SubscribeUpdate($this, $owner, $curSubscribe);
+
+        return $curSubscribe;
+    }
+
+    /**
+     * @param $parentKey
+     * @param $key
+     * @param $itemid
+     * @return NotifyOwner|int
+     */
+    public function SubscribeItemAppend($parentKey, $key, $itemid){
+        $parentKey = NotifyOwner::NormalizeKey($parentKey);
         $key = NotifyOwner::NormalizeKey($key, $itemid);
 
+        $owner = $this->OwnerAppendByKey($parentKey, $key);
+
+        $subscribe = $this->Subscribe($owner);
+        $subscribe->status = $owner->defaultStatus;
+        $subscribe->emailStatus = $owner->defaultEmailStatus;
+
+        NotifyQuery::SubscribeUpdate($this, $owner, $subscribe);
+
+        return $owner;
     }
+
 
 }
 

@@ -10,6 +10,13 @@
       "type": "int",
       "json": "pid"
     },
+    "recordType": {
+      "type": "string",
+      "default": "item",
+      "valid": "root,module,container,method,item",
+      "notNULL": true,
+      "json": "rtp"
+    },
     "module": {
       "type": "string",
       "dbField": "ownerModule",
@@ -47,14 +54,6 @@
       "valid": "off,parent,always,first,daily,weekly",
       "notNULL": true,
       "json": "defemlst"
-    },
-    "isBase": {
-      "type": "bool",
-      "json": "isb"
-    },
-    "isContainer": {
-      "type": "bool",
-      "json": "isctr"
     }
   }
 }

@@ -13,6 +13,39 @@
  */
 class NotifyQuery {
 
+    public static function OwnerAppend(NotifyApp $app, NotifyOwner $owner){
+        $db = $app->db;
+        $sql = "
+			INSERT INTO ".$db->prefix."notify_owner (
+			    parentid, recordType,
+			    ownerModule, ownerType, ownerMethod, ownerItemId, ownerStatus,
+			    defaultStatus, defaultEmailStatus
+			) VALUES (
+			    ".intval($owner->parentid).",
+			    '".bkstr($owner->recordType)."',
+			    '".bkstr($owner->module)."',
+			    '".bkstr($owner->type)."',
+			    '".bkstr($owner->method)."',
+			    ".intval($owner->itemid).",
+			    '".bkstr($owner->status)."',
+			    '".bkstr($owner->defaultStatus)."',
+			    '".bkstr($owner->defaultEmailStatus)."'
+			)
+		";
+        $db->query_write($sql);
+        return $db->insert_id();
+    }
+
+    public static function OwnerBaseList(NotifyApp $app){
+        $db = $app->db;
+        $sql = "
+			SELECT o.*
+			FROM ".$db->prefix."notify_owner o
+			WHERE o.recordType<>'item'
+		";
+        return $db->query_read($sql);
+    }
+
     public static function OwnerById(NotifyApp $app, $ownerid){
         $db = $app->db;
         $sql = "
@@ -23,6 +56,7 @@ class NotifyQuery {
 		";
         return $db->query_first($sql);
     }
+
 
     public static function OwnerByKey(NotifyApp $app, $key, $itemid = 0){
         $key = NotifyOwner::ParseKey($key, $itemid);
@@ -40,28 +74,7 @@ class NotifyQuery {
         return $db->query_first($sql);
     }
 
-    public static function OwnerRoot(NotifyApp $app){
-        $db = $app->db;
-        $sql = "
-			SELECT o.*
-			FROM ".$db->prefix."notify_owner o
-			WHERE o.ownerModule='' AND o.ownerType='' AND o.ownerMethod='' AND o.ownerItemId=0
-			LIMIT 1
-		";
-        return $db->query_first($sql);
-    }
-
-    public static function OwnerBaseList(NotifyApp $app){
-        $db = $app->db;
-        $sql = "
-			SELECT o.*
-			FROM ".$db->prefix."notify_owner o
-			WHERE o.isBase=1
-		";
-        return $db->query_read($sql);
-    }
-
-    public static function OwnerSave(NotifyApp $app, NotifyOwner $owner){
+    public static function old_OwnerSave(NotifyApp $app, NotifyOwner $owner){
         $db = $app->db;
         $sql = "
 			INSERT INTO ".$db->prefix."notify_owner (
@@ -85,23 +98,17 @@ class NotifyQuery {
         return $db->insert_id();
     }
 
-    public static function SubscribeUpdate(NotifyApp $app, NotifyOwner $owner, NotifySubscribe $subscribe){
+    /* * * * * * * * * * * * * Subscribe * * * * * * * * * * * * */
+
+    public static function SubscribeBaseList(NotifyApp $app){
         $db = $app->db;
         $sql = "
-			INSERT INTO ".$db->prefix."notify_subscribe (
-			    ownerid, userid, status, emailStatus, dateline
-			) VALUES (
-			    ".intval($owner->id).",
-			    ".intval(Abricos::$user->id).",
-			    '".bkstr($owner->defaultStatus)."',
-			    '".bkstr($owner->defaultEmailStatus)."',
-			    ".intval(TIMENOW)."
-			) ON DUPLICATE KEY UPDATE
-			    status='".bkstr($subscribe->status)."',
-			    emailStatus='".bkstr($subscribe->emailStatus)."'
+			SELECT s.*
+			FROM ".$db->prefix."notify_subscribe s
+			INNER JOIN ".$db->prefix."notify_owner o ON s.ownerid=o.ownerid
+			WHERE o.recordType<>'item' AND s.userid=".bkint(Abricos::$user->id)."
 		";
-        $db->query_write($sql);
-        return $db->insert_id();
+        return $db->query_read($sql);
     }
 
     public static function Subscribe(NotifyApp $app, NotifyOwner $owner){
@@ -115,7 +122,37 @@ class NotifyQuery {
         return $db->query_first($sql);
     }
 
-    public static function SubscribeByOwnerId(NotifyApp $app, $ownerid){
+    public static function SubscribeAppend(NotifyApp $app, NotifyOwner $owner){
+        $db = $app->db;
+        $sql = "
+			INSERT INTO ".$db->prefix."notify_subscribe (
+			    ownerid, userid, status, emailStatus, dateline
+			) VALUES (
+			    ".intval($owner->id).",
+			    ".intval(Abricos::$user->id).",
+			    '".bkstr($owner->defaultStatus)."',
+			    '".bkstr($owner->defaultEmailStatus)."',
+			    ".intval(TIMENOW)."
+			)
+		";
+        $db->query_write($sql);
+        return $db->insert_id();
+    }
+
+    public static function SubscribeUpdate(NotifyApp $app, NotifyOwner $owner, NotifySubscribe $subscribe){
+        $db = $app->db;
+        $sql = "
+			UPDATE ".$db->prefix."notify_subscribe
+			SET
+			    status='".bkstr($subscribe->status)."',
+			    emailStatus='".bkstr($subscribe->emailStatus)."'
+			WHERE ownerid=".intval($owner->id)." AND userid=".intval(Abricos::$user->id)."
+		";
+        $db->query_write($sql);
+        return $db->insert_id();
+    }
+
+    public static function old_SubscribeByOwnerId(NotifyApp $app, $ownerid){
         $db = $app->db;
         $sql = "
 			SELECT s.*
@@ -126,16 +163,6 @@ class NotifyQuery {
         return $db->query_first($sql);
     }
 
-    public static function SubscribeBaseList(NotifyApp $app){
-        $db = $app->db;
-        $sql = "
-			SELECT s.*
-			FROM ".$db->prefix."notify_subscribe s
-			INNER JOIN ".$db->prefix."notify_owner o ON s.ownerid=o.ownerid
-			WHERE o.isBase=1 AND s.userid=".bkint(Abricos::$user->id)."
-		";
-        return $db->query_read($sql);
-    }
 }
 
 

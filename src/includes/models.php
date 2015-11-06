@@ -30,6 +30,7 @@ class NotifyOwnerKey {
  * @property NotifyApp $app
  *
  * @property int $parentid
+ * @property string $recordType
  * @property string $module
  * @property string $type
  * @property string $method
@@ -37,10 +38,14 @@ class NotifyOwnerKey {
  * @property string $status
  * @property string $defaultStatus Default status for User Subscribe
  * @property string $defaultEmailStatus Default EMail Status for User Subscribe
- * @property boolean $isBase
- * @property boolean $isContainer
  */
 class NotifyOwner extends AbricosModel {
+    const TYPE_ROOT = 'root';
+    const TYPE_MODULE = 'module';
+    const TYPE_CONTAINER = 'container';
+    const TYPE_METHOD = 'method';
+    const TYPE_ITEM = 'item';
+
     const STATUS_ON = 'on';
     const STATUS_OFF = 'off';
 
@@ -72,6 +77,10 @@ class NotifyOwner extends AbricosModel {
         $key = NotifyOwner::NormalizeKey($key, $itemid);
         $a = explode(":", $key);
         return new NotifyOwnerKey($a[0], $a[1], $a[2], $a[3]);
+    }
+
+    public function IsBase(){
+        return $this->recordType !== NotifyOwner::TYPE_ITEM;
     }
 
     private $_ownerKey;
@@ -142,6 +151,8 @@ class NotifyOwnerList extends AbricosModelList {
 /**
  * Class NotifySubscribe
  *
+ * @property NotifyApp $app
+ *
  * @property int $ownerid
  * @property int $userid
  * @property string $status
@@ -164,6 +175,21 @@ class NotifySubscribe extends AbricosModel {
     protected $_structName = 'Subscribe';
 
 
+    private $_owner;
+
+    public function GetOwner(){
+        if (!empty($this->_owner)){
+            return $this->_owner;
+        }
+
+        $this->_owner = $this->app->OwnerById($this->ownerid);
+
+        return $this->_owner;
+    }
+
+    public function IsBase(){
+        return $this->GetOwner()->IsBase();
+    }
 }
 
 /**
@@ -177,6 +203,24 @@ class NotifySubscribeList extends AbricosModelList {
      * @var NotifyOwnerList
      */
     public $ownerList;
+
+    /**
+     * @param NotifyOwner|int $ownerid
+     * @return NotifySubscribe|null
+     */
+    public function GetByOwner($ownerid){
+        if ($ownerid instanceof NotifyOwner){
+            $ownerid = $ownerid->id;
+        }
+        $count = $this->Count();
+        for ($i = 0; $i < $count; $i++){
+            $subscribe = $this->GetByIndex($i);
+            if ($subscribe->ownerid === $ownerid){
+                return $subscribe;
+            }
+        }
+        return null;
+    }
 }
 
 ?>
