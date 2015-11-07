@@ -109,6 +109,36 @@ class NotifyApp extends AbricosApplication {
         return NotifyQuery::OwnerAppend($this, $owner);
     }
 
+    /**
+     * @param NotifyOwner $ownerCont
+     * @param int $itemid
+     * @return NotifyOwner|int
+     */
+    public function OwnerItemAppend(NotifyOwner $ownerCont, $itemid){
+        if ($ownerCont->recordType !== NotifyOwner::TYPE_CONTAINER){
+            return AbricosResponse::ERR_BAD_REQUEST;
+        }
+
+        /** @var NotifyOwner $owner */
+        $owner = $this->InstanceClass('Owner', array(
+            'parentid' => $ownerCont->id,
+            'module' => $ownerCont->module,
+            'type' => $ownerCont->type,
+            'itemid' => $itemid,
+            'status' => NotifyOwner::STATUS_ON,
+            'defaultStatus' => NotifySubscribe::STATUS_ON,
+            'defaultEmailStatus' => NotifySubscribe::EML_STATUS_PARENT,
+            'recordType' => NotifyOwner::TYPE_ITEM
+        ));
+
+        $ownerid = NotifyQuery::OwnerAppend($this, $owner);
+        if ($ownerid === 0){
+            return AbricosResponse::ERR_SERVER_ERROR;
+        }
+
+        return $this->OwnerById($ownerid);
+    }
+
     public function OwnerBaseListToJSON(){
         $res = $this->OwnerBaseList();
         return $this->ResultToJSON('ownerBaseList', $res);
@@ -187,62 +217,32 @@ class NotifyApp extends AbricosApplication {
         return $owner;
     }
 
-    public function old_OwnerByKey($key, $itemid = 0){
-        $key = NotifyOwner::NormalizeKey($key, $itemid);
-
-        if (!isset($this->_cache['OwnerByKey'])){
-            $this->_cache['OwnerByKey'] = array();
-        }
-        if (isset($this->_cache['OwnerByKey'][$key])){
-            return $this->_cache['OwnerByKey'][$key];
-        }
-        $d = NotifyQuery::OwnerByKey($this, $key);
-        if (empty($d)){
-            return AbricosResponse::ERR_NOT_FOUND;
-        }
-        /** @var NotifyOwner $owner */
-        $owner = $this->InstanceClass('Owner', $d);
-
-        return $this->_cache['OwnerByKey'][$key] = $owner;
-    }
-
-    public function old_OwnerSave($d){
-        /** @var NotifyOwner $owner */
-        $owner = $this->InstanceClass('Owner', $d);
-
-        if ($owner->parentid === 0){
-            $owner->parentid = 1;
-        }
-
-        NotifyQuery::OwnerSave($this, $owner);
-
-        $this->CacheClear();
-
-        return $this->OwnerByKey($owner->GetKey());
-    }
-
-
     /**
-     * @param $key
-     * @param $parentKey
+     * @param NotifyOwner $ownerCont
+     * @param inte $itemid
+     * @param bool|false $createIfNotFound
      * @return NotifyOwner|int
      */
-    public function old_OwnerAppendByKey($parentKey, $key){
-        $parentOwner = $this->OwnerBaseList()->GetByKey($parentKey);
-        if (empty($parentOwner) || !$parentOwner->isBase){
-            return AbricosResponse::ERR_BAD_REQUEST;
+    public function OwnerByContainer(NotifyOwner $ownerCont, $itemid, $createIfNotFound = false){
+        $ownerList = $this->OwnerCacheList();
+        $owner = $ownerList->GetByContainer($ownerCont, $itemid);
+
+        if (!empty($owner)){
+            return $owner;
         }
 
-        $key = NotifyOwner::ParseKey($key);
+        $d = NotifyQuery::OwnerByContiner($this, $ownerCont, $itemid);
+        if (!empty($d)){
+            /** @var NotifyOwner $owner */
+            $owner = $this->InstanceClass('Owner', $d);
+            $ownerList->Add($owner);
+            return $owner;
+        }
+        if (!$createIfNotFound){
+            return AbricosResponse::ERR_NOT_FOUND;
+        }
 
-        $arr = array(
-            "module" => $key->module,
-            "type" => $key->type,
-            "method" => $key->method,
-            "itemid" => $key->itemid,
-            "parentid" => $parentOwner->id
-        );
-        return $this->OwnerSave($arr);
+        return $this->OwnerItemAppend($ownerCont, $itemid);
     }
 
     /* * * * * * * * * * * * * Subscribe * * * * * * * * * * * * */
@@ -408,6 +408,24 @@ class NotifyApp extends AbricosApplication {
         return $owner;
     }
 
+    /* * * * * * * * * * * * * Notify * * * * * * * * * * * * */
+
+    /**
+     * @param string $methodKey Example 'forum:topic:new'
+     * @param int $itemid
+     * @return NotifyOwner|int
+     */
+    public function NotifyAppend($methodKey, $itemid){
+        $ownerMethod = $this->OwnerBaseList()->GetByKey($methodKey);
+        if (empty($ownerMethod) || $ownerMethod->recordType !== NotifyOwner::TYPE_METHOD){
+            return AbricosResponse::ERR_BAD_REQUEST;
+        }
+        $ownerCont = $ownerMethod->GetParent();
+
+        $owner = $this->OwnerByContainer($ownerCont, $itemid, true);
+
+        return $owner;
+    }
 
 }
 

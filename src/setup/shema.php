@@ -38,6 +38,7 @@ if ($updateManager->isUpdate('0.1.4')){
 
             PRIMARY KEY (ownerid),
             UNIQUE KEY owner (ownerModule, ownerType, ownerMethod, ownerItemId),
+            KEY parentid (parentid),
             KEY recordType (recordType)
         )".$charset
     );

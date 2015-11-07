@@ -100,20 +100,20 @@ class NotifyOwner extends AbricosModel {
         return $this->_ownerKey = implode(":", $arr);
     }
 
-    private $_parent;
+    private $_ownerParent;
 
     /**
      * @return NotifyOwner|null
      */
     public function GetParent(){
-        if (!empty($this->_parent)){
-            return $this->_parent;
+        if (!empty($this->_ownerParent)){
+            return $this->_ownerParent;
         }
         if ($this->parentid === 0){
             return null;
         }
 
-        return $this->parentid = $this->app->OwnerBaseList()->Get($this->parentid);
+        return $this->_ownerParent = $this->app->OwnerBaseList()->Get($this->parentid);
     }
 
     public function IsEnable(){
@@ -134,12 +134,33 @@ class NotifyOwner extends AbricosModel {
  */
 class NotifyOwnerList extends AbricosModelList {
 
+    /**
+     * @param string $key
+     * @param int $itemid
+     * @return NotifyOwner|null
+     */
     public function GetByKey($key, $itemid = 0){
         $key = NotifyOwner::NormalizeKey($key, $itemid);
         $count = $this->Count();
         for ($i = 0; $i < $count; $i++){
             $owner = $this->GetByIndex($i);
             if ($owner->GetKey() === $key){
+                return $owner;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param NotifyOwner $ownerCont
+     * @param int $itemid
+     * @return NotifyOwner|null
+     */
+    public function GetByContainer(NotifyOwner $ownerCont, $itemid){
+        $count = $this->Count();
+        for ($i = 0; $i < $count; $i++){
+            $owner = $this->GetByIndex($i);
+            if ($owner->parentid === $ownerCont->id && $owner->itemid === $itemid){
                 return $owner;
             }
         }

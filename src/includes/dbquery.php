@@ -33,7 +33,7 @@ class NotifyQuery {
 			)
 		";
         $db->query_write($sql);
-        return $db->insert_id();
+        return intval($db->insert_id());
     }
 
     public static function OwnerBaseList(NotifyApp $app){
@@ -57,8 +57,18 @@ class NotifyQuery {
         return $db->query_first($sql);
     }
 
+    public static function OwnerByContiner(NotifyApp $app, NotifyOwner $ownerCont, $itemid){
+        $db = $app->db;
+        $sql = "
+			SELECT o.*
+			FROM ".$db->prefix."notify_owner o
+			WHERE o.parentid=".intval($ownerCont->id)." AND o.ownerItemId=".intval($itemid)."
+			LIMIT 1
+		";
+        return $db->query_first($sql);
+    }
 
-    public static function OwnerByKey(NotifyApp $app, $key, $itemid = 0){
+    public static function old_OwnerByKey(NotifyApp $app, $key, $itemid = 0){
         $key = NotifyOwner::ParseKey($key, $itemid);
 
         $db = $app->db;
