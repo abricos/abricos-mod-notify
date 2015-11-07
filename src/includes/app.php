@@ -248,7 +248,7 @@ class NotifyApp extends AbricosApplication {
             return $owner;
         }
 
-        $d = NotifyQuery::OwnerByContiner($this, $ownerCont, $itemid);
+        $d = NotifyQuery::OwnerByContainer($this, $ownerCont, $itemid);
         if (!empty($d)){
             /** @var NotifyOwner $owner */
             $owner = $this->InstanceClass('Owner', $d);
@@ -275,6 +275,9 @@ class NotifyApp extends AbricosApplication {
         }
 
         $d = NotifyQuery::OwnerByKey($this, $key, $itemid);
+        throw new Exception();
+        print_r($key);
+        print_r($d); exit;
         if (empty($d)){
             return AbricosResponse::ERR_NOT_FOUND;
         }
@@ -483,21 +486,22 @@ class NotifyApp extends AbricosApplication {
         return $owner;
     }
 
-    public function EventPerfomed(NotifyEvent $event){
-        
-    }
-
     public function EventCheck(){
-
         $rows = NotifyQuery::EventListByExpect($this);
         while (($d = $this->db->fetch_array($rows))){
             /** @var NotifyEvent $event */
             $event = $this->InstanceClass('Owner', $d);
-            $this->EventPerfomed($event);
+            NotifyQuery::EventPerfomed($this, $event);
         }
     }
 
-
+    public function EventRead($key, $itemid){
+        $owner = $this->OwnerByKey($key, $itemid);
+        if (AbricosResponse::IsError($owner)){
+            return AbricosResponse::ERR_NOT_FOUND;
+        }
+        NotifyQuery::ActivityUpdate($this, $owner);
+    }
 
 }
 

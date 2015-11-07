@@ -75,6 +75,22 @@ if ($updateManager->isUpdate('0.1.4')){
         )".$charset
     );
 
+    // User Activity
+    $db->query_write("
+        CREATE TABLE IF NOT EXISTS ".$pfx."notify_activity (
+            activityid INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+
+            ownerItemId INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Owner Item Id',
+            userid INT(10) UNSIGNED NOT NULL COMMENT 'User ID',
+
+			activity INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Activity Date',
+            viewCount INT(6) UNSIGNED NOT NULL DEFAULT 1 COMMENT 'User ID',
+
+            PRIMARY KEY (activityid),
+            UNIQUE KEY ownerItem (ownerItemId, userid)
+        )".$charset
+    );
+
     $db->query_write("
         CREATE TABLE IF NOT EXISTS ".$pfx."notify_event (
             eventid INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -100,6 +116,22 @@ if ($updateManager->isUpdate('0.1.4')){
         CREATE TABLE IF NOT EXISTS ".$pfx."notify (
             notifyid INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 
+            eventid INT(10) UNSIGNED NOT NULL COMMENT 'Owner ID',
+            userid INT(10) UNSIGNED NOT NULL COMMENT 'User ID',
+
+			dateline INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Create Date',
+
+            PRIMARY KEY (notifyid),
+            UNIQUE KEY notify (eventid, userid),
+            KEY userid (userid)
+        )".$charset
+    );
+
+    /*
+    $db->query_write("
+        CREATE TABLE IF NOT EXISTS ".$pfx."notify (
+            notifyid INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+
             ownerid INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Owner ID',
             userid INT(10) UNSIGNED NOT NULL COMMENT 'User ID',
 
@@ -120,6 +152,6 @@ if ($updateManager->isUpdate('0.1.4')){
             KEY userid (userid)
         )".$charset
     );
-
+    /**/
 }
 ?>

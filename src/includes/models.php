@@ -261,15 +261,20 @@ class NotifySubscribeList extends AbricosModelList {
 /**
  * Class NotifyEvent
  *
- * @property int @ownerItemId
- * @property int @ownerMethodId
- * @property string @status
- * @property int @dateline
- * @property int @timeout
+ * @property int $ownerItemId
+ * @property int $ownerMethodId
+ * @property int $userid
+ * @property string $status
+ * @property int $dateline
+ * @property int $timeout
  */
 class NotifyEvent extends AbricosModel {
     protected $_structModule = 'notify';
     protected $_structName = 'Event';
+
+    const STATUS_EXPECT = 'expect';
+    const STATUS_PERFOMED = 'perfomed';
+    const STATUS_FINISHED = 'finished';
 }
 
 /**

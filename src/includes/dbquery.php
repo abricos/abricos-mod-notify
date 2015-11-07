@@ -58,7 +58,7 @@ class NotifyQuery {
         return $db->query_first($sql);
     }
 
-    public static function OwnerByContiner(NotifyApp $app, NotifyOwner $ownerCont, $itemid){
+    public static function OwnerByContainer(NotifyApp $app, NotifyOwner $ownerCont, $itemid){
         $db = $app->db;
         $sql = "
 			SELECT o.*
@@ -79,7 +79,7 @@ class NotifyQuery {
 			WHERE o.ownerModule='".bkstr($key->module)."'
 			    AND o.ownerType='".bkstr($key->type)."'
 			    AND o.ownerMethod='".bkstr($key->method)."'
-			    AND o.ownerItemId=".intval($key->itemid)."
+			    AND o.ownerItemId=".intval($itemid)."
 			LIMIT 1
 		";
         return $db->query_first($sql);
@@ -139,6 +139,24 @@ class NotifyQuery {
         return $db->insert_id();
     }
 
+    /* * * * * * * * * * * * * User Activity * * * * * * * * * * * * */
+
+    public static function ActivityUpdate(NotifyApp $app, NotifyOwner $ownerItem){
+        $db = $app->db;
+        $sql = "
+			INSERT INTO ".$db->prefix."notify_activity (
+			    ownerItemId, userid, activity
+			) VALUES (
+			    ".intval($ownerItem->id).",
+			    ".intval(Abricos::$user->id).",
+			    ".intval(TIMENOW)."
+			) ON DUPLICATE KEY UPDATE
+			    activity=".intval(TIMENOW).",
+			    viewCount=viewCount+1
+		";
+        $db->query_write($sql);
+    }
+
     /* * * * * * * * * * * * * Event * * * * * * * * * * * * */
 
     public static function EventAppend(NotifyApp $app, NotifyOwner $ownerItem, NotifyOwner $ownerMethod){
@@ -155,7 +173,24 @@ class NotifyQuery {
 			)
 		";
         $db->query_write($sql);
-        return $db->insert_id();
+        $eventid = $db->insert_id();
+
+        $sql = "
+            INSERT INTO ".$db->prefix."notify (
+                eventid, userid, dateline
+            )
+            SELECT
+                ".intval($eventid).",
+                s.userid,
+                ".intval(TIMENOW)." as dateline
+            FROM ".$db->prefix."notify_subscribe s
+			WHERE s.userid<>".intval(Abricos::$user->id)."
+			    AND s.ownerid=".intval($ownerMethod->id)."
+			    AND s.status='".NotifySubscribe::STATUS_ON."'
+		";
+        $db->query_write($sql);
+
+        return $eventid;
     }
 
     public static function EventListByExpect(NotifyApp $app){
@@ -163,9 +198,14 @@ class NotifyQuery {
         $sql = "
 			SELECT *
 			FROM ".$db->prefix."notify_event
-			WHERE status='expect' AND (dateline+timeout)<".intval(TIMENOW)."
+			WHERE status='".NotifyEvent::STATUS_EXPECT."'
+			    AND (dateline+timeout)<".intval(TIMENOW)."
 		";
         return $db->query_read($sql);
+    }
+
+    public static function EventPerfomed(NotifyApp $app, NotifyEvent $event){
+
     }
 }
 
