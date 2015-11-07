@@ -19,7 +19,7 @@ class NotifyQuery {
 			INSERT INTO ".$db->prefix."notify_owner (
 			    parentid, recordType,
 			    ownerModule, ownerType, ownerMethod, ownerItemId, ownerStatus,
-			    defaultStatus, defaultEmailStatus
+			    defaultStatus, defaultEmailStatus, eventTimeout
 			) VALUES (
 			    ".intval($owner->parentid).",
 			    '".bkstr($owner->recordType)."',
@@ -29,7 +29,8 @@ class NotifyQuery {
 			    ".intval($owner->itemid).",
 			    '".bkstr($owner->status)."',
 			    '".bkstr($owner->defaultStatus)."',
-			    '".bkstr($owner->defaultEmailStatus)."'
+			    '".bkstr($owner->defaultEmailStatus)."',
+			    ".intval($owner->eventTimeout)."
 			)
 		";
         $db->query_write($sql);
@@ -68,7 +69,7 @@ class NotifyQuery {
         return $db->query_first($sql);
     }
 
-    public static function old_OwnerByKey(NotifyApp $app, $key, $itemid = 0){
+    public static function OwnerByKey(NotifyApp $app, $key, $itemid = 0){
         $key = NotifyOwner::ParseKey($key, $itemid);
 
         $db = $app->db;
@@ -82,30 +83,6 @@ class NotifyQuery {
 			LIMIT 1
 		";
         return $db->query_first($sql);
-    }
-
-    public static function old_OwnerSave(NotifyApp $app, NotifyOwner $owner){
-        $db = $app->db;
-        $sql = "
-			INSERT INTO ".$db->prefix."notify_owner (
-			    parentid, ownerModule, ownerType, ownerMethod, ownerItemId, ownerStatus,
-			    defaultStatus, defaultEmailStatus, isBase, isContainer
-			) VALUES (
-			    ".intval($owner->parentid).",
-			    '".bkstr($owner->module)."',
-			    '".bkstr($owner->type)."',
-			    '".bkstr($owner->method)."',
-			    ".intval($owner->itemid).",
-			    '".bkstr($owner->status)."',
-			    '".bkstr($owner->defaultStatus)."',
-			    '".bkstr($owner->defaultEmailStatus)."',
-			    ".intval($owner->isBase).",
-			    ".intval($owner->isContainer)."
-			) ON DUPLICATE KEY UPDATE
-			    ownerStatus='".bkstr($owner->status)."'
-		";
-        $db->query_write($sql);
-        return $db->insert_id();
     }
 
     /* * * * * * * * * * * * * Subscribe * * * * * * * * * * * * */
@@ -162,17 +139,34 @@ class NotifyQuery {
         return $db->insert_id();
     }
 
-    public static function old_SubscribeByOwnerId(NotifyApp $app, $ownerid){
+    /* * * * * * * * * * * * * Event * * * * * * * * * * * * */
+
+    public static function EventAppend(NotifyApp $app, NotifyOwner $ownerItem, NotifyOwner $ownerMethod){
         $db = $app->db;
         $sql = "
-			SELECT s.*
-			FROM ".$db->prefix."notify_subscribe s
-			WHERE s.userid=".bkint(Abricos::$user->id)." AND s.ownerid=".intval($ownerid)."
-			LIMIT 1
+			INSERT INTO ".$db->prefix."notify_event (
+			    ownerItemId, ownerMethodId, userid, dateline, timeout
+			) VALUES (
+			    ".intval($ownerItem->id).",
+			    ".intval($ownerMethod->id).",
+			    ".intval(Abricos::$user->id).",
+			    ".intval(TIMENOW).",
+			    ".intval($ownerMethod->eventTimeout)."
+			)
 		";
-        return $db->query_first($sql);
+        $db->query_write($sql);
+        return $db->insert_id();
     }
 
+    public static function EventListByExpect(NotifyApp $app){
+        $db = $app->db;
+        $sql = "
+			SELECT *
+			FROM ".$db->prefix."notify_event
+			WHERE status='expect' AND (dateline+timeout)<".intval(TIMENOW)."
+		";
+        return $db->query_read($sql);
+    }
 }
 
 

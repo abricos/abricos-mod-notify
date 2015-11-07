@@ -38,6 +38,7 @@ class NotifyOwnerKey {
  * @property string $status
  * @property string $defaultStatus Default status for User Subscribe
  * @property string $defaultEmailStatus Default EMail Status for User Subscribe
+ * @property int $eventTimeout
  */
 class NotifyOwner extends AbricosModel {
     const TYPE_ROOT = 'root';
@@ -52,35 +53,17 @@ class NotifyOwner extends AbricosModel {
     protected $_structModule = 'notify';
     protected $_structName = 'Owner';
 
-    public static function NormalizeKey($key, $itemid = 0){
-        // TODO: create cache normalized key
-        if (!is_string($key)){
-            $key = '';
-        }
-        $itemid = intval($itemid);
-        $key = str_replace('{v#itemid}', $itemid, $key);
-        $a = array();
-        $aa = explode(":", $key);
-        for ($i = 0; $i < 4; $i++){
-            $a[] = $i < 3 ? (isset($aa[$i]) ? $aa[$i] : "") :
-                (isset($aa[$i]) ? intval($aa[$i]) : 0);
-        }
-        return implode(":", $a);
-    }
-
-    /**
-     * @param $key
-     * @param int $itemid
-     * @return NotifyOwnerKey
-     */
-    public static function ParseKey($key, $itemid = 0){
-        $key = NotifyOwner::NormalizeKey($key, $itemid);
-        $a = explode(":", $key);
-        return new NotifyOwnerKey($a[0], $a[1], $a[2], $a[3]);
-    }
-
     public function IsBase(){
         return $this->recordType !== NotifyOwner::TYPE_ITEM;
+    }
+
+    public function IsSubscribe(){
+        switch ($this->recordType){
+            case NotifyOwner::TYPE_CONTAINER:
+            case NotifyOwner::TYPE_ITEM:
+                return false;
+        }
+        return true;
     }
 
     private $_ownerKey;
@@ -125,6 +108,36 @@ class NotifyOwner extends AbricosModel {
         }
         return true;
     }
+
+    /* * * * * * * * * * * * * Static * * * * * * * * * * * */
+
+    public static function NormalizeKey($key, $itemid = 0){
+        // TODO: create cache normalized key
+        if (!is_string($key)){
+            $key = '';
+        }
+        $itemid = intval($itemid);
+        $key = str_replace('{v#itemid}', $itemid, $key);
+        $a = array();
+        $aa = explode(":", $key);
+        for ($i = 0; $i < 4; $i++){
+            $a[] = $i < 3 ? (isset($aa[$i]) ? $aa[$i] : "") :
+                (isset($aa[$i]) ? intval($aa[$i]) : 0);
+        }
+        return implode(":", $a);
+    }
+
+    /**
+     * @param $key
+     * @param int $itemid
+     * @return NotifyOwnerKey
+     */
+    public static function ParseKey($key, $itemid = 0){
+        $key = NotifyOwner::NormalizeKey($key, $itemid);
+        $a = explode(":", $key);
+        return new NotifyOwnerKey($a[0], $a[1], $a[2], $a[3]);
+    }
+
 }
 
 /**
@@ -133,6 +146,8 @@ class NotifyOwner extends AbricosModel {
  * @method NotifyOwner GetByIndex($index)
  */
 class NotifyOwnerList extends AbricosModelList {
+
+    public $subscribeBaseCount = 0;
 
     /**
      * @param string $key
@@ -195,7 +210,6 @@ class NotifySubscribe extends AbricosModel {
     protected $_structModule = 'notify';
     protected $_structName = 'Subscribe';
 
-
     private $_owner;
 
     public function GetOwner(){
@@ -242,6 +256,30 @@ class NotifySubscribeList extends AbricosModelList {
         }
         return null;
     }
+}
+
+/**
+ * Class NotifyEvent
+ *
+ * @property int @ownerItemId
+ * @property int @ownerMethodId
+ * @property string @status
+ * @property int @dateline
+ * @property int @timeout
+ */
+class NotifyEvent extends AbricosModel {
+    protected $_structModule = 'notify';
+    protected $_structName = 'Event';
+}
+
+/**
+ * Class NotifyEventList
+ *
+ * @method NotifyEvent Get($id)
+ * @method NotifyEvent GetByIndex($index)
+ */
+class NotifyEventList extends AbricosModelList {
+    
 }
 
 ?>

@@ -23,6 +23,8 @@ class NotifyApp extends AbricosApplication {
             'OwnerList' => 'NotifyOwnerList',
             'Subscribe' => 'NotifySubscribe',
             'SubscribeList' => 'NotifySubscribeList',
+            'Event' => 'NotifyEvent',
+            'EventList' => 'NotifyEventList',
         );
     }
 
@@ -34,10 +36,10 @@ class NotifyApp extends AbricosApplication {
         switch ($d->do){
             case 'ownerBaseList':
                 return $this->OwnerBaseListToJSON();
-            case 'subscribeSave':
-                return $this->SubscribeSaveToJSON($d->ownerid, $d->subscribe);
             case 'subscribeBaseList':
                 return $this->SubscribeBaseListToJSON();
+            case 'subscribeSave':
+                return $this->SubscribeSaveToJSON($d->ownerid, $d->subscribe);
         }
         return null;
     }
@@ -48,7 +50,7 @@ class NotifyApp extends AbricosApplication {
         $this->_cache = array();
     }
 
-    private function GetOwnerApp($moduleName){
+    protected function GetOwnerApp($moduleName){
         if (!isset($this->_cache['app'])){
             $this->_cache['app'] = array();
         }
@@ -69,7 +71,7 @@ class NotifyApp extends AbricosApplication {
         return $this->_cache['app'][$moduleName] = $manager->GetApp();
     }
 
-    private function OwnerAppFunctionExist($module, $fn){
+    protected function OwnerAppFunctionExist($module, $fn){
         $ownerApp = $this->GetOwnerApp($module);
         if (empty($ownerApp)){
             return false;
@@ -114,7 +116,7 @@ class NotifyApp extends AbricosApplication {
      * @param int $itemid
      * @return NotifyOwner|int
      */
-    public function OwnerItemAppend(NotifyOwner $ownerCont, $itemid){
+    protected function OwnerItemAppend(NotifyOwner $ownerCont, $itemid){
         if ($ownerCont->recordType !== NotifyOwner::TYPE_CONTAINER){
             return AbricosResponse::ERR_BAD_REQUEST;
         }
@@ -163,6 +165,9 @@ class NotifyApp extends AbricosApplication {
 
             /** @var NotifyOwner $owner */
             $owner = $this->InstanceClass('Owner', $d);
+            if ($owner->IsSubscribe()){
+                $list->subscribeBaseCount++;
+            }
 
             $list->Add($owner);
         }
@@ -173,7 +178,7 @@ class NotifyApp extends AbricosApplication {
     /**
      * @return NotifyOwnerList
      */
-    private function OwnerCacheList(){
+    protected function OwnerCacheList(){
         if (isset($this->_cache['OwnerList'])){
             return $this->_cache['OwnerList'];
         }
@@ -185,7 +190,7 @@ class NotifyApp extends AbricosApplication {
     }
 
     /**
-     * @param $ownerid
+     * @param int $ownerid
      * @return NotifyOwner
      */
     public function OwnerById($ownerid){
@@ -196,6 +201,18 @@ class NotifyApp extends AbricosApplication {
         $owner = $this->OwnerBaseList()->Get($ownerid);
         if (!empty($owner)){
             return $owner;
+        }
+
+        return $this->OwnerItemById($ownerid);
+    }
+
+    /**
+     * @param int $ownerid
+     * @return NotifyOwner|int
+     */
+    public function OwnerItemById($ownerid){
+        if (!$this->manager->IsViewRole()){
+            return AbricosResponse::ERR_FORBIDDEN;
         }
 
         $ownerList = $this->OwnerCacheList();
@@ -223,7 +240,7 @@ class NotifyApp extends AbricosApplication {
      * @param bool|false $createIfNotFound
      * @return NotifyOwner|int
      */
-    public function OwnerByContainer(NotifyOwner $ownerCont, $itemid, $createIfNotFound = false){
+    protected function OwnerByContainer(NotifyOwner $ownerCont, $itemid, $createIfNotFound = false){
         $ownerList = $this->OwnerCacheList();
         $owner = $ownerList->GetByContainer($ownerCont, $itemid);
 
@@ -245,6 +262,28 @@ class NotifyApp extends AbricosApplication {
         return $this->OwnerItemAppend($ownerCont, $itemid);
     }
 
+    public function OwnerByKey($key, $itemid = 0){
+        $itemid = intval($itemid);
+        $key = NotifyOwner::NormalizeKey($key, $itemid);
+        if ($itemid === 0){
+            return $this->OwnerBaseList()->GetByKey($key);
+        }
+        $ownerList = $this->OwnerCacheList();
+        $owner = $ownerList->GetByKey($key);
+        if (!empty($owner)){
+            return $owner;
+        }
+
+        $d = NotifyQuery::OwnerByKey($this, $key, $itemid);
+        if (empty($d)){
+            return AbricosResponse::ERR_NOT_FOUND;
+        }
+        /** @var NotifyOwner $owner */
+        $owner = $this->InstanceClass('Owner', $d);
+        $ownerList->Add($owner);
+        return $owner;
+    }
+
     /* * * * * * * * * * * * * Subscribe * * * * * * * * * * * * */
 
     public function SubscribeBaseListToJSON(){
@@ -258,14 +297,10 @@ class NotifyApp extends AbricosApplication {
         if (isset($this->_cache['SubscribeBaseList'])){
             return $this->_cache['SubscribeBaseList'];
         }
-        if (!$this->manager->IsViewRole()){
-            return AbricosResponse::ERR_FORBIDDEN;
-        }
-
         /** @var NotifySubscribeList $list */
         $list = $this->InstanceClass('SubscribeList');
 
-        if (Abricos::$user->id === 0){
+        if (!$this->manager->IsViewRole() || Abricos::$user->id === 0){
             return $list;
         }
 
@@ -277,16 +312,19 @@ class NotifyApp extends AbricosApplication {
         }
 
         $ownerBaseList = $this->OwnerBaseList();
-        $ownerCount = $ownerBaseList->Count();
-        if ($list->Count() != $ownerCount){
 
+        if ($list->Count() !== $ownerBaseList->subscribeBaseCount){
             if ($this->_isSubscribeBaseListUpdate){
                 return AbricosResponse::ERR_SERVER_ERROR;
             }
-
             $this->_isSubscribeBaseListUpdate = true;
+
+            $ownerCount = $ownerBaseList->Count();
             for ($i = 0; $i < $ownerCount; $i++){
                 $owner = $ownerBaseList->GetByIndex($i);
+                if (!$owner->IsSubscribe()){
+                    continue;
+                }
                 $subscribe = $list->GetBy('ownerid', $owner->id);
                 if (empty($subscribe)){
                     NotifyQuery::SubscribeAppend($this, $owner);
@@ -298,7 +336,7 @@ class NotifyApp extends AbricosApplication {
         return $this->_cache['SubscribeBaseList'] = $list;
     }
 
-    private function SubscribeCacheList(){
+    protected function SubscribeCacheList(){
         if (isset($this->_cache['SubscribeList'])){
             return $this->_cache['SubscribeList'];
         }
@@ -313,9 +351,13 @@ class NotifyApp extends AbricosApplication {
      * @param NotifyOwner $owner
      * @return int|NotifySubscribe
      */
-    public function Subscribe(NotifyOwner $owner){
+    protected function Subscribe(NotifyOwner $owner){
         if (!$this->manager->IsViewRole()){
             return AbricosResponse::ERR_FORBIDDEN;
+        }
+
+        if (!$owner->IsSubscribe()){
+            return AbricosResponse::ERR_BAD_REQUEST;
         }
 
         if ($owner->IsBase()){
@@ -408,6 +450,15 @@ class NotifyApp extends AbricosApplication {
         return $owner;
     }
 
+    public function SubscribeByKey($key, $itemid = 0){
+        $owner = $this->OwnerByKey($key, $itemid);
+        if (AbricosResponse::IsError($owner)){
+            return AbricosResponse::ERR_NOT_FOUND;
+        }
+
+        return $this->Subscribe($owner);
+    }
+
     /* * * * * * * * * * * * * Notify * * * * * * * * * * * * */
 
     /**
@@ -424,8 +475,29 @@ class NotifyApp extends AbricosApplication {
 
         $owner = $this->OwnerByContainer($ownerCont, $itemid, true);
 
+        // Добавить событие в очередь
+        NotifyQuery::EventAppend($this, $owner, $ownerMethod);
+
+        $this->EventCheck();
+
         return $owner;
     }
+
+    public function EventPerfomed(NotifyEvent $event){
+        
+    }
+
+    public function EventCheck(){
+
+        $rows = NotifyQuery::EventListByExpect($this);
+        while (($d = $this->db->fetch_array($rows))){
+            /** @var NotifyEvent $event */
+            $event = $this->InstanceClass('Owner', $d);
+            $this->EventPerfomed($event);
+        }
+    }
+
+
 
 }
 

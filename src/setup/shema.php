@@ -36,6 +36,8 @@ if ($updateManager->isUpdate('0.1.4')){
             isEnable TINYINT(1) UNSIGNED NOT NULL DEFAULT 1 COMMENT 'The calculated value based on the parent`s value',
 			calcDate INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Caclulate Date',
 
+            eventTimeout INT(4) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Event Timeout (seconds)',
+
             PRIMARY KEY (ownerid),
             UNIQUE KEY owner (ownerModule, ownerType, ownerMethod, ownerItemId),
             KEY parentid (parentid),
@@ -70,6 +72,27 @@ if ($updateManager->isUpdate('0.1.4')){
             UNIQUE KEY subscribe (ownerid, userid),
             KEY userid (userid),
             KEY isEnable (isEnable)
+        )".$charset
+    );
+
+    $db->query_write("
+        CREATE TABLE IF NOT EXISTS ".$pfx."notify_event (
+            eventid INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+
+            ownerItemId INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Owner by method type ID',
+            ownerMethodId INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Owner by method type ID',
+
+            userid INT(10) UNSIGNED NOT NULL COMMENT 'User ID',
+
+			status ENUM('expect', 'performed', 'finished') DEFAULT 'expect' COMMENT '',
+
+			dateline INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Create Date',
+            timeout INT(4) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Event Timeout (seconds)',
+
+            PRIMARY KEY (eventid),
+            UNIQUE KEY event (ownerItemId, ownerMethodId),
+            KEY status (status),
+            KEY eventdate (dateline, timeout)
         )".$charset
     );
 

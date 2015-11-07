@@ -44,16 +44,23 @@
       "json": "st"
     },
     "defaultStatus": {
+      "rolefn": "IsAdminRole",
       "type": "string",
       "valid": "off,on",
       "json": "defst"
     },
     "defaultEmailStatus": {
+      "rolefn": "IsAdminRole",
       "type": "string",
       "default": "off",
       "valid": "off,parent,always,first,daily,weekly",
       "notNULL": true,
       "json": "defemlst"
+    },
+    "eventTimeout": {
+      "rolefn": "IsAdminRole",
+      "type": "int",
+      "json": "etmout"
     }
   }
 }
