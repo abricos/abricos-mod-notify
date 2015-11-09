@@ -13,7 +13,7 @@
     "recordType": {
       "type": "string",
       "default": "item",
-      "valid": "root,module,container,method,item",
+      "valid": "root,module,container,method,item,imethod",
       "notNULL": true,
       "json": "rtp"
     },
@@ -56,6 +56,10 @@
       "valid": "off,parent,always,first,daily,weekly",
       "notNULL": true,
       "json": "defemlst"
+    },
+    "isBase": {
+      "type": "bool",
+      "json": "isb"
     },
     "eventTimeout": {
       "rolefn": "IsAdminRole",

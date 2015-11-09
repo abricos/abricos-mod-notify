@@ -21,7 +21,7 @@ if ($updateManager->isUpdate('0.1.4')){
             ownerid INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 
             parentid INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Parent Owner ID',
-			recordType ENUM('root', 'module', 'container', 'method', 'item') DEFAULT 'item' COMMENT '',
+			recordType ENUM('root', 'module', 'container', 'method', 'item', 'imethod') DEFAULT 'item' COMMENT '',
 
             ownerModule VARCHAR(32) NOT NULL DEFAULT '' COMMENT 'Owner Module Name',
             ownerType VARCHAR(16) NOT NULL DEFAULT '' COMMENT 'Owner Type',
@@ -33,6 +33,8 @@ if ($updateManager->isUpdate('0.1.4')){
 			defaultStatus ENUM('off', 'on') DEFAULT 'off' COMMENT '',
 			defaultEmailStatus ENUM('off', 'parent', 'always', 'first', 'daily', 'weekly') DEFAULT 'off' COMMENT '',
 
+            isBase TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT '',
+
             isEnable TINYINT(1) UNSIGNED NOT NULL DEFAULT 1 COMMENT 'The calculated value based on the parent`s value',
 			calcDate INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Caclulate Date',
 
@@ -41,6 +43,7 @@ if ($updateManager->isUpdate('0.1.4')){
             PRIMARY KEY (ownerid),
             UNIQUE KEY owner (ownerModule, ownerType, ownerMethod, ownerItemId),
             KEY parentid (parentid),
+            KEY isBase (isBase),
             KEY recordType (recordType)
         )".$charset
     );
@@ -48,8 +51,8 @@ if ($updateManager->isUpdate('0.1.4')){
     $db->query_write("
         INSERT INTO ".$pfx."notify_owner (
             ownerid, recordType, ownerModule, ownerType, ownerMethod, ownerItemId, ownerStatus,
-            defaultStatus, defaultEmailStatus
-        ) VALUES (1, 'root', '', '', '', 0, 'on', 'on', 'daily')
+            defaultStatus, defaultEmailStatus, isBase
+        ) VALUES (1, 'root', '', '', '', 0, 'on', 'on', 'daily', 1)
     ");
 
     $db->query_write("

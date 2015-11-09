@@ -14,13 +14,11 @@ class NotifyOwnerKey {
     public $module;
     public $type;
     public $method;
-    public $itemid;
 
-    public function __construct($module, $type, $method, $itemid){
+    public function __construct($module, $type, $method){
         $this->module = strval($module);
         $this->type = strval($type);
         $this->method = strval($method);
-        $this->itemid = intval($itemid);
     }
 }
 
@@ -39,6 +37,7 @@ class NotifyOwnerKey {
  * @property string $defaultStatus Default status for User Subscribe
  * @property string $defaultEmailStatus Default EMail Status for User Subscribe
  * @property int $eventTimeout
+ * @property bool $isBase
  */
 class NotifyOwner extends AbricosModel {
     const TYPE_ROOT = 'root';
@@ -46,6 +45,7 @@ class NotifyOwner extends AbricosModel {
     const TYPE_CONTAINER = 'container';
     const TYPE_METHOD = 'method';
     const TYPE_ITEM = 'item';
+    const TYPE_ITEM_METHOD = 'imethod';
 
     const STATUS_ON = 'on';
     const STATUS_OFF = 'off';
@@ -53,11 +53,17 @@ class NotifyOwner extends AbricosModel {
     protected $_structModule = 'notify';
     protected $_structName = 'Owner';
 
-    public function IsBase(){
+    /**
+     * @deprecated
+     */
+    private function IsBase(){
         return $this->recordType !== NotifyOwner::TYPE_ITEM;
     }
 
-    public function IsSubscribe(){
+    /**
+     * @deprecated
+     */
+    private function IsSubscribe(){
         switch ($this->recordType){
             case NotifyOwner::TYPE_CONTAINER:
             case NotifyOwner::TYPE_ITEM:
@@ -76,8 +82,7 @@ class NotifyOwner extends AbricosModel {
         $arr = array(
             $this->module,
             $this->type,
-            $this->method,
-            $this->itemid
+            $this->method
         );
 
         return $this->_ownerKey = implode(":", $arr);
@@ -111,18 +116,15 @@ class NotifyOwner extends AbricosModel {
 
     /* * * * * * * * * * * * * Static * * * * * * * * * * * */
 
-    public static function NormalizeKey($key, $itemid = 0){
+    public static function NormalizeKey($key){
         // TODO: create cache normalized key
         if (!is_string($key)){
             $key = '';
         }
-        $itemid = intval($itemid);
-        $key = str_replace('{v#itemid}', $itemid, $key);
         $a = array();
         $aa = explode(":", $key);
-        for ($i = 0; $i < 4; $i++){
-            $a[] = $i < 3 ? (isset($aa[$i]) ? $aa[$i] : "") :
-                (isset($aa[$i]) ? intval($aa[$i]) : 0);
+        for ($i = 0; $i < 3; $i++){
+            $a[] = (isset($aa[$i]) ? $aa[$i] : "");
         }
         return implode(":", $a);
     }
@@ -132,10 +134,10 @@ class NotifyOwner extends AbricosModel {
      * @param int $itemid
      * @return NotifyOwnerKey
      */
-    public static function ParseKey($key, $itemid = 0){
-        $key = NotifyOwner::NormalizeKey($key, $itemid);
+    public static function ParseKey($key){
+        $key = NotifyOwner::NormalizeKey($key);
         $a = explode(":", $key);
-        return new NotifyOwnerKey($a[0], $a[1], $a[2], $a[3]);
+        return new NotifyOwnerKey($a[0], $a[1], $a[2]);
     }
 
 }
@@ -147,19 +149,18 @@ class NotifyOwner extends AbricosModel {
  */
 class NotifyOwnerList extends AbricosModelList {
 
-    public $subscribeBaseCount = 0;
-
     /**
      * @param string $key
      * @param int $itemid
      * @return NotifyOwner|null
      */
     public function GetByKey($key, $itemid = 0){
+        $itemid = intval($itemid);
         $key = NotifyOwner::NormalizeKey($key, $itemid);
         $count = $this->Count();
         for ($i = 0; $i < $count; $i++){
             $owner = $this->GetByIndex($i);
-            if ($owner->GetKey() === $key){
+            if ($owner->GetKey() === $key && $owner->itemid === $itemid){
                 return $owner;
             }
         }
@@ -223,7 +224,7 @@ class NotifySubscribe extends AbricosModel {
     }
 
     public function IsBase(){
-        return $this->GetOwner()->IsBase();
+        return $this->GetOwner()->isBase;
     }
 }
 
@@ -284,7 +285,7 @@ class NotifyEvent extends AbricosModel {
  * @method NotifyEvent GetByIndex($index)
  */
 class NotifyEventList extends AbricosModelList {
-    
+
 }
 
 ?>

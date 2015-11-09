@@ -19,7 +19,7 @@ class NotifyQuery {
 			INSERT INTO ".$db->prefix."notify_owner (
 			    parentid, recordType,
 			    ownerModule, ownerType, ownerMethod, ownerItemId, ownerStatus,
-			    defaultStatus, defaultEmailStatus, eventTimeout
+			    defaultStatus, defaultEmailStatus, eventTimeout, isBase
 			) VALUES (
 			    ".intval($owner->parentid).",
 			    '".bkstr($owner->recordType)."',
@@ -30,7 +30,8 @@ class NotifyQuery {
 			    '".bkstr($owner->status)."',
 			    '".bkstr($owner->defaultStatus)."',
 			    '".bkstr($owner->defaultEmailStatus)."',
-			    ".intval($owner->eventTimeout)."
+			    ".intval($owner->eventTimeout).",
+			    ".intval($owner->isBase)."
 			)
 		";
         $db->query_write($sql);
@@ -42,7 +43,7 @@ class NotifyQuery {
         $sql = "
 			SELECT o.*
 			FROM ".$db->prefix."notify_owner o
-			WHERE o.recordType<>'item'
+			WHERE o.isBase=1
 		";
         return $db->query_read($sql);
     }
@@ -58,13 +59,14 @@ class NotifyQuery {
         return $db->query_first($sql);
     }
 
-    public static function OwnerByContainer(NotifyApp $app, NotifyOwner $ownerCont, $itemid){
+    public static function OwnerListByContainer(NotifyApp $app, NotifyOwner $ownerCont, $itemid){
         $db = $app->db;
         $sql = "
 			SELECT o.*
 			FROM ".$db->prefix."notify_owner o
-			WHERE o.parentid=".intval($ownerCont->id)." AND o.ownerItemId=".intval($itemid)."
-			LIMIT 1
+			WHERE o.ownerModule='".bkstr($ownerCont->module)."'
+			    AND o.ownerType='".bkstr($ownerCont->type)."'
+			    AND o.ownerItemId=".intval($itemid)."
 		";
         return $db->query_first($sql);
     }
@@ -93,7 +95,7 @@ class NotifyQuery {
 			SELECT s.*
 			FROM ".$db->prefix."notify_subscribe s
 			INNER JOIN ".$db->prefix."notify_owner o ON s.ownerid=o.ownerid
-			WHERE o.recordType<>'item' AND s.userid=".bkint(Abricos::$user->id)."
+			WHERE o.isBase=1 AND s.userid=".bkint(Abricos::$user->id)."
 		";
         return $db->query_read($sql);
     }
