@@ -38,6 +38,7 @@ if ($updateManager->isUpdate('0.1.4')){
             isEnable TINYINT(1) UNSIGNED NOT NULL DEFAULT 1 COMMENT 'The calculated value based on the parent`s value',
 			calcDate INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Caclulate Date',
 
+            isChildSubscribe TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT '',
             eventTimeout INT(4) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Event Timeout (seconds)',
 
             PRIMARY KEY (ownerid),

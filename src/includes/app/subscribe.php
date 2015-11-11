@@ -115,7 +115,7 @@ class NotifyAppSubscribe extends AbricosApplication {
             $subscribe = $this->BaseList()->GetByOwnerId($owner);
         } else {
             $list = $this->CacheList();
-            $subscribe = $list->GetByOwner($owner);
+            $subscribe = $list->GetByOwnerId($owner);
 
             if (empty($subscribe)){
                 $d = NotifyQuery::Subscribe($this, $owner);

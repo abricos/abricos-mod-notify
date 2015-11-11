@@ -61,6 +61,10 @@
       "type": "bool",
       "json": "isb"
     },
+    "isChildSubscribe": {
+      "type": "bool",
+      "json": "ischs"
+    },
     "eventTimeout": {
       "rolefn": "IsAdminRole",
       "type": "int",

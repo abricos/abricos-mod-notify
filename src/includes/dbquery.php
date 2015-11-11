@@ -19,7 +19,7 @@ class NotifyQuery {
 			INSERT INTO ".$db->prefix."notify_owner (
 			    parentid, recordType,
 			    ownerModule, ownerType, ownerMethod, ownerItemId, ownerStatus,
-			    defaultStatus, defaultEmailStatus, eventTimeout, isBase
+			    defaultStatus, defaultEmailStatus, eventTimeout, isChildSubscribe, isBase
 			) VALUES (
 			    ".intval($owner->parentid).",
 			    '".bkstr($owner->recordType)."',
@@ -31,11 +31,12 @@ class NotifyQuery {
 			    '".bkstr($owner->defaultStatus)."',
 			    '".bkstr($owner->defaultEmailStatus)."',
 			    ".intval($owner->eventTimeout).",
+			    ".intval($owner->isChildSubscribe).",
 			    ".intval($owner->isBase)."
 			)
 		";
         $db->query_write($sql);
-        return intval($db->insert_id());
+        return $db->insert_id();
     }
 
     public static function OwnerBaseList(AbricosApplication $app){
@@ -68,7 +69,7 @@ class NotifyQuery {
 			    AND o.ownerType='".bkstr($ownerCont->type)."'
 			    AND o.ownerItemId=".intval($itemid)."
 		";
-        return $db->query_first($sql);
+        return $db->query_read($sql);
     }
 
     public static function OwnerByKey(AbricosApplication $app, $key, $itemid = 0){
@@ -136,6 +137,26 @@ class NotifyQuery {
 			    status='".bkstr($subscribe->status)."',
 			    emailStatus='".bkstr($subscribe->emailStatus)."'
 			WHERE ownerid=".intval($owner->id)." AND userid=".intval(Abricos::$user->id)."
+		";
+        $db->query_write($sql);
+        return $db->insert_id();
+    }
+
+    public static function SubscribeAutoAppend(AbricosApplication $app, NotifyOwner $owner){
+        $db = $app->db;
+        $sql = "
+			INSERT INTO ".$db->prefix."notify_subscribe (
+			    ownerid, userid, status, emailStatus, dateline
+			)
+			SELECT
+			    ".intval($owner->id)." as ownerid,
+			    userid,
+			    status,
+			    emailStatus,
+			    ".intval(TIMENOW)." as dateline
+			FROM ".$db->prefix."notify_subscribe
+			WHERE ownerid=".intval($owner->parentid)."
+			    AND status='".NotifySubscribe::STATUS_ON."'
 		";
         $db->query_write($sql);
         return $db->insert_id();

@@ -36,8 +36,9 @@ class NotifyOwnerKey {
  * @property string $status
  * @property string $defaultStatus Default status for User Subscribe
  * @property string $defaultEmailStatus Default EMail Status for User Subscribe
- * @property int $eventTimeout
  * @property bool $isBase
+ * @property int $eventTimeout
+ * @property bool $isChildSubscribe
  */
 class NotifyOwner extends AbricosModel {
     const TYPE_ROOT = 'root';

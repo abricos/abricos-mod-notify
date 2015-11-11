@@ -96,7 +96,7 @@ class NotifyAppOwner extends AbricosApplication {
         }
 
         /** @var NotifyOwnerList $list */
-        $list = $this->InstanceClass('List');
+        $list = $this->InstanceClass('OwnerList');
 
         return $this->_cache['List'] = $list;
     }
@@ -106,10 +106,10 @@ class NotifyAppOwner extends AbricosApplication {
      * @param int $itemid
      * @return NotifyOwner|int
      */
-    protected function ItemAppend($container, $itemid){
+    public function ItemAppend($container, $itemid){
         if (is_string($container)){
-            $container = $this->BaseList()->GetByKey($container);
-            if (empty($container)){
+            $container = $this->ContainerByKey($container);
+            if (AbricosResponse::IsError($container)){
                 return AbricosResponse::ERR_BAD_REQUEST;
             }
         }
@@ -129,13 +129,13 @@ class NotifyAppOwner extends AbricosApplication {
             'recordType' => NotifyOwner::TYPE_ITEM
         ));
 
-        $ownerid = NotifyQuery::OwnerAppend($this, $owner);
-        if ($ownerid === 0){
+        $owner->id = NotifyQuery::OwnerAppend($this, $owner);
+        if ($owner->id === 0){
             return AbricosResponse::ERR_SERVER_ERROR;
         }
 
         // add item subscribe methods
-        $ownerList = $this->OwnerBaseList();
+        $ownerList = $this->BaseList();
         $count = $ownerList->Count();
         for ($i = 0; $i < $count; $i++){
             $ownerMethod = $ownerList->GetByIndex($i);
@@ -145,6 +145,7 @@ class NotifyAppOwner extends AbricosApplication {
                 continue;
             }
 
+            /** @var NotifyOwner $ownerItemMethod */
             $ownerItemMethod = $this->InstanceClass('Owner', array(
                 'parentid' => $ownerMethod->id,
                 'module' => $ownerMethod->module,
@@ -156,10 +157,18 @@ class NotifyAppOwner extends AbricosApplication {
                 'defaultEmailStatus' => NotifySubscribe::EML_STATUS_PARENT,
                 'recordType' => NotifyOwner::TYPE_ITEM_METHOD
             ));
-            NotifyQuery::OwnerAppend($this, $ownerItemMethod);
+            $ownerItemMethod->id = $id = NotifyQuery::OwnerAppend($this, $ownerItemMethod);
+
+            if ($ownerMethod->isChildSubscribe){
+                NotifyQuery::SubscribeAutoAppend($this, $ownerItemMethod);
+            }
         }
 
-        return $this->ItemByKey($container->GetKey(), $itemid);
+        $this->CacheClear();
+
+        $owner = $this->ItemByKey($container->GetKey(), $itemid);
+
+        return $owner;
     }
 
     /**
@@ -197,9 +206,10 @@ class NotifyAppOwner extends AbricosApplication {
     public function ContainerByKey($key){
         $pkey = NotifyOwner::ParseKey($key);
         $baseList = $this->BaseList();
-        $count = count($baseList);
+        $count = $baseList->Count();
         for ($i = 0; $i < $count; $i++){
             $owner = $baseList->GetByIndex($i);
+
             if ($owner->recordType === NotifyOwner::TYPE_CONTAINER
                 && $owner->module === $pkey->module
                 && $owner->type === $pkey->type
@@ -216,7 +226,7 @@ class NotifyAppOwner extends AbricosApplication {
 
         $owner = AbricosResponse::ERR_NOT_FOUND;
         $list = $this->CacheList();
-        $count = count($list);
+        $count = $list->Count();
         for ($i = 0; $i < $count; $i++){
             $owner = $list->GetByIndex($i);
 
@@ -251,7 +261,7 @@ class NotifyAppOwner extends AbricosApplication {
         $this->ItemByKey($key, $itemid);
 
         $list = $this->CacheList();
-        $count = count($list);
+        $count = $list->Count();
         for ($i = 0; $i < $count; $i++){
             $owner = $list->GetByIndex($i);
 
