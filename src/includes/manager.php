@@ -41,7 +41,11 @@ class NotifyManager extends Ab_ModuleManager {
         if (!is_null($this->_app)){
             return $this->_app;
         }
-        $this->module->ScriptRequire('includes/app.php');
+        $this->module->ScriptRequireOnce(array(
+            'includes/dbquery.php',
+            'includes/models.php',
+            'includes/app/app.php'
+        ));
         return $this->_app = new NotifyApp($this);
     }
 

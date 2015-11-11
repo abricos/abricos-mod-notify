@@ -53,25 +53,6 @@ class NotifyOwner extends AbricosModel {
     protected $_structModule = 'notify';
     protected $_structName = 'Owner';
 
-    /**
-     * @deprecated
-     */
-    private function IsBase(){
-        return $this->recordType !== NotifyOwner::TYPE_ITEM;
-    }
-
-    /**
-     * @deprecated
-     */
-    private function IsSubscribe(){
-        switch ($this->recordType){
-            case NotifyOwner::TYPE_CONTAINER:
-            case NotifyOwner::TYPE_ITEM:
-                return false;
-        }
-        return true;
-    }
-
     private $_ownerKey;
 
     public function GetKey(){
@@ -106,10 +87,11 @@ class NotifyOwner extends AbricosModel {
 
     public function IsEnable(){
         $parent = $this;
-        while (!empty($parent)){
+        while ($parent){
             if ($this->status !== NotifyOwner::STATUS_ON){
                 return false;
             }
+            $parent = $parent->GetParent();
         }
         return true;
     }
@@ -188,7 +170,7 @@ class NotifyOwnerList extends AbricosModelList {
 /**
  * Class NotifySubscribe
  *
- * @property NotifyApp $app
+ * @property NotifyAppSubscribe $app
  *
  * @property int $ownerid
  * @property int $userid
@@ -211,12 +193,14 @@ class NotifySubscribe extends AbricosModel {
     protected $_structModule = 'notify';
     protected $_structName = 'Subscribe';
 
+    /*
     private $_owner;
 
     public function GetOwner(){
         if (!empty($this->_owner)){
             return $this->_owner;
         }
+        // $this->app->Owner()->Owner
 
         $this->_owner = $this->app->OwnerById($this->ownerid);
 
@@ -226,6 +210,7 @@ class NotifySubscribe extends AbricosModel {
     public function IsBase(){
         return $this->GetOwner()->isBase;
     }
+    /**/
 }
 
 /**
@@ -244,7 +229,7 @@ class NotifySubscribeList extends AbricosModelList {
      * @param NotifyOwner|int $ownerid
      * @return NotifySubscribe|null
      */
-    public function GetByOwner($ownerid){
+    public function GetByOwnerId($ownerid){
         if ($ownerid instanceof NotifyOwner){
             $ownerid = $ownerid->id;
         }

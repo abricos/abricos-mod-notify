@@ -13,7 +13,7 @@
  */
 class NotifyQuery {
 
-    public static function OwnerAppend(NotifyApp $app, NotifyOwner $owner){
+    public static function OwnerAppend(AbricosApplication $app, NotifyOwner $owner){
         $db = $app->db;
         $sql = "
 			INSERT INTO ".$db->prefix."notify_owner (
@@ -38,7 +38,7 @@ class NotifyQuery {
         return intval($db->insert_id());
     }
 
-    public static function OwnerBaseList(NotifyApp $app){
+    public static function OwnerBaseList(AbricosApplication $app){
         $db = $app->db;
         $sql = "
 			SELECT o.*
@@ -48,7 +48,7 @@ class NotifyQuery {
         return $db->query_read($sql);
     }
 
-    public static function OwnerById(NotifyApp $app, $ownerid){
+    public static function OwnerById(AbricosApplication $app, $ownerid){
         $db = $app->db;
         $sql = "
 			SELECT o.*
@@ -59,7 +59,7 @@ class NotifyQuery {
         return $db->query_first($sql);
     }
 
-    public static function OwnerListByContainer(NotifyApp $app, NotifyOwner $ownerCont, $itemid){
+    public static function OwnerListByContainer(AbricosApplication $app, NotifyOwner $ownerCont, $itemid){
         $db = $app->db;
         $sql = "
 			SELECT o.*
@@ -71,7 +71,7 @@ class NotifyQuery {
         return $db->query_first($sql);
     }
 
-    public static function OwnerByKey(NotifyApp $app, $key, $itemid = 0){
+    public static function OwnerByKey(AbricosApplication $app, $key, $itemid = 0){
         $key = NotifyOwner::ParseKey($key, $itemid);
 
         $db = $app->db;
@@ -89,7 +89,7 @@ class NotifyQuery {
 
     /* * * * * * * * * * * * * Subscribe * * * * * * * * * * * * */
 
-    public static function SubscribeBaseList(NotifyApp $app){
+    public static function SubscribeBaseList(AbricosApplication $app){
         $db = $app->db;
         $sql = "
 			SELECT s.*
@@ -100,7 +100,7 @@ class NotifyQuery {
         return $db->query_read($sql);
     }
 
-    public static function Subscribe(NotifyApp $app, NotifyOwner $owner){
+    public static function Subscribe(AbricosApplication $app, NotifyOwner $owner){
         $db = $app->db;
         $sql = "
 			SELECT s.*
@@ -111,7 +111,7 @@ class NotifyQuery {
         return $db->query_first($sql);
     }
 
-    public static function SubscribeAppend(NotifyApp $app, NotifyOwner $owner){
+    public static function SubscribeAppend(AbricosApplication $app, NotifyOwner $owner){
         $db = $app->db;
         $sql = "
 			INSERT INTO ".$db->prefix."notify_subscribe (
@@ -128,7 +128,7 @@ class NotifyQuery {
         return $db->insert_id();
     }
 
-    public static function SubscribeUpdate(NotifyApp $app, NotifyOwner $owner, NotifySubscribe $subscribe){
+    public static function SubscribeUpdate(AbricosApplication $app, NotifyOwner $owner, NotifySubscribe $subscribe){
         $db = $app->db;
         $sql = "
 			UPDATE ".$db->prefix."notify_subscribe
@@ -143,7 +143,7 @@ class NotifyQuery {
 
     /* * * * * * * * * * * * * User Activity * * * * * * * * * * * * */
 
-    public static function ActivityUpdate(NotifyApp $app, NotifyOwner $ownerItem){
+    public static function ActivityUpdate(AbricosApplication $app, NotifyOwner $ownerItem){
         $db = $app->db;
         $sql = "
 			INSERT INTO ".$db->prefix."notify_activity (
@@ -161,7 +161,7 @@ class NotifyQuery {
 
     /* * * * * * * * * * * * * Event * * * * * * * * * * * * */
 
-    public static function EventAppend(NotifyApp $app, NotifyOwner $ownerItem, NotifyOwner $ownerMethod){
+    public static function EventAppend(AbricosApplication $app, NotifyOwner $ownerItem, NotifyOwner $ownerMethod){
         $db = $app->db;
         $sql = "
 			INSERT INTO ".$db->prefix."notify_event (
@@ -195,7 +195,7 @@ class NotifyQuery {
         return $eventid;
     }
 
-    public static function EventListByExpect(NotifyApp $app){
+    public static function EventListByExpect(AbricosApplication $app){
         $db = $app->db;
         $sql = "
 			SELECT *
@@ -206,7 +206,7 @@ class NotifyQuery {
         return $db->query_read($sql);
     }
 
-    public static function EventPerfomed(NotifyApp $app, NotifyEvent $event){
+    public static function EventPerfomed(AbricosApplication $app, NotifyEvent $event){
 
     }
 }
