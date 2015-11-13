@@ -149,6 +149,8 @@ class NotifyAppOwner extends AbricosApplication {
         /** @var NotifyOwner $owner */
         $owner = $this->InstanceClass('Owner', array(
             'parentid' => $container->id,
+            'isEnable' => $container->isEnable,
+            'calcDate' => TIMENOW,
             'module' => $container->module,
             'type' => $container->type,
             'itemid' => $itemid,
@@ -157,6 +159,7 @@ class NotifyAppOwner extends AbricosApplication {
             'defaultEmailStatus' => NotifySubscribe::EML_STATUS_PARENT,
             'recordType' => NotifyOwner::TYPE_ITEM
         ));
+        $owner->isEnable = $owner->IsEnable();
 
         $owner->id = NotifyQuery::OwnerAppend($this, $owner);
         if ($owner->id === 0){
@@ -177,6 +180,8 @@ class NotifyAppOwner extends AbricosApplication {
             /** @var NotifyOwner $ownerItemMethod */
             $ownerItemMethod = $this->InstanceClass('Owner', array(
                 'parentid' => $ownerMethod->id,
+                'isEnable' => $container->isEnable,
+                'calcDate' => TIMENOW,
                 'module' => $ownerMethod->module,
                 'type' => $ownerMethod->type,
                 'method' => $ownerMethod->method,

@@ -91,7 +91,7 @@ class NotifyOwner extends AbricosModel {
     public function IsEnable(){
         $parent = $this;
         while (!empty($parent)){
-            if ($this->status !== NotifyOwner::STATUS_ON){
+            if ($parent->status !== NotifyOwner::STATUS_ON){
                 return false;
             }
             $parent = $parent->GetParent();
@@ -175,12 +175,15 @@ class NotifyOwnerList extends AbricosModelList {
  *
  * @property NotifyAppSubscribe $app
  *
+ * @property int $parentid
  * @property int $ownerid
  * @property int $userid
  * @property string $status
  * @property string $emailStatus
  * @property string $pubkey
  * @property int $dateline
+ * @property bool $isEnable
+ * @property int $calcDate
  */
 class NotifySubscribe extends AbricosModel {
     const STATUS_ON = 'on';
@@ -196,24 +199,79 @@ class NotifySubscribe extends AbricosModel {
     protected $_structModule = 'notify';
     protected $_structName = 'Subscribe';
 
-    /*
+
     private $_owner;
 
     public function GetOwner(){
         if (!empty($this->_owner)){
             return $this->_owner;
         }
-        // $this->app->Owner()->Owner
+        $ownerid = $this->ownerid;
+        $ownerApp = $this->app->Owner();
+        $this->_owner = $ownerApp->BaseList()->Get($ownerid);
+        if (!empty($this->_owner)){
+            return $this->_owner;
+        }
 
-        $this->_owner = $this->app->OwnerById($this->ownerid);
+        $this->_owner = $ownerApp->ById($ownerid);
 
         return $this->_owner;
     }
 
+    /*
     public function IsBase(){
         return $this->GetOwner()->isBase;
     }
     /**/
+
+    private $_parent;
+
+    /**
+     * @return NotifySubscribe|null
+     */
+    public function GetParent(){
+        if (isset($this->_parent)){
+            return $this->_parent;
+        }
+        $parentOwnerId = $this->GetOwner()->parentid;
+        $this->_parent = $this->app->BaseList()->GetBy('ownerid', $parentOwnerId);;
+
+        return $this->_parent;
+    }
+
+    public function GetParentId(){
+        $parent = $this->GetParent();
+        return empty($parent) ? 0 : $parent->id;
+    }
+
+    private function IsEnableMethod(){
+        $owner = $this->GetOwner();
+        $parent = $this->GetParent();
+        $isEnableParent = empty($parent) ? true : $parent->IsEnableMethod();
+        print_r(
+            array(
+                'id=' => $this->id,
+                'parent=' => empty($parent) ? 0 : $parent->id,
+                '!$isEnableParent=' => !$isEnableParent,
+                '!$owner->isEnable=' => !$owner->isEnable,
+                '$this->status !== NotifySubscribe::STATUS_ON=' => $this->status !== NotifySubscribe::STATUS_ON
+            )
+        );
+        return
+            !$isEnableParent || !$owner->isEnable
+            || $this->status !== NotifySubscribe::STATUS_ON;
+    }
+
+    public function IsEnable(){
+        $parent = $this;
+        while (!empty($parent)){
+            if (!$parent->IsEnableMethod()){
+                return false;
+            }
+            $parent = $parent->GetParent();
+        }
+        return true;
+    }
 }
 
 /**

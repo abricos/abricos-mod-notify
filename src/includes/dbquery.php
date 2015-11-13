@@ -19,7 +19,8 @@ class NotifyQuery {
 			INSERT INTO ".$db->prefix."notify_owner (
 			    parentid, recordType,
 			    ownerModule, ownerType, ownerMethod, ownerItemId, ownerStatus,
-			    defaultStatus, defaultEmailStatus, eventTimeout, isChildSubscribe, isBase
+			    defaultStatus, defaultEmailStatus, eventTimeout, isChildSubscribe, isBase,
+			    isEnable, calcDate
 			) VALUES (
 			    ".intval($owner->parentid).",
 			    '".bkstr($owner->recordType)."',
@@ -32,7 +33,9 @@ class NotifyQuery {
 			    '".bkstr($owner->defaultEmailStatus)."',
 			    ".intval($owner->eventTimeout).",
 			    ".intval($owner->isChildSubscribe).",
-			    ".intval($owner->isBase)."
+			    ".intval($owner->isBase).",
+			    ".intval($owner->isEnable).",
+			    ".intval($owner->calcDate)."
 			)
 		";
         $db->query_write($sql);
@@ -137,16 +140,19 @@ class NotifyQuery {
         return $db->query_first($sql);
     }
 
-    public static function SubscribeAppend(AbricosApplication $app, NotifyOwner $owner){
+    public static function SubscribeAppend(AbricosApplication $app, NotifySubscribe $subscribe){
         $db = $app->db;
         $sql = "
 			INSERT INTO ".$db->prefix."notify_subscribe (
-			    ownerid, userid, status, emailStatus, dateline
+			    parentid, ownerid, userid, status, emailStatus, isEnable, calcDate, dateline
 			) VALUES (
-			    ".intval($owner->id).",
+			    ".intval($subscribe->parentid).",
+			    ".intval($subscribe->ownerid).",
 			    ".intval(Abricos::$user->id).",
-			    '".bkstr($owner->defaultStatus)."',
-			    '".bkstr($owner->defaultEmailStatus)."',
+			    '".bkstr($subscribe->status)."',
+			    '".bkstr($subscribe->emailStatus)."',
+			    ".intval($subscribe->isEnable).",
+			    ".intval($subscribe->calcDate).",
 			    ".intval(TIMENOW)."
 			)
 		";
@@ -174,11 +180,29 @@ class NotifyQuery {
 			WHERE ownerid=".intval($owner->id)."
 		";
         $db->query_write($sql);
-
     }
 
-    public static function SubscribeUpdateByCalc(){
+    public static function SubscribeCalcCleanByUser(AbricosApplication $app){
+        $db = $app->db;
+        $sql = "
+			UPDATE ".$db->prefix."notify_subscribe
+			SET calcDate=0
+			WHERE userid=".intval(Abricos::$user->id)."
+		";
+        $db->query_write($sql);
+    }
 
+    public static function SubscribeUpdateByCalc(AbricosApplication $app, NotifySubscribe $subscribe){
+        $db = $app->db;
+        $sql = "
+			UPDATE ".$db->prefix."notify_subscribe
+			SET parentid=".intval($subscribe->parentid).",
+			    isEnable=".intval($subscribe->isEnable).",
+			    calcDate=".intval(TIMENOW)."
+			WHERE subscribeid=".intval($subscribe->id)."
+			LIMIT 1
+		";
+        $db->query_write($sql);
     }
 
     public static function SubscribeAutoAppend(AbricosApplication $app, NotifyOwner $owner){

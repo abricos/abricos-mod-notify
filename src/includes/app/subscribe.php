@@ -44,6 +44,21 @@ class NotifyAppSubscribe extends AbricosApplication {
         return null;
     }
 
+    public function BaseListUpdateByCalc(NotifySubscribeList $list){
+        $count = $list->Count();
+        for ($i = 0; $i < $count; $i++){
+            $subscribe = $list->GetByIndex($i);
+
+            $recalc = $subscribe->isEnable !== $subscribe->IsEnable();
+            if ($recalc || $subscribe->calcDate === 0){
+                $subscribe->calcDate = TIMENOW;
+                $subscribe->parentid = $subscribe->GetParentId();
+                $subscribe->isEnable = $subscribe->IsEnable();
+                NotifyQuery::SubscribeUpdateByCalc($this, $subscribe);
+            }
+        }
+    }
+
     public function BaseListToJSON(){
         $res = $this->BaseList();
         return $this->ResultToJSON('subscribeBaseList', $res);
@@ -62,10 +77,15 @@ class NotifyAppSubscribe extends AbricosApplication {
             return $list;
         }
 
+        $isRecalc = false;
+
         $rows = NotifyQuery::SubscribeBaseList($this);
         while (($d = $this->db->fetch_array($rows))){
             /** @var NotifySubscribe $subscribe */
             $subscribe = $this->InstanceClass('Subscribe', $d);
+            if ($subscribe->calcDate === 0){
+                $isRecalc = true;
+            }
             $list->Add($subscribe);
         }
 
@@ -87,8 +107,13 @@ class NotifyAppSubscribe extends AbricosApplication {
             }
             return $this->BaseList();
         }
+        $this->_cache['BaseList'] = $list;
 
-        return $this->_cache['BaseList'] = $list;
+        if ($isRecalc){
+            $this->BaseListUpdateByCalc($list);
+        }
+
+        return $list;
     }
 
     protected function CacheList(){
@@ -138,7 +163,19 @@ class NotifyAppSubscribe extends AbricosApplication {
                 }
             }
         }
-        $subscribeid = NotifyQuery::SubscribeAppend($this, $owner);
+
+        $subscribe = $this->InstanceClass('Subscribe', array(
+            'ownerid' => $owner->id,
+            'userid' => Abricos::$user->id,
+            'status' => $owner->defaultStatus,
+            'emailStatus' => $owner->defaultEmailStatus,
+            'calcDate' => TIMENOW
+        ));
+
+        $subscribe->parentid = $subscribe->GetParentId();
+        $subscribe->isEnable = $subscribe->IsEnable();
+
+        $subscribeid = NotifyQuery::SubscribeAppend($this, $subscribe);
         if ($subscribeid === 0){
             return AbricosResponse::ERR_SERVER_ERROR;
         }
@@ -176,6 +213,8 @@ class NotifyAppSubscribe extends AbricosApplication {
         $curSubscribe->emailStatus = $subscribe->emailStatus;
 
         NotifyQuery::SubscribeUpdate($this, $owner, $curSubscribe);
+
+        NotifyQuery::SubscribeCalcCleanByUser($this);
 
         return $curSubscribe;
     }

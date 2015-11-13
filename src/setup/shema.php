@@ -60,6 +60,8 @@ if ($updateManager->isUpdate('0.1.4')){
         CREATE TABLE IF NOT EXISTS ".$pfx."notify_subscribe (
             subscribeid INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 
+            parentid INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Parent Subscribe ID',
+
             ownerid INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Owner ID',
             userid INT(10) UNSIGNED NOT NULL COMMENT 'User ID',
 

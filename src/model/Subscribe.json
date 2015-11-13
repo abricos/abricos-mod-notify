@@ -6,6 +6,10 @@
       "type": "int",
       "dbField": "subscribeid"
     },
+    "parentid": {
+      "type": "int",
+      "json": "pid"
+    },
     "ownerid": {
       "type": "int",
       "json": "oid"
