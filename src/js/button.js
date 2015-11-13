@@ -103,12 +103,11 @@ Component.entryPoint = function(NS){
             var tp = this.template,
                 subscribe = this.get('subscribe');
 
-            if (!subscribe || !subscribe.get('owner')){
+            if (!subscribe){
                 return;
             }
 
-            var owner = subscribe.get('owner'),
-                sst = subscribe.get('status'),
+            var sst = subscribe.get('status'),
                 disable = !subscribe.isEnable();
 
             tp.each('buttonOn,buttonOff,emailStatus', function(node){
@@ -149,14 +148,13 @@ Component.entryPoint = function(NS){
         subscribeSave: function(){
             var tp = this.template,
                 emlStNode = tp.one('emailStatus'),
-                subscribe = this.get('subscribe'),
-                owner = subscribe.get('owner');
+                subscribe = this.get('subscribe');
 
             if (emlStNode){
                 subscribe.set('emailStatus', tp.getValue('emailStatus'));
             }
 
-            this.get('notifyApp').subscribeSave(owner.get('id'), subscribe.toJSON(true));
+            this.get('notifyApp').subscribeSave(subscribe.toJSON(true));
         },
         onClick: function(e){
             switch (e.dataClick) {

@@ -25,7 +25,7 @@ class NotifyOwnerKey {
 /**
  * Class NotifyOwner
  *
- * @property NotifyApp $app
+ * @property NotifyAppOwner $app
  *
  * @property int $parentid
  * @property string $recordType
@@ -39,6 +39,8 @@ class NotifyOwnerKey {
  * @property bool $isBase
  * @property int $eventTimeout
  * @property bool $isChildSubscribe
+ * @property bool $isEnable
+ * @property int $calcDate
  */
 class NotifyOwner extends AbricosModel {
     const TYPE_ROOT = 'root';
@@ -76,19 +78,19 @@ class NotifyOwner extends AbricosModel {
      * @return NotifyOwner|null
      */
     public function GetParent(){
-        if (!empty($this->_ownerParent)){
+        if (isset($this->_ownerParent)){
             return $this->_ownerParent;
         }
         if ($this->parentid === 0){
-            return null;
+            return $this->_ownerParent = null;
         }
 
-        return $this->_ownerParent = $this->app->OwnerBaseList()->Get($this->parentid);
+        return $this->_ownerParent = $this->app->BaseList()->Get($this->parentid);
     }
 
     public function IsEnable(){
         $parent = $this;
-        while ($parent){
+        while (!empty($parent)){
             if ($this->status !== NotifyOwner::STATUS_ON){
                 return false;
             }

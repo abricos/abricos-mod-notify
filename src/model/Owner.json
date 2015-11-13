@@ -57,6 +57,15 @@
       "notNULL": true,
       "json": "defemlst"
     },
+    "isEnable": {
+      "type": "bool",
+      "json": "isen"
+    },
+    "calcDate": {
+      "rolefn": "IsAdminRole",
+      "type": "date",
+      "json": "calc"
+    },
     "isBase": {
       "type": "bool",
       "json": "isb"

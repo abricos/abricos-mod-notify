@@ -67,6 +67,7 @@ if ($updateManager->isUpdate('0.1.4')){
 			emailStatus ENUM('off', 'parent', 'always', 'first', 'daily', 'weekly') DEFAULT 'off' COMMENT '',
 
             isEnable TINYINT(1) UNSIGNED NOT NULL DEFAULT 1 COMMENT 'The calculated value based on the parent`s value',
+			calcDate INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Caclulate Date',
 
 			pubkey CHAR(32) NOT NULL DEFAULT '' COMMENT 'Public Key',
 
@@ -74,6 +75,7 @@ if ($updateManager->isUpdate('0.1.4')){
 
             PRIMARY KEY (subscribeid),
             UNIQUE KEY subscribe (ownerid, userid),
+            KEY ownerid (ownerid),
             KEY userid (userid),
             KEY isEnable (isEnable)
         )".$charset

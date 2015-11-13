@@ -31,6 +31,15 @@
       "type": "string",
       "json": "pk"
     },
+    "isEnable": {
+      "type": "bool",
+      "json": "isen"
+    },
+    "calcDate": {
+      "rolefn": "IsAdminRole",
+      "type": "date",
+      "json": "calc"
+    },
     "dateline": {
       "type": "date",
       "json": "dl"

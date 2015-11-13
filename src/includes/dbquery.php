@@ -39,6 +39,18 @@ class NotifyQuery {
         return $db->insert_id();
     }
 
+    public static function OwnerUpdateByCalc(AbricosApplication $app, NotifyOwner $owner){
+        $db = $app->db;
+        $sql = "
+			UPDATE ".$db->prefix."notify_owner
+			SET isEnable=".intval($owner->isEnable).",
+			    calcDate=".intval(TIMENOW)."
+			WHERE ownerid=".intval($owner->id)."
+			LIMIT 1
+		";
+        $db->query_write($sql);
+    }
+
     public static function OwnerBaseList(AbricosApplication $app){
         $db = $app->db;
         $sql = "
@@ -67,6 +79,19 @@ class NotifyQuery {
 			FROM ".$db->prefix."notify_owner o
 			WHERE o.ownerModule='".bkstr($ownerCont->module)."'
 			    AND o.ownerType='".bkstr($ownerCont->type)."'
+			    AND o.ownerItemId=".intval($itemid)."
+		";
+        return $db->query_read($sql);
+    }
+
+    public static function OwnerItemMethodList(AbricosApplication $app, NotifyOwner $owner, $itemid){
+        $db = $app->db;
+        $sql = "
+			SELECT o.*
+			FROM ".$db->prefix."notify_owner o
+			WHERE o.recordType='".bkstr(NotifyOwner::TYPE_ITEM_METHOD)."'
+			    AND o.ownerModule='".bkstr($owner->module)."'
+			    AND o.ownerType='".bkstr($owner->type)."'
 			    AND o.ownerItemId=".intval($itemid)."
 		";
         return $db->query_read($sql);
@@ -139,7 +164,21 @@ class NotifyQuery {
 			WHERE ownerid=".intval($owner->id)." AND userid=".intval(Abricos::$user->id)."
 		";
         $db->query_write($sql);
-        return $db->insert_id();
+    }
+
+    public static function SubscribeCalcClean(AbricosApplication $app, NotifyOwner $owner){
+        $db = $app->db;
+        $sql = "
+			UPDATE ".$db->prefix."notify_subscribe
+			SET calcDate=0
+			WHERE ownerid=".intval($owner->id)."
+		";
+        $db->query_write($sql);
+
+    }
+
+    public static function SubscribeUpdateByCalc(){
+
     }
 
     public static function SubscribeAutoAppend(AbricosApplication $app, NotifyOwner $owner){

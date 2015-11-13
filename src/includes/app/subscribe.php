@@ -39,7 +39,7 @@ class NotifyAppSubscribe extends AbricosApplication {
             case 'subscribeBaseList':
                 return $this->BaseListToJSON();
             case 'subscribeSave':
-                return $this->SaveToJSON($d->ownerid, $d->subscribe);
+                return $this->SaveToJSON($d->subscribe);
         }
         return null;
     }
@@ -146,22 +146,22 @@ class NotifyAppSubscribe extends AbricosApplication {
         return $this->ByOwner($owner);
     }
 
-    public function SaveToJSON($ownerid, $d){
-        $res = $this->Save($ownerid, $d);
+    public function SaveToJSON($d){
+        $res = $this->Save($d);
         return $this->ResultToJSON('subscribeSave', $res);
     }
 
-    public function Save($ownerid, $d){
+    public function Save($d){
         if (!$this->manager->IsWriteRole()){
             return AbricosResponse::ERR_FORBIDDEN;
         }
-        if ($ownerid instanceof NotifyOwner){
-            $owner = $ownerid;
-        } else {
-            $owner = $this->Owner()->ById($ownerid);
-            if (AbricosResponse::IsError($owner)){
-                return AbricosResponse::ERR_BAD_REQUEST;
-            }
+        if (!isset($d->ownerid)){
+            return AbricosResponse::ERR_BAD_REQUEST;
+        }
+
+        $owner = $this->Owner()->ById(intval($d->ownerid));
+        if (AbricosResponse::IsError($owner)){
+            return AbricosResponse::ERR_BAD_REQUEST;
         }
 
         $curSubscribe = $this->ByOwner($owner);

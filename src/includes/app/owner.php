@@ -60,6 +60,23 @@ class NotifyAppOwner extends AbricosApplication {
         return NotifyQuery::OwnerAppend($this, $owner);
     }
 
+    private function BaseListUpdateByCalc(NotifyOwnerList $list){
+        $count = $list->Count();
+        for ($i = 0; $i < $count; $i++){
+            $owner = $list->GetByIndex($i);
+            $recalc = $owner->isEnable !== $owner->IsEnable();
+            if ($recalc || $owner->calcDate === 0
+            ){
+                $owner->isEnable = $owner->IsEnable();
+                $owner->calcDate = TIMENOW;
+                NotifyQuery::OwnerUpdateByCalc($this, $owner);
+                if ($recalc){
+                    NotifyQuery::SubscribeCalcClean($this, $owner);
+                }
+            }
+        }
+    }
+
     public function BaseListToJSON(){
         $res = $this->BaseList();
         return $this->ResultToJSON('ownerBaseList', $res);
@@ -75,16 +92,28 @@ class NotifyAppOwner extends AbricosApplication {
         if (!$this->manager->IsViewRole()){
             return AbricosResponse::ERR_FORBIDDEN;
         }
+        $isRecalc = false;
 
         /** @var NotifyOwnerList $list */
         $list = $this->InstanceClass('OwnerList');
+        $this->_cache['BaseList'] = $list;
 
         $rows = NotifyQuery::OwnerBaseList($this);
         while (($d = $this->db->fetch_array($rows))){
-            $list->Add($this->InstanceClass('Owner', $d));
+            /** @var NotifyOwner $owner */
+            $owner = $this->InstanceClass('Owner', $d);
+
+            if ($owner->calcDate === 0){
+                $isRecalc = true;
+            }
+            $list->Add($owner);
         }
 
-        return $this->_cache['BaseList'] = $list;
+        if ($isRecalc){
+            $this->BaseListUpdateByCalc($list);
+        }
+
+        return $list;
     }
 
     /**
@@ -200,6 +229,14 @@ class NotifyAppOwner extends AbricosApplication {
         $owner = $this->InstanceClass('Owner', $d);
         $ownerList->Add($owner);
 
+        if ($owner->recordType === NotifyOwner::TYPE_ITEM){
+            $rows = NotifyQuery::OwnerItemMethodList($this, $owner, $owner->itemid);
+            while (($d = $this->db->fetch_array($rows))){
+                /** @var NotifyOwner $own */
+                $ownerList->Add($this->InstanceClass('Owner', $d));
+            }
+        }
+
         return $owner;
     }
 
@@ -227,6 +264,7 @@ class NotifyAppOwner extends AbricosApplication {
         $owner = AbricosResponse::ERR_NOT_FOUND;
         $list = $this->CacheList();
         $count = $list->Count();
+
         for ($i = 0; $i < $count; $i++){
             $owner = $list->GetByIndex($i);
 
