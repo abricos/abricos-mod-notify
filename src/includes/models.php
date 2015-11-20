@@ -234,7 +234,7 @@ class NotifySubscribe extends AbricosModel {
             return $this->_parent;
         }
         $parentOwnerId = $this->GetOwner()->parentid;
-        $this->_parent = $this->app->BaseList()->GetBy('ownerid', $parentOwnerId);;
+        $this->_parent = $this->app->BaseList()->GetBy('ownerid', $parentOwnerId);
 
         return $this->_parent;
     }
@@ -244,22 +244,34 @@ class NotifySubscribe extends AbricosModel {
         return empty($parent) ? 0 : $parent->id;
     }
 
+    private $_isEnableMethodCache = null;
+
     private function IsEnableMethod(){
+        if (!is_null($this->_isEnableMethodCache)){
+            return $this->_isEnableMethodCache;
+        }
         $owner = $this->GetOwner();
         $parent = $this->GetParent();
         $isEnableParent = empty($parent) ? true : $parent->IsEnableMethod();
+
+        $this->_isEnableMethodCache = $isEnableParent
+            && $owner->isEnable
+            && $this->status === NotifySubscribe::STATUS_ON;
+
+        /*
         print_r(
             array(
                 'id=' => $this->id,
-                'parent=' => empty($parent) ? 0 : $parent->id,
-                '!$isEnableParent=' => !$isEnableParent,
-                '!$owner->isEnable=' => !$owner->isEnable,
-                '$this->status !== NotifySubscribe::STATUS_ON=' => $this->status !== NotifySubscribe::STATUS_ON
+                'parentid=' => empty($parent) ? 0 : $parent->id,
+                '$isEnableParent=' => $isEnableParent,
+                '$isEnable=' => $this->_isEnableMethodCache,
+                '$owner->isEnable=' => $owner->isEnable,
+                '$this->status=' => $this->status
             )
         );
-        return
-            !$isEnableParent || !$owner->isEnable
-            || $this->status !== NotifySubscribe::STATUS_ON;
+        /**/
+
+        return $this->_isEnableMethodCache;
     }
 
     public function IsEnable(){

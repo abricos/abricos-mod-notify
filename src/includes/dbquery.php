@@ -202,6 +202,7 @@ class NotifyQuery {
 			WHERE subscribeid=".intval($subscribe->id)."
 			LIMIT 1
 		";
+        print_r($subscribe->ToArray());
         $db->query_write($sql);
     }
 
