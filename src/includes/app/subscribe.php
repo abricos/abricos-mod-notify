@@ -71,7 +71,7 @@ class NotifyAppSubscribe extends AbricosApplication {
             return $this->_cache['BaseList'];
         }
         /** @var NotifySubscribeList $list */
-        $list = $this->InstanceClass('List');
+        $list = $this->_cache['BaseList'] = $this->InstanceClass('List');
 
         if (!$this->manager->IsViewRole() || Abricos::$user->id === 0){
             return $list;
@@ -102,12 +102,26 @@ class NotifyAppSubscribe extends AbricosApplication {
                 $owner = $ownerBaseList->GetByIndex($i);
                 $subscribe = $list->GetBy('ownerid', $owner->id);
                 if (empty($subscribe)){
-                    NotifyQuery::SubscribeAppend($this, $owner);
+
+                    $subscribe = $this->InstanceClass('Subscribe', array(
+                        'ownerid' => $owner->id,
+                        'userid' => Abricos::$user->id,
+                        'status' => $owner->defaultStatus,
+                        'emailStatus' => $owner->defaultEmailStatus,
+                        'calcDate' => TIMENOW
+                    ));
+
+                    $subscribe->parentid = $subscribe->GetParentId();
+                    $subscribe->isEnable = $subscribe->IsEnable();
+
+                    $list->Add($subscribe);
+
+                    $subscribe->id = NotifyQuery::SubscribeAppend($this, $subscribe);
+
                 }
             }
             return $this->BaseList();
         }
-        $this->_cache['BaseList'] = $list;
 
         if ($isRecalc){
             $this->BaseListUpdateByCalc($list);
