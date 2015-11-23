@@ -31,6 +31,14 @@ Component.entryPoint = function(NS){
             }
             ownerList.add(owner);
         },
+        registerOwnerList: function(list){
+            if (!list || !Y.Lang.isFunction(list.each)){
+                return;
+            }
+            list.each(function(owner){
+                this.registerOwner(owner);
+            }, this);
+        },
         registerSubscribe: function(subscribe){
             if (!subscribe || !Y.Lang.isFunction(subscribe.get)){
                 return;
@@ -44,6 +52,14 @@ Component.entryPoint = function(NS){
                 return;
             }
             subscribeList.add(subscribe);
+        },
+        registerSubscribeList: function(list){
+            if (!list || !Y.Lang.isFunction(list.each)){
+                return;
+            }
+            list.each(function(subscribe){
+                this.registerSubscribe(subscribe);
+            }, this);
         },
         initializer: function(){
             var instance = this;

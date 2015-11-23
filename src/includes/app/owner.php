@@ -142,6 +142,7 @@ class NotifyAppOwner extends AbricosApplication {
                 return AbricosResponse::ERR_BAD_REQUEST;
             }
         }
+
         if ($container->recordType !== NotifyOwner::TYPE_CONTAINER){
             return AbricosResponse::ERR_BAD_REQUEST;
         }
@@ -191,6 +192,7 @@ class NotifyAppOwner extends AbricosApplication {
                 'defaultEmailStatus' => NotifySubscribe::EML_STATUS_PARENT,
                 'recordType' => NotifyOwner::TYPE_ITEM_METHOD
             ));
+
             $ownerItemMethod->id = $id = NotifyQuery::OwnerAppend($this, $ownerItemMethod);
 
             if ($ownerMethod->isChildSubscribe){
@@ -295,6 +297,35 @@ class NotifyAppOwner extends AbricosApplication {
         }
 
         return $owner;
+    }
+
+    /**
+     * @param $key
+     * @param $itemid
+     * @return int|NotifyOwnerList
+     */
+    public function ItemWithMethodListByKey($key, $itemid){
+        $owner = $this->ItemByKey($key, $itemid);
+        if (empty($owner)){
+            return AbricosResponse::ERR_NOT_FOUND;
+        }
+
+        /** @var NotifyOwnerList $retList */
+        $retList = $this->InstanceClass('OwnerList');
+
+        $list = $this->CacheList();
+        $count = $list->Count();
+        for ($i = 0; $i < $count; $i++){
+            $iown = $list->GetByIndex($i);
+
+            if ($owner->module === $iown->module
+                && $owner->type === $iown->type
+                && $owner->itemid === $itemid
+            ){
+                $retList->Add($iown);
+            }
+        }
+        return $retList;
     }
 
     public function ItemMethodByKey($key, $itemid){

@@ -71,7 +71,8 @@ class NotifyAppSubscribe extends AbricosApplication {
             return $this->_cache['BaseList'];
         }
         /** @var NotifySubscribeList $list */
-        $list = $this->_cache['BaseList'] = $this->InstanceClass('List');
+        $list = $this->InstanceClass('List');
+        $this->_cache['BaseList'] = $list;
 
         if (!$this->manager->IsViewRole() || Abricos::$user->id === 0){
             return $list;
@@ -230,6 +231,9 @@ class NotifyAppSubscribe extends AbricosApplication {
 
         NotifyQuery::SubscribeCalcCleanByUser($this);
 
+        $this->CacheClear();
+        $this->BaseList();
+
         return $curSubscribe;
     }
 
@@ -241,6 +245,19 @@ class NotifyAppSubscribe extends AbricosApplication {
         return $this->ByOwner($owner);
     }
 
+    public function ItemWithMethodListByKey($key, $itemid){
+        $ownerList = $this->Owner()->ItemWithMethodListByKey($key, $itemid);
+
+        /** @var NotifySubscribeList $list */
+        $list = $this->InstanceClass('List');
+
+        $cnt = $ownerList->Count();
+        for ($i = 0; $i < $cnt; $i++){
+            $subscribe = $this->ByOwner($ownerList->GetByIndex($i));
+            $list->Add($subscribe);
+        }
+        return $list;
+    }
 
 }
 

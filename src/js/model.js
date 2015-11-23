@@ -124,15 +124,8 @@ Component.entryPoint = function(NS){
                     if (!Y.Lang.isUndefined(val)){
                         return val;
                     }
-                    var parentOwner = this.get('owner').get('parent');
-
-                    if (!parentOwner){
-                        return null;
-                    }
-
-                    var parentKey = parentOwner.get('key');
-
-                    return this.appInstance.get('subscribeList').getByKey(parentKey);
+                    var parentid = this.get('parentid');
+                    return this.appInstance.get('subscribeList').getById(parentid);
                 }
             }
         }
