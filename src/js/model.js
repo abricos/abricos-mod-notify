@@ -111,9 +111,6 @@ Component.entryPoint = function(NS){
                     if (Y.Lang.isUndefined(val)){
                         var ownerid = this.get('ownerid');
                         val = this.appInstance.get('ownerList').getById(ownerid);
-                        console.log('id=' + this.get('id'));
-                        console.log(ownerid);
-                        console.log(val);
                     }
                     return val;
                 }
@@ -148,5 +145,4 @@ Component.entryPoint = function(NS){
     NS.Config = Y.Base.create('config', SYS.AppModel, [], {
         structureName: 'Config'
     });
-
 };

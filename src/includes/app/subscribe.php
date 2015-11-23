@@ -9,7 +9,7 @@
 
 
 /**
- * Class NotifyApp
+ * Class NotifyAppSubscribe
  *
  * @property NotifyManager $manager
  */

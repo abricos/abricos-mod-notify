@@ -55,65 +55,14 @@ class NotifyApp extends AbricosApplication {
         return $this->GetChildApp('Subscribe');
     }
 
-    /*
-    public function old_OwnerByKey($key, $itemid = 0){
-        $itemid = intval($itemid);
-        $key = NotifyOwner::NormalizeKey($key, $itemid);
-
-        if ($itemid === 0){
-            return $this->OwnerBaseList()->GetByKey($key);
-        }
-        $ownerList = $this->OwnerCacheList();
-        $owner = $ownerList->GetByKey($key);
-        if (!empty($owner)){
-            return $owner;
-        }
-
-        $d = NotifyQuery::OwnerByKey($this, $key, $itemid);
-
-        if (empty($d)){
-            return AbricosResponse::ERR_NOT_FOUND;
-        }
-        //** @var NotifyOwner $owner * /
-        $owner = $this->InstanceClass('Owner', $d);
-        $ownerList->Add($owner);
-        return $owner;
-    }
-
-    public function old_SubscribeItemAppend($parentKey, $key, $itemid){
-        $parentKey = NotifyOwner::NormalizeKey($parentKey);
-        $key = NotifyOwner::NormalizeKey($key, $itemid);
-
-        $owner = $this->OwnerAppendByKey($parentKey, $key);
-
-        $subscribe = $this->Subscribe($owner);
-        $subscribe->status = $owner->defaultStatus;
-        $subscribe->emailStatus = $owner->defaultEmailStatus;
-
-        NotifyQuery::SubscribeUpdate($this, $owner, $subscribe);
-
-        return $owner;
-    }
-
-    public function old_SubscribeByKey($key, $itemid = 0){
-        $owner = $this->OwnerByKey($key, $itemid);
-        if (AbricosResponse::IsError($owner)){
-            return AbricosResponse::ERR_NOT_FOUND;
-        }
-
-        return $this->Subscribe($owner);
-    }
-    /**/
-
-    /* * * * * * * * * * * * * Notify * * * * * * * * * * * * */
-
     /**
-     * Example: $notifyApp->NotifyAppendByKey('forum:topic:new', 112);
-     *
-     * @param string $methodKey
-     * @param int $itemid
-     * @return NotifyOwner|int
+     * @return NotifyAppEvent
      */
+    public function Event(){
+        return $this->GetChildApp('Event');
+    }
+
+    /*
     public function NotifyAppend($methodKey, $itemid){
         $ownerMethod = $this->OwnerBaseList()->GetByKey($methodKey);
         if (empty($ownerMethod) || $ownerMethod->recordType !== NotifyOwner::TYPE_METHOD){
@@ -134,7 +83,6 @@ class NotifyApp extends AbricosApplication {
     public function EventCheck(){
         $rows = NotifyQuery::EventListByExpect($this);
         while (($d = $this->db->fetch_array($rows))){
-            /** @var NotifyEvent $event */
             $event = $this->InstanceClass('Owner', $d);
             NotifyQuery::EventPerfomed($this, $event);
         }
@@ -147,7 +95,7 @@ class NotifyApp extends AbricosApplication {
         }
         NotifyQuery::ActivityUpdate($this, $owner);
     }
-
+    /**/
 }
 
 ?>
