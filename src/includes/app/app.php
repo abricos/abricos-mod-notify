@@ -55,12 +55,34 @@ class NotifyApp extends AbricosApplication {
         return $this->GetChildApp('Subscribe');
     }
 
-    /**
-     * @return NotifyAppEvent
-     */
-    public function Event(){
-        return $this->GetChildApp('Event');
+    public function ActivityUpdate($key, $itemid){
+        if (!isset($this->_cache['ActivityUpdate'])){
+            $this->_cache['ActivityUpdate'] = array();
+        }
+        $cacheKey = $key.":".$itemid;
+        if (isset($this->_cache['ActivityUpdate'][$cacheKey])){
+            return;
+        }
+        $this->_cache['ActivityUpdate'][$cacheKey] = true;
+
+
+        $ownerItem = $this->Owner()->ItemByKey($key, $itemid);
+        if (AbricosResponse::IsError($ownerItem)){
+            return AbricosResponse::ERR_BAD_REQUEST;
+        }
+
+        NotifyQuery::ActivityUpdate($this, $ownerItem);
     }
+
+    public function EventAppend($key, $itemid){
+        $ownerMethod = $this->Owner()->ItemMethodByKey($key, $itemid);
+        if (AbricosResponse::IsError($ownerMethod)){
+            return AbricosResponse::ERR_BAD_REQUEST;
+        }
+
+        $eventid = NotifyQuery::EventAppend($this, $ownerMethod);
+    }
+
 
     /*
     public function NotifyAppend($methodKey, $itemid){

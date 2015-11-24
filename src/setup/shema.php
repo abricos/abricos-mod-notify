@@ -88,14 +88,14 @@ if ($updateManager->isUpdate('0.1.4')){
         CREATE TABLE IF NOT EXISTS ".$pfx."notify_activity (
             activityid INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 
-            ownerItemId INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Owner Item Id',
+            ownerid INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Owner ID',
             userid INT(10) UNSIGNED NOT NULL COMMENT 'User ID',
 
 			activity INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Activity Date',
             viewCount INT(6) UNSIGNED NOT NULL DEFAULT 1 COMMENT 'User ID',
 
             PRIMARY KEY (activityid),
-            UNIQUE KEY ownerItem (ownerItemId, userid)
+            UNIQUE KEY owner (ownerid, userid)
         )".$charset
     );
 
@@ -103,9 +103,7 @@ if ($updateManager->isUpdate('0.1.4')){
         CREATE TABLE IF NOT EXISTS ".$pfx."notify_event (
             eventid INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 
-            ownerItemId INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Owner by method type ID',
-            ownerMethodId INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Owner by method type ID',
-
+            ownerid INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Owner Item Method ID',
             userid INT(10) UNSIGNED NOT NULL COMMENT 'User ID',
 
 			status ENUM('expect', 'performed', 'finished') DEFAULT 'expect' COMMENT '',
@@ -114,7 +112,7 @@ if ($updateManager->isUpdate('0.1.4')){
             timeout INT(4) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Event Timeout (seconds)',
 
             PRIMARY KEY (eventid),
-            UNIQUE KEY event (ownerItemId, ownerMethodId),
+            UNIQUE KEY ownerid (ownerid),
             KEY status (status),
             KEY eventdate (dateline, timeout)
         )".$charset

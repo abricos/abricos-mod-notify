@@ -190,7 +190,8 @@ class NotifyAppOwner extends AbricosApplication {
                 'status' => NotifyOwner::STATUS_ON,
                 'defaultStatus' => NotifySubscribe::STATUS_ON,
                 'defaultEmailStatus' => NotifySubscribe::EML_STATUS_PARENT,
-                'recordType' => NotifyOwner::TYPE_ITEM_METHOD
+                'recordType' => NotifyOwner::TYPE_ITEM_METHOD,
+                'eventTimeout' => $ownerMethod->eventTimeout
             ));
 
             $ownerItemMethod->id = $id = NotifyQuery::OwnerAppend($this, $ownerItemMethod);

@@ -231,7 +231,7 @@ class NotifyQuery {
         $db = $app->db;
         $sql = "
 			INSERT INTO ".$db->prefix."notify_activity (
-			    ownerItemId, userid, activity
+			    ownerid, userid, activity
 			) VALUES (
 			    ".intval($ownerItem->id).",
 			    ".intval(Abricos::$user->id).",
@@ -245,21 +245,27 @@ class NotifyQuery {
 
     /* * * * * * * * * * * * * Event * * * * * * * * * * * * */
 
-    public static function EventAppend(AbricosApplication $app, NotifyOwner $ownerItem, NotifyOwner $ownerMethod){
+    public static function EventAppend(AbricosApplication $app, NotifyOwner $ownerItemMethod){
         $db = $app->db;
         $sql = "
 			INSERT INTO ".$db->prefix."notify_event (
-			    ownerItemId, ownerMethodId, userid, dateline, timeout
+			    ownerid, userid, dateline, timeout
 			) VALUES (
-			    ".intval($ownerItem->id).",
-			    ".intval($ownerMethod->id).",
+			    ".intval($ownerItemMethod->id).",
 			    ".intval(Abricos::$user->id).",
 			    ".intval(TIMENOW).",
-			    ".intval($ownerMethod->eventTimeout)."
+			    ".intval($ownerItemMethod->eventTimeout)."
 			)
 		";
         $db->query_write($sql);
         $eventid = $db->insert_id();
+
+        // Subscribe users up to this event
+        $ownerid = $ownerItemMethod->id;
+        $ownerMethod = $ownerItemMethod->GetParent();
+        if ($ownerMethod->isChildSubscribe){
+            $ownerid = $ownerMethod->id;
+        }
 
         $sql = "
             INSERT INTO ".$db->prefix."notify (
@@ -271,14 +277,16 @@ class NotifyQuery {
                 ".intval(TIMENOW)." as dateline
             FROM ".$db->prefix."notify_subscribe s
 			WHERE s.userid<>".intval(Abricos::$user->id)."
-			    AND s.ownerid=".intval($ownerMethod->id)."
-			    AND s.status='".NotifySubscribe::STATUS_ON."'
+			    AND s.ownerid=".intval($ownerid)."
+			    AND s.isEnable=1
 		";
         $db->query_write($sql);
 
         return $eventid;
     }
 
+
+    /*
     public static function EventListByExpect(AbricosApplication $app){
         $db = $app->db;
         $sql = "
@@ -293,6 +301,7 @@ class NotifyQuery {
     public static function EventPerfomed(AbricosApplication $app, NotifyEvent $event){
 
     }
+    /**/
 }
 
 
