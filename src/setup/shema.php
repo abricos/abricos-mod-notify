@@ -39,6 +39,8 @@ if ($updateManager->isUpdate('0.1.4')){
 			calcDate INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Caclulate Date',
 
             isChildSubscribe TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT '',
+
+            eventLimit INT(4) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Event Timeout (seconds)',
             eventTimeout INT(4) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Event Timeout (seconds)',
 
             PRIMARY KEY (ownerid),
@@ -106,7 +108,7 @@ if ($updateManager->isUpdate('0.1.4')){
             ownerid INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Owner Item Method ID',
             userid INT(10) UNSIGNED NOT NULL COMMENT 'User ID',
 
-			status ENUM('expect', 'performed', 'finished') DEFAULT 'expect' COMMENT '',
+			status ENUM('waiting', 'runs', 'finished') DEFAULT 'waiting' COMMENT '',
 
 			dateline INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Create Date',
             timeout INT(4) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Event Timeout (seconds)',

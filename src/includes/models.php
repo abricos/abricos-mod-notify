@@ -331,8 +331,8 @@ class NotifyEvent extends AbricosModel {
     protected $_structModule = 'notify';
     protected $_structName = 'Event';
 
-    const STATUS_EXPECT = 'expect';
-    const STATUS_PERFOMED = 'perfomed';
+    const STATUS_WAITING = 'waiting';
+    const STATUS_RUNS = 'runs';
     const STATUS_FINISHED = 'finished';
 }
 

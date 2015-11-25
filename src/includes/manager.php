@@ -68,6 +68,16 @@ class NotifyManager extends Ab_ModuleManager {
     }
     /**/
 
+    public function Bos_ExtensionData(){
+        if (!$this->IsViewRole()){
+            return null;
+        }
+        return array(
+            "component" => "cron",
+            "method" => "initializeCron"
+        );
+    }
+
 }
 
 ?>

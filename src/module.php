@@ -21,6 +21,9 @@ class NotifyModule extends Ab_Module {
         $this->permission = new NotifyPermission($this);
     }
 
+    public function Bos_IsExtension(){
+        return true;
+    }
 }
 
 class NotifyAction {

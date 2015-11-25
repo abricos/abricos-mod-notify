@@ -17,6 +17,14 @@ Component.entryPoint = function(NS){
     });
 
     SYS.Application.build(COMPONENT, {}, {
+        initializer: function(){
+            var instance = this;
+            this.ownerBaseList(function(){
+                NS.roles.load(function(){
+                    instance.initCallbackFire();
+                });
+            }, this);
+        },
         registerOwner: function(owner){
             if (!owner || !Y.Lang.isFunction(owner.get) || owner.get('isBase')){
                 return;
@@ -61,13 +69,33 @@ Component.entryPoint = function(NS){
                 this.registerSubscribe(subscribe);
             }, this);
         },
-        initializer: function(){
-            var instance = this;
-            this.ownerBaseList(function(){
-                NS.roles.load(function(){
-                    instance.initCallbackFire();
-                });
+        _cronRunner: function(){
+            this.notifyList(function(err, result){
+                console.log(arguments);
             }, this);
+        },
+        cronIsStart: function(){
+            return !!this._cronThread;
+        },
+        cronStart: function(){
+            if (this.cronIsStart()){
+                return;
+            }
+            this._cronRunner();
+
+            var instance = this;
+            this._cronThread = setInterval(function(){
+                try {
+                    instance._cronRunner.call(instance);
+                } catch (e) {
+                }
+            }, 1000 * 60 * 5);
+        },
+        cronStop: function(){
+            if (!this.cronIsStart()){
+                return;
+            }
+            clearInterval();
         }
     }, [], {
         ATTRS: {
@@ -120,6 +148,7 @@ Component.entryPoint = function(NS){
                 args: ['subscribe'],
                 type: 'model:Subscribe',
             },
+            notifyList: {},
             config: {
                 attribute: true,
                 type: 'model:Config'

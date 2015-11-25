@@ -285,23 +285,16 @@ class NotifyQuery {
         return $eventid;
     }
 
-
-    /*
-    public static function EventListByExpect(AbricosApplication $app){
+    public static function EventListByWaiting(AbricosApplication $app){
         $db = $app->db;
         $sql = "
 			SELECT *
 			FROM ".$db->prefix."notify_event
-			WHERE status='".NotifyEvent::STATUS_EXPECT."'
+			WHERE status='".NotifyEvent::STATUS_WAITING."'
 			    AND (dateline+timeout)<".intval(TIMENOW)."
 		";
         return $db->query_read($sql);
     }
-
-    public static function EventPerfomed(AbricosApplication $app, NotifyEvent $event){
-
-    }
-    /**/
 }
 
 

@@ -83,6 +83,35 @@ class NotifyApp extends AbricosApplication {
         $eventid = NotifyQuery::EventAppend($this, $ownerMethod);
     }
 
+    /**
+     * @return NotifyEventList|null
+     */
+    public function EventListByWaiting(){
+        $list = null;
+        $rows = NotifyQuery::EventListByExpect($this);
+        while (($d = $this->db->fetch_array($rows))){
+            if (empty($list)){
+                /** @var NotifyEventList $list */
+                $list = $this->InstanceClass('EventList');
+            }
+            $event = $this->InstanceClass('Owner', $d);
+            $list->Add($event);
+        }
+        return $list;
+    }
+
+    public function Cron(){
+        if (isset($this->_cache['Cron'])){
+            return;
+        }
+        $this->_cache['Cron'] = true;
+        $list = $this->EventListByExpect();
+        $cnt = $list->Count();
+        for ($i = 0; $i < $cnt; $i++){
+
+        }
+    }
+
 
     /*
     public function NotifyAppend($methodKey, $itemid){
@@ -102,13 +131,7 @@ class NotifyApp extends AbricosApplication {
         return $owner;
     }
 
-    public function EventCheck(){
-        $rows = NotifyQuery::EventListByExpect($this);
-        while (($d = $this->db->fetch_array($rows))){
-            $event = $this->InstanceClass('Owner', $d);
-            NotifyQuery::EventPerfomed($this, $event);
-        }
-    }
+
 
     public function EventRead($key, $itemid){
         $owner = $this->OwnerByKey($key, $itemid);
