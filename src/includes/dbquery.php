@@ -295,6 +295,21 @@ class NotifyQuery {
 		";
         return $db->query_read($sql);
     }
+
+    public static function SummaryList(AbricosApplication $app){
+        $db = $app->db;
+        $sql = "
+			SELECT
+			  o.ownerModule as module,
+			  count(n.userid) as cnt
+			FROM ".$db->prefix."notify n
+			INNER JOIN ".$db->prefix."notify_event e ON n.eventid=e.eventid
+			INNER JOIN ".$db->prefix."notify_owner o ON o.ownerid=e.ownerid
+			WHERE n.userid=".intval(Abricos::$user->id)."
+			GROUP BY o.ownerModule
+		";
+        return $db->query_read($sql);
+    }
 }
 
 

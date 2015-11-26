@@ -67,7 +67,7 @@ class NotifyManager extends Ab_ModuleManager {
         );
     }
     /**/
-
+    /*
     public function Bos_ExtensionData(){
         if (!$this->IsViewRole()){
             return null;
@@ -77,7 +77,7 @@ class NotifyManager extends Ab_ModuleManager {
             "method" => "initializeCron"
         );
     }
-
+    /**/
 }
 
 ?>

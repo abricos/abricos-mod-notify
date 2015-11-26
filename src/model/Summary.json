@@ -1,0 +1,15 @@
+{
+  "version": "0.1.0",
+  "type": "model",
+  "fields": {
+    "id": {
+      "type": "string",
+      "dbField": "module"
+    },
+    "count": {
+      "type": "int",
+      "dbField": "cnt",
+      "json": "c"
+    }
+  }
+}

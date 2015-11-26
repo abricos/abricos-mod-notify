@@ -142,6 +142,14 @@ Component.entryPoint = function(NS){
         }
     });
 
+    NS.Summary = Y.Base.create('summary', SYS.AppModel, [], {
+        structureName: 'Summary',
+    }, {});
+
+    NS.SummaryList = Y.Base.create('summaryList', SYS.AppModelList, [], {
+        appItem: NS.Summary,
+    });
+
     NS.Config = Y.Base.create('config', SYS.AppModel, [], {
         structureName: 'Config'
     });

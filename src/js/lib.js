@@ -19,11 +19,11 @@ Component.entryPoint = function(NS){
     SYS.Application.build(COMPONENT, {}, {
         initializer: function(){
             var instance = this;
-            this.ownerBaseList(function(){
+            // this.ownerBaseList(function(){
                 NS.roles.load(function(){
                     instance.initCallbackFire();
                 });
-            }, this);
+            // }, this);
         },
         registerOwner: function(owner){
             if (!owner || !Y.Lang.isFunction(owner.get) || owner.get('isBase')){
@@ -70,8 +70,8 @@ Component.entryPoint = function(NS){
             }, this);
         },
         _cronRunner: function(){
-            this.notifyList(function(err, result){
-                console.log(arguments);
+            this.summaryList(function(err, result){
+                // console.log(arguments);
             }, this);
         },
         cronIsStart: function(){
@@ -104,6 +104,8 @@ Component.entryPoint = function(NS){
             OwnerList: {value: NS.OwnerList},
             Subscribe: {value: NS.Subscribe},
             SubscribeList: {value: NS.SubscribeList},
+            Summary: {value: NS.Summary},
+            SummaryList: {value: NS.SummaryList},
             Config: {value: NS.Config},
             ownerList: {
                 readOnly: true,
@@ -120,7 +122,6 @@ Component.entryPoint = function(NS){
         },
         REQS: {
             ownerBaseList: {
-                attach: 'subscribeBaseList',
                 attribute: true,
                 type: 'modelList:OwnerList',
             },
@@ -148,7 +149,10 @@ Component.entryPoint = function(NS){
                 args: ['subscribe'],
                 type: 'model:Subscribe',
             },
-            notifyList: {},
+            summaryList: {
+                attach: 'ownerBaseList,subscribeBaseList',
+                type: 'modelList:SummaryList',
+            },
             config: {
                 attribute: true,
                 type: 'model:Config'

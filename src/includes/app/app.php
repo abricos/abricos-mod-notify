@@ -21,15 +21,19 @@ class NotifyApp extends AbricosApplication {
         return array(
             'Event' => 'NotifyEvent',
             'EventList' => 'NotifyEventList',
+            'Summary' => 'NotifySummary',
+            'SummaryList' => 'NotifySummaryList',
         );
     }
 
     protected function GetStructures(){
-        return '';
+        return 'Summary';
     }
 
     public function ResponseToJSON($d){
         switch ($d->do){
+            case 'summaryList':
+                return $this->SummaryListToJSON();
         }
         return null;
     }
@@ -112,35 +116,26 @@ class NotifyApp extends AbricosApplication {
         }
     }
 
-
-    /*
-    public function NotifyAppend($methodKey, $itemid){
-        $ownerMethod = $this->OwnerBaseList()->GetByKey($methodKey);
-        if (empty($ownerMethod) || $ownerMethod->recordType !== NotifyOwner::TYPE_METHOD){
-            return AbricosResponse::ERR_BAD_REQUEST;
-        }
-        $ownerCont = $ownerMethod->GetParent();
-
-        $owner = $this->OwnerItemByContainer($ownerCont, $itemid, true);
-
-        // Добавить событие в очередь
-        NotifyQuery::EventAppend($this, $owner, $ownerMethod);
-
-        $this->EventCheck();
-
-        return $owner;
+    public function SummaryListToJSON(){
+        $ret = $this->SummaryList();
+        return $this->ResultToJSON('summaryList', $ret);
     }
 
-
-
-    public function EventRead($key, $itemid){
-        $owner = $this->OwnerByKey($key, $itemid);
-        if (AbricosResponse::IsError($owner)){
-            return AbricosResponse::ERR_NOT_FOUND;
+    public function SummaryList(){
+        if (!$this->manager->IsViewRole()){
+            return AbricosResponse::ERR_FORBIDDEN;
         }
-        NotifyQuery::ActivityUpdate($this, $owner);
+
+        /** @var NoticeSummaryList $list */
+        $list = $this->InstanceClass('SummaryList');
+
+        $rows = NotifyQuery::SummaryList($this);
+        while (($d = $this->db->fetch_array($rows))){
+            $list->Add($this->InstanceClass('Summary', $d));
+        }
+        return $list;
     }
-    /**/
+
 }
 
 ?>
