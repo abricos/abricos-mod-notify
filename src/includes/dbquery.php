@@ -300,13 +300,44 @@ class NotifyQuery {
         $db = $app->db;
         $sql = "
 			SELECT
-			  o.ownerModule as module,
-			  count(n.userid) as cnt
+                o.ownerModule as module,
+                count(n.userid) as cnt
 			FROM ".$db->prefix."notify n
 			INNER JOIN ".$db->prefix."notify_event e ON n.eventid=e.eventid
 			INNER JOIN ".$db->prefix."notify_owner o ON o.ownerid=e.ownerid
 			WHERE n.userid=".intval(Abricos::$user->id)."
 			GROUP BY o.ownerModule
+		";
+        return $db->query_read($sql);
+    }
+
+    public static function NoticeListByOwnerItemIds(AbricosApplication $app, NotifyOwnerKey $key, $ids){
+        $cnt = count($ids);
+        if ($cnt === 0){
+            return null;
+        }
+        $wh = array();
+        for ($i = 0; $i < $cnt; $i++){
+            $wh[] = "o.ownerItemId=".intval($ids[$i]);
+        }
+        $db = $app->db;
+        $sql = "
+			SELECT
+                n.notifyid,
+                n.eventid,
+                o.ownerid,
+                o.ownerModule,
+                o.ownerType,
+                o.ownerMethod,
+                o.ownerItemId,
+                n.dateline
+			FROM ".$db->prefix."notify n
+			INNER JOIN ".$db->prefix."notify_event e ON n.eventid=e.eventid
+			INNER JOIN ".$db->prefix."notify_owner o ON o.ownerid=e.ownerid
+			WHERE n.userid=".intval(Abricos::$user->id)."
+			    AND o.ownerModule='".bkstr($key->module)."'
+			    AND o.ownerType='".bkstr($key->type)."'
+			    AND (".implode(" OR ", $wh).")
 		";
         return $db->query_read($sql);
     }

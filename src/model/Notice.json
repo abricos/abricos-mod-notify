@@ -1,0 +1,42 @@
+{
+  "version": "0.1.0",
+  "type": "model",
+  "fields": {
+    "id": {
+      "type": "int",
+      "dbField": "notifyid"
+    },
+    "eventid": {
+      "type": "int",
+      "json": "eid"
+    },
+    "ownerid": {
+      "type": "int",
+      "json": "i"
+    },
+    "module": {
+      "type": "string",
+      "dbField": "ownerModule",
+      "json": "mod"
+    },
+    "type": {
+      "type": "string",
+      "dbField": "ownerType",
+      "json": "tp"
+    },
+    "method": {
+      "type": "string",
+      "dbField": "ownerMethod",
+      "json": "tp"
+    },
+    "itemid": {
+      "type": "int",
+      "dbField": "ownerItemId",
+      "json": "iid"
+    },
+    "dateline": {
+      "type": "date",
+      "json": "dl"
+    }
+  }
+}

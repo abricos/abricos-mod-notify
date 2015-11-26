@@ -367,4 +367,30 @@ class NotifySummaryList extends AbricosModelList {
 
 }
 
+/**
+ * Class NotifyNotice
+ *
+ * @property int $eventid
+ * @property int $ownerid
+ * @property string $module
+ * @property string $type
+ * @property string $method
+ * @property int $itemid
+ * @property int $dateline
+ */
+class NotifyNotice extends AbricosModel {
+    protected $_structModule = 'notify';
+    protected $_structName = 'Notice';
+}
+
+/**
+ * Class NotifyNoticeList
+ *
+ * @method NotifyNotice Get($id)
+ * @method NotifyNotice GetByIndex($index)
+ */
+class NotifyNoticeList extends AbricosModelList {
+
+}
+
 ?>

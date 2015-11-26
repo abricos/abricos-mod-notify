@@ -23,6 +23,8 @@ class NotifyApp extends AbricosApplication {
             'EventList' => 'NotifyEventList',
             'Summary' => 'NotifySummary',
             'SummaryList' => 'NotifySummaryList',
+            'Notice' => 'NotifyNotice',
+            'NoticeList' => 'NotifyNoticeList',
         );
     }
 
@@ -126,12 +128,30 @@ class NotifyApp extends AbricosApplication {
             return AbricosResponse::ERR_FORBIDDEN;
         }
 
-        /** @var NoticeSummaryList $list */
+        /** @var NotifySummaryList $list */
         $list = $this->InstanceClass('SummaryList');
 
         $rows = NotifyQuery::SummaryList($this);
         while (($d = $this->db->fetch_array($rows))){
             $list->Add($this->InstanceClass('Summary', $d));
+        }
+        return $list;
+    }
+
+    /**
+     * @param $key
+     * @param $ids
+     * @return NotifyNoticeList
+     */
+    public function NoticeListByOwnerItemIds($key, $ids){
+        $pkey = NotifyOwner::ParseKey($key);
+        
+        /** @var NotifyNoticeList $list */
+        $list = $this->InstanceClass('NoticeList');
+
+        $rows = NotifyQuery::NoticeListByOwnerItemIds($this, $pkey, $ids);
+        while (($d = $this->db->fetch_array($rows))){
+            $list->Add($this->InstanceClass('Notice', $d));
         }
         return $list;
     }
