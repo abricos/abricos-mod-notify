@@ -71,13 +71,15 @@ class NotifyApp extends AbricosApplication {
         }
         $this->_cache['ActivityUpdate'][$cacheKey] = true;
 
-
         $ownerItem = $this->Owner()->ItemByKey($key, $itemid);
         if (AbricosResponse::IsError($ownerItem)){
             return AbricosResponse::ERR_BAD_REQUEST;
         }
 
         NotifyQuery::ActivityUpdate($this, $ownerItem);
+
+        $noticeList = $this->NoticeListByOwnerItemIds($key, array($itemid));
+        NotifyQuery::NoticeRemove($this, $noticeList);
     }
 
     public function EventAppend($key, $itemid){
@@ -145,7 +147,7 @@ class NotifyApp extends AbricosApplication {
      */
     public function NoticeListByOwnerItemIds($key, $ids){
         $pkey = NotifyOwner::ParseKey($key);
-        
+
         /** @var NotifyNoticeList $list */
         $list = $this->InstanceClass('NoticeList');
 

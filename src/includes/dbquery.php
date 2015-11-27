@@ -341,6 +341,23 @@ class NotifyQuery {
 		";
         return $db->query_read($sql);
     }
+
+    public static function NoticeRemove(AbricosApplication $app, NotifyNoticeList $noticeList){
+        $cnt = $noticeList->Count();
+        if ($cnt === 0){
+            return;
+        }
+        $wh = array();
+        for ($i = 0; $i < $cnt; $i++){
+            $notice = $noticeList->GetByIndex($i);
+            $wh[] = "notifyid=".intval($notice->id);
+        }
+        $db = $app->db;
+        $sql = "
+			DELETE FROM ".$db->prefix."notify WHERE ".implode(" OR ", $wh)."
+		";
+        return $db->query_write($sql);
+    }
 }
 
 

@@ -20,9 +20,9 @@ Component.entryPoint = function(NS){
         initializer: function(){
             var instance = this;
             // this.ownerBaseList(function(){
-                NS.roles.load(function(){
-                    instance.initCallbackFire();
-                });
+            NS.roles.load(function(){
+                instance.initCallbackFire();
+            });
             // }, this);
         },
         registerOwner: function(owner){
@@ -69,9 +69,11 @@ Component.entryPoint = function(NS){
                 this.registerSubscribe(subscribe);
             }, this);
         },
-        _cronRunner: function(){
+        summaryUpdate: function(){
+            if (Brick.env.user.id === 0){
+                return;
+            }
             this.summaryList(function(err, result){
-                // console.log(arguments);
             }, this);
         },
         cronIsStart: function(){
@@ -81,12 +83,12 @@ Component.entryPoint = function(NS){
             if (this.cronIsStart()){
                 return;
             }
-            this._cronRunner();
+            this.summaryUpdate();
 
             var instance = this;
             this._cronThread = setInterval(function(){
                 try {
-                    instance._cronRunner.call(instance);
+                    instance.summaryUpdate.call(instance);
                 } catch (e) {
                 }
             }, 1000 * 60 * 5);
