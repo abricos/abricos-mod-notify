@@ -53,6 +53,26 @@ class NotifyManager extends Ab_ModuleManager {
         return $this->GetApp()->AJAX($d);
     }
 
+    private $_oldManager = null;
+
+    /**
+     * @param $email
+     * @param $subject
+     * @param $message
+     * @param string $from
+     * @param string $fromName
+     *
+     * @deprecated
+     */
+    public function SendMail($email, $subject, $message, $from = '', $fromName = ''){
+        if (empty($this->_oldManager)){
+            $this->module->ScriptRequireOnce('includes/old_manager.php');
+            $this->_oldManager = new old_NotifyManager($this->module);
+        }
+
+        $this->_oldManager->SendMail($email, $subject, $message, $from, $fromName);
+    }
+
     /*
     public function Bos_MenuData(){
         $i18n = $this->module->I18n();
