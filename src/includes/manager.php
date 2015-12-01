@@ -70,7 +70,7 @@ class NotifyManager extends Ab_ModuleManager {
             $this->_oldManager = new old_NotifyManager($this->module);
         }
 
-        $this->_oldManager->SendMail($email, $subject, $message, $from, $fromName);
+        return $this->_oldManager->SendMail($email, $subject, $message, $from, $fromName);
     }
 
     /*
