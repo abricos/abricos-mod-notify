@@ -14,15 +14,9 @@ require_once 'phpmailer/class.phpmailer.php';
  *
  * @property NotifyModule $module
  */
-class old_NotifyManager extends Ab_Notification {
+class old_NotifyManager extends Ab_ModuleManager {
 
     private $emlcounter = 1;
-
-    public function __construct(NotifyModule $module){
-
-        $this->module = $module;
-        $this->db = Abricos::$db;
-    }
 
     public function SendMail($email, $subject, $message, $from = '', $fromName = ''){
         /*
