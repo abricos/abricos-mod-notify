@@ -358,6 +358,31 @@ class NotifyQuery {
 		";
         return $db->query_write($sql);
     }
+
+
+    public static function MailAppend(AbricosApplication $app, $toName, $toEmail, $subject, $body){
+        $db = $app->db;
+
+        /** @var NotifyConfig $config */
+        $config = $app->Config();
+
+        $sql = "
+			INSERT INTO ".$db->prefix."notify_mail (
+			    toName, toEmail, fromName, fromEmail, subject, body, dateline
+			) VALUES (
+			    ".bkstr($toName).",
+			    ".bkstr($toEmail).",
+			    ".bkstr($config->fromName).",
+			    ".bkstr($config->fromEmail).",
+			    ".bkstr($subject).",
+			    ".bkstr($body).",
+			    ".intval(TIMENOW)."
+			)
+		";
+        $db->query_write($sql);
+
+        return $db->insert_id();
+    }
 }
 
 

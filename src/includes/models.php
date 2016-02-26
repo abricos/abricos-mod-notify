@@ -396,6 +396,11 @@ class NotifyNoticeList extends AbricosModelList {
 /**
  * Class NotifyConfig
  *
+ * @property string $fromName
+ * @property string $fromEmail
+ *
+ * @property bool $totestfile
+ *
  * @property bool $SMTP
  * @property string $SMTPHost
  * @property int $SMTPPort
@@ -412,6 +417,33 @@ class NotifyNoticeList extends AbricosModelList {
 class NotifyConfig extends AbricosModel {
     protected $_structModule = 'notify';
     protected $_structName = 'Config';
+}
+
+/**
+ * Class NotifyMail
+ *
+ * @property string $fromName
+ * @property string $fromEmail
+ * @property string $toName
+ * @property string $toEmail
+ * @property string $subject
+ * @property string $body
+ * @property int $dateline
+ * @property int $sendDate
+ */
+class NotifyMail extends AbricosModel {
+    protected $_structModule = 'notify';
+    protected $_structName = 'Mail';
+}
+
+/**
+ * Class NotifyMailList
+ *
+ * @method NotifyMail Get($id)
+ * @method NotifyMail GetByIndex($index)
+ */
+class NotifyMailList extends AbricosModelList {
+
 }
 
 ?>

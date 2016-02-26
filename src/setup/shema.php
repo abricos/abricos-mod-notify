@@ -135,31 +135,30 @@ if ($updateManager->isUpdate('0.1.4')){
         )".$charset
     );
 
-    /*
+}
+
+if ($updateManager->isUpdate('0.1.4.1')){
+
     $db->query_write("
-        CREATE TABLE IF NOT EXISTS ".$pfx."notify (
-            notifyid INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+        CREATE TABLE IF NOT EXISTS ".$pfx."notify_mail (
+            mailid INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 
-            ownerid INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Owner ID',
-            userid INT(10) UNSIGNED NOT NULL COMMENT 'User ID',
+            toName VARCHAR(255) NOT NULL DEFAULT '' COMMENT '',
+            toEmail VARCHAR(255) NOT NULL DEFAULT '' COMMENT '',
 
-            emailSubject VARCHAR(255) NOT NULL DEFAULT '' COMMENT '',
-			emailBody TEXT NOT NULL COMMENT '',
-            emailURI VARCHAR(255) NOT NULL DEFAULT '' COMMENT '',
-			emailDate INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Send email date',
+            fromName VARCHAR(255) NOT NULL DEFAULT '' COMMENT '',
+            fromEmail VARCHAR(255) NOT NULL DEFAULT '' COMMENT '',
 
-            bosSubject VARCHAR(255) NOT NULL DEFAULT '' COMMENT '',
-			bosBody TEXT NOT NULL COMMENT '',
-            bosURI VARCHAR(255) NOT NULL DEFAULT '' COMMENT '',
-			bosDate INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Read notify date in BosUI',
+            subject VARCHAR(255) NOT NULL DEFAULT '' COMMENT '',
+			body TEXT NOT NULL COMMENT '',
 
 			dateline INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Create Date',
+			sendDate INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Send Date',
 
-            PRIMARY KEY (notifyid),
-            UNIQUE KEY notify (ownerid, userid),
-            KEY userid (userid)
+            PRIMARY KEY (mailid)
         )".$charset
     );
-    /**/
+
 }
+
 ?>

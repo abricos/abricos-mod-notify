@@ -1,0 +1,31 @@
+{
+  "version": "0.1.0",
+  "type": "model",
+  "rolefn": "IsAdminRole",
+  "fields": {
+    "fromName": {
+      "type": "string"
+    },
+    "fromEmail": {
+      "type": "string"
+    },
+    "toName": {
+      "type": "string"
+    },
+    "toEmail": {
+      "type": "string"
+    },
+    "subject": {
+      "type": "string"
+    },
+    "body": {
+      "type": "string"
+    },
+    "dateline": {
+      "type": "date"
+    },
+    "sendDate": {
+      "type": "date"
+    }
+  }
+}

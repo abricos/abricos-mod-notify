@@ -1,7 +1,16 @@
 {
   "version": "0.1.0",
   "type": "model",
+  "rolefn": "IsAdminRole",
   "fields": {
+    "fromName": {
+      "rolefn": "IsAdminRole",
+      "type": "string"
+    },
+    "fromEmail": {
+      "rolefn": "IsAdminRole",
+      "type": "string"
+    },
     "totestfile": {
       "rolefn": "IsAdminRole",
       "type": "bool"

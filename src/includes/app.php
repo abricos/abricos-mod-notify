@@ -25,12 +25,14 @@ class NotifyApp extends AbricosApplication {
             'SummaryList' => 'NotifySummaryList',
             'Notice' => 'NotifyNotice',
             'NoticeList' => 'NotifyNoticeList',
-            'Config' => 'NotifyConfig'
+            'Config' => 'NotifyConfig',
+            'Mail' => 'NotifyMail',
+            'MailList' => 'NotifyMailList',
         );
     }
 
     protected function GetStructures(){
-        return 'Summary,Config';
+        return 'Summary,Mail,Config';
     }
 
     public function ResponseToJSON($d){
@@ -163,15 +165,24 @@ class NotifyApp extends AbricosApplication {
         return $this->ResultToJSON('config', $res);
     }
 
+    /**
+     * @return NotifyConfig
+     */
     public function Config(){
+
+        if (isset($this->_cache['Config'])){
+            return $this->_cache['Config'];
+        }
+
         $d = isset(Abricos::$config['module']['notify']) ?
             Abricos::$config['module']['notify'] : array();
 
 
+        $sysPhrases = Abricos::GetModule('sys')->GetPhrases();
+        $d['fromName'] = $sysPhrases->Get('site_name');
+        $d['fromEmail'] = $sysPhrases->Get('admin_mail');
 
-        $phrases = $this->manager->module->GetPhrases();
-
-
+        // $phrases = $this->manager->module->GetPhrases();
         /*
         for ($i = 0; $i < $phrases->Count(); $i++){
             $ph = $phrases->GetByIndex($i);
@@ -179,7 +190,11 @@ class NotifyApp extends AbricosApplication {
         }
         /**/
 
-        return $this->InstanceClass('Config', $d);
+        $config = $this->InstanceClass('Config', $d);
+
+        $this->_cache['Config'] = $config;
+
+        return $config;
     }
 
     public function ConfigSaveToJSON($sd){
@@ -193,10 +208,35 @@ class NotifyApp extends AbricosApplication {
         }
         $utmf = Abricos::TextParser(true);
 
-        $phs = FeedbackModule::$instance->GetPhrases();
-        $phs->Set("adm_emails", $utmf->Parser($sd->adm_emails));
+        // $phs = FeedbackModule::$instance->GetPhrases();
+        // $phs->Set("adm_emails", $utmf->Parser($sd->adm_emails));
 
         Abricos::$phrases->Save();
+    }
+
+
+    /* * * * * * * * * * Mail * * * * * * * * * * */
+
+    public function Mail($mailid){
+
+    }
+
+    public function MailSend($toName, $toEmail, $subject, $body){
+
+        $utmf = Abricos::TextParser(true);
+
+
+        $this->manager->module->ScriptRequireOnce('includes/phpmailer/class.phpmailer.php');
+
+        // NotifyQuery::MailAppend($this, )
+
+
+        $config = $this->Config();
+
+        if ($config->totestfile){
+
+        }
+
     }
 
 }
