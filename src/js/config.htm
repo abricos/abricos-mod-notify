@@ -1,0 +1,178 @@
+<!--{widget}-->
+
+<div class="config panel panel-default ">
+    <div class="panel-heading">
+
+        <div class="row">
+            <div class="col-md-7">
+                <h3 class="panel-title">Настройки</h3>
+            </div>
+            <div class="col-md-5">
+                <div class="btn-toolbar text-right">
+                        <span data-wait="show">
+                            <img src="/images/loading.gif"/> Загрузка...
+                        </span>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+    <div class="panel-body">
+        <h4>Настройка SMTP-сервера</h4>
+        <p>
+            Настройки SMTP-сервера производятся в файле config.php.
+
+            <a id="{i#showConfigExample}" href="#" data-click="showConfigExample">Показать пример</a>
+        </p>
+
+        <code id="{i#configExample}" class="hide">
+            $config["module"]["notify"] = array( <br/>
+            &nbsp;&nbsp;"totestfile" => false, // не отправлять письма, а сохранять их
+            &nbsp;&nbsp;"SMTP" => true, // Использовать SMTP <br/>
+            &nbsp;&nbsp;"SMTPHost" => "mail.yourdomain.com", // SMTP сервер <br/>
+            &nbsp;&nbsp;"SMTPPort" => 26, // SMTP порт <br/>
+            &nbsp;&nbsp;"SMTPAuth" => true, // использовать авторизацию SMTP <br/>
+            &nbsp;&nbsp;"SMTPUsername" => "yourname@youdomain", // имя пользователя SMTP <br/>
+            &nbsp;&nbsp;"SMTPPassword" => "yourpassword" // пароль пользователя SMTP <br/>
+            );
+        </code>
+
+        <h4>Текущие настройки</h4>
+
+        <div id="{i#smtpNotPanel}">
+            <p>
+                SMTP-сервер отключен
+            </p>
+        </div>
+
+        <div id="{i#smtpUsePanel}" class="hide">
+            <p>
+                SMTP-сервер включен
+            </p>
+
+            <div class="form-horizontal">
+
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">
+                        SMTPHost
+                    </label>
+                    <div class="col-sm-10">
+                        <input id="{i#SMTPHost}" type="text" class="form-control" readonly="readonly">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">
+                        SMTPPort
+                    </label>
+                    <div class="col-sm-10">
+                        <input id="{i#SMTPPort}" type="text" class="form-control" readonly="readonly">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">
+                        SMTPUsername
+                    </label>
+                    <div class="col-sm-10">
+                        <input id="{i#SMTPUsername}" type="text" class="form-control" readonly="readonly">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">
+                        SMTPPassword
+                    </label>
+                    <div class="col-sm-10">
+                        <input id="{i#SMTPPassword}" type="text" class="form-control" readonly="readonly">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">
+                        SMTPSecure
+                    </label>
+                    <div class="col-sm-10">
+                        <input id="{i#SMTPSecure}" type="text" class="form-control" readonly="readonly">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">
+                        POPBefore
+                    </label>
+                    <div class="col-sm-10">
+                        <input id="{i#POPBefore}" type="text" class="form-control" readonly="readonly">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">
+                        POPHost
+                    </label>
+                    <div class="col-sm-10">
+                        <input id="{i#POPHost}" type="text" class="form-control" readonly="readonly">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">
+                        POPPort
+                    </label>
+                    <div class="col-sm-10">
+                        <input id="{i#POPPort}" type="text" class="form-control" readonly="readonly">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">
+                        POPUsername
+                    </label>
+                    <div class="col-sm-10">
+                        <input id="{i#POPUsername}" type="text" class="form-control" readonly="readonly">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">
+                        POPPassword
+                    </label>
+                    <div class="col-sm-10">
+                        <input id="{i#POPPassword}" type="text" class="form-control" readonly="readonly">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h4>Для разработчика</h4>
+
+        <div class="form-horizontal">
+
+            <div class="form-group">
+                <label class="col-sm-2 control-label">
+                    Включить режим отладки
+                </label>
+                <div class="col-sm-10">
+                    <input id="{i#totestfile}" type="text" class="form-control" readonly="readonly">
+                    <p class="help-block">
+                        Если режим включен, то все письма не отправляются адресату, а сохраняются в
+                        базу для последующего анализа
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="panel-footer">
+        <div class="btn-toolbar pull-right">
+            <span data-wait="show">
+                <img src="/images/loading.gif"/> Загрузка...
+            </span>
+            <button type="button" class="btn btn-default edit-isedit" data-wait="disable">
+                Сохранить
+            </button>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+</div>

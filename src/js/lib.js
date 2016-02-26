@@ -158,10 +158,18 @@ Component.entryPoint = function(NS){
             config: {
                 attribute: true,
                 type: 'model:Config'
-            }
+            },
+            configSave: {
+                args: ['config']
+            },
         },
         URLS: {
             ws: "#app={C#MODNAMEURI}/wspace/ws/",
+            config: {
+                view: function(){
+                    return this.getURL('ws') + 'config/ConfigWidget/'
+                }
+            },
         }
     });
 

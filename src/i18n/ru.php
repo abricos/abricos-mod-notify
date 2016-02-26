@@ -1,5 +1,5 @@
 <?php
 return array(
-    "title" => "Уведомления на Email"
+    "title" => "Уведомления"
 );
 ?>

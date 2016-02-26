@@ -32,22 +32,6 @@ class NotifyManager extends Ab_ModuleManager {
         return $this->IsRoleEnable(NotifyAction::VIEW);
     }
 
-    private $_app = null;
-
-    /**
-     * @return NotifyApp
-     */
-    public function GetApp(){
-        if (!is_null($this->_app)){
-            return $this->_app;
-        }
-        $this->module->ScriptRequireOnce(array(
-            'includes/dbquery.php',
-            'includes/models.php',
-            'includes/app/app.php'
-        ));
-        return $this->_app = new NotifyApp($this);
-    }
 
     public function AJAX($d){
         return $this->GetApp()->AJAX($d);
@@ -73,7 +57,6 @@ class NotifyManager extends Ab_ModuleManager {
         return $this->_oldManager->SendMail($email, $subject, $message, $from, $fromName);
     }
 
-    /*
     public function Bos_MenuData(){
         $i18n = $this->module->I18n();
         return array(
@@ -81,12 +64,29 @@ class NotifyManager extends Ab_ModuleManager {
                 "name" => "notify",
                 "title" => $i18n->Translate('title'),
                 "role" => NotifyAction::ADMIN,
-                "icon" => "/modules/notify/images/forum-24.png",
-                "url" => "forum/wspace/ws"
+                "icon" => "/modules/notify/images/logo-96x96.png",
+                "url" => "notify/wspace/ws/",
+                "parent" => "controlPanel"
             )
         );
     }
-    /**/
+
+    public function Bos_SummaryData(){
+        if (!$this->IsAdminRole()){
+            return;
+        }
+
+        $i18n = $this->module->I18n();
+        return array(
+            array(
+                "module" => "notify",
+                "component" => "summary",
+                "widget" => "SummaryWidget",
+                "title" => $i18n->Translate('title'),
+            )
+        );
+    }
+
     /*
     public function Bos_ExtensionData(){
         if (!$this->IsViewRole()){

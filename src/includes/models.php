@@ -393,4 +393,25 @@ class NotifyNoticeList extends AbricosModelList {
 
 }
 
+/**
+ * Class NotifyConfig
+ *
+ * @property bool $SMTP
+ * @property string $SMTPHost
+ * @property int $SMTPPort
+ * @property string $SMTPUsername
+ * @property string $SMTPPassword
+ * @property string $SMTPSecure
+ *
+ * @property bool $POPBefore
+ * @property string $POPHost
+ * @property int $POPPort
+ * @property string $POPUsername
+ * @property string $POPPassword
+ */
+class NotifyConfig extends AbricosModel {
+    protected $_structModule = 'notify';
+    protected $_structName = 'Config';
+}
+
 ?>

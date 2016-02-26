@@ -1,0 +1,34 @@
+<!--{widget}-->
+<div class="app-workspace aw-feedback">
+    <div class="app-nav">
+        <nav class="navbar navbar-default" role="navigation">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a class="navbar-brand" data-url="ws" href="#">
+                        Уведомления
+                    </a>
+                </div>
+                <ul class="nav navbar-nav">
+                    <li>
+                        <a href="#" data-url="config.view">Настройки</a>
+                    </li>
+                </ul>
+
+                <ul class="nav navbar-nav pull-right" data-wait="show">
+                    <li><a href="#" data-url="ws">
+                        <img src="/images/loading.gif"/></a></li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+
+    <div data-wait="show" class="text-center">
+        <img src="/images/loading.gif"/>
+
+        <p>Идет загрузка данных</p>
+ 
+        <p>Пожалуйста, подождите...</p>
+    </div>
+
+    <div class="app-workspace-page" data-wait="hide"></div>
+</div>

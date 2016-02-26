@@ -2,5 +2,53 @@
   "version": "0.1.0",
   "type": "model",
   "fields": {
+    "totestfile": {
+      "rolefn": "IsAdminRole",
+      "type": "bool"
+    },
+    "SMTP": {
+      "rolefn": "IsAdminRole",
+      "type": "bool"
+    },
+    "SMTPHost": {
+      "rolefn": "IsAdminRole",
+      "type": "string"
+    },
+    "SMTPPort": {
+      "rolefn": "IsAdminRole",
+      "type": "int"
+    },
+    "SMTPUsername": {
+      "rolefn": "IsAdminRole",
+      "type": "string"
+    },
+    "SMTPPassword": {
+      "rolefn": "IsAdminRole",
+      "type": "string"
+    },
+    "SMTPSecure": {
+      "rolefn": "IsAdminRole",
+      "type": "string"
+    },
+    "POPBefore": {
+      "rolefn": "IsAdminRole",
+      "type": "bool"
+    },
+    "POPHost": {
+      "rolefn": "IsAdminRole",
+      "type": "string"
+    },
+    "POPPort": {
+      "rolefn": "IsAdminRole",
+      "type": "int"
+    },
+    "POPUsername": {
+      "rolefn": "IsAdminRole",
+      "type": "string"
+    },
+    "POPPassword": {
+      "rolefn": "IsAdminRole",
+      "type": "string"
+    }
   }
 }

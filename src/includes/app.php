@@ -7,8 +7,8 @@
  * @author Alexander Kuzmin <roosit@abricos.org>
  */
 
-require_once 'owner.php';
-require_once 'subscribe.php';
+require_once 'app/owner.php';
+require_once 'app/subscribe.php';
 
 /**
  * Class NotifyApp
@@ -25,26 +25,24 @@ class NotifyApp extends AbricosApplication {
             'SummaryList' => 'NotifySummaryList',
             'Notice' => 'NotifyNotice',
             'NoticeList' => 'NotifyNoticeList',
+            'Config' => 'NotifyConfig'
         );
     }
 
     protected function GetStructures(){
-        return 'Summary';
+        return 'Summary,Config';
     }
 
     public function ResponseToJSON($d){
         switch ($d->do){
             case 'summaryList':
                 return $this->SummaryListToJSON();
+            case "config":
+                return $this->ConfigToJSON();
+            case "configSave":
+                return $this->ConfigSaveToJSON($d->config);
         }
         return null;
-    }
-
-    protected function GetAppClasses(){
-        return array(
-            'Owner' => 'NotifyAppOwner',
-            'Subscribe' => 'NotifyAppSubscribe'
-        );
     }
 
     /**
@@ -156,6 +154,49 @@ class NotifyApp extends AbricosApplication {
             $list->Add($this->InstanceClass('Notice', $d));
         }
         return $list;
+    }
+
+    /* * * * * * * * * * Config * * * * * * * * * * */
+
+    public function ConfigToJSON(){
+        $res = $this->Config();
+        return $this->ResultToJSON('config', $res);
+    }
+
+    public function Config(){
+        $d = isset(Abricos::$config['module']['notify']) ?
+            Abricos::$config['module']['notify'] : array();
+
+
+
+        $phrases = $this->manager->module->GetPhrases();
+
+
+        /*
+        for ($i = 0; $i < $phrases->Count(); $i++){
+            $ph = $phrases->GetByIndex($i);
+            $d[$ph->id] = $ph->value;
+        }
+        /**/
+
+        return $this->InstanceClass('Config', $d);
+    }
+
+    public function ConfigSaveToJSON($sd){
+        $this->ConfigSave($sd);
+        return $this->ConfigToJSON();
+    }
+
+    public function ConfigSave($sd){
+        if (!$this->manager->IsAdminRole()){
+            return 403;
+        }
+        $utmf = Abricos::TextParser(true);
+
+        $phs = FeedbackModule::$instance->GetPhrases();
+        $phs->Set("adm_emails", $utmf->Parser($sd->adm_emails));
+
+        Abricos::$phrases->Save();
     }
 
 }

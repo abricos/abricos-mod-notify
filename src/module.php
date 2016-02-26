@@ -26,6 +26,15 @@ class NotifyModule extends Ab_Module {
         return true;
     }
     /**/
+
+    public function Bos_IsMenu(){
+        return true;
+    }
+
+    public function Bos_IsSummary(){
+        return true;
+    }
+
 }
 
 class NotifyAction {
