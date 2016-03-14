@@ -217,26 +217,55 @@ class NotifyApp extends AbricosApplication {
 
     /* * * * * * * * * * Mail * * * * * * * * * * */
 
-    public function Mail($mailid){
+    private static $_globalCounter = 1;
 
-    }
+    /**
+     * @param $toEmail
+     * @param $subject
+     * @param $body
+     *
+     * @return NotifyMail
+     */
+    public function MailByFields($toEmail, $subject, $body){
+        /** @var NotifyMail $mail */
+        $mail = $this->InstanceClass('Mail');
 
-    public function MailSend($toName, $toEmail, $subject, $body){
-
-        $utmf = Abricos::TextParser(true);
-
-
-        $this->manager->module->ScriptRequireOnce('includes/phpmailer/class.phpmailer.php');
-
-        // NotifyQuery::MailAppend($this, )
-
+        $mail->toEmail = $toEmail;
+        $mail->subject = $subject;
+        $mail->body = $body;
 
         $config = $this->Config();
+        $mail->fromName = $config->fromName;
+        $mail->fromEmail = $config->fromEmail;
+        $mail->userid = Abricos::$user->id;
 
-        if ($config->totestfile){
+        $mail->globalid = md5(TIMENOW + (NotifyApp::$_globalCounter++));
 
+        return $mail;
+    }
+
+    public function MailSend(NotifyMail $mail){
+        $mail->id = intval($mail->id);
+
+        if ($mail->id === 0){
+            $mail->id = NotifyQuery::MailAppend($this, $mail);
         }
 
+        if ($mail->sendDate > 0){
+            return;
+        }
+
+        NotifyQuery::MailSetSended($this, $mail);
+
+        $config = $this->Config();
+        if (!$config->totestfile){
+            return;
+        }
+
+        // $utmf = Abricos::TextParser(true);
+        // NotifyQuery::MailAppend($this, )
+
+        $this->manager->module->ScriptRequireOnce('includes/phpmailer/class.phpmailer.php');
     }
 
 }

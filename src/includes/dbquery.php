@@ -360,28 +360,42 @@ class NotifyQuery {
     }
 
 
-    public static function MailAppend(AbricosApplication $app, $toName, $toEmail, $subject, $body){
+    public static function MailAppend(AbricosApplication $app, NotifyMail $mail){
         $db = $app->db;
-
-        /** @var NotifyConfig $config */
-        $config = $app->Config();
+        $mail->dateline = TIMENOW;
+        $mail->sendDate = 0;
 
         $sql = "
 			INSERT INTO ".$db->prefix."notify_mail (
-			    toName, toEmail, fromName, fromEmail, subject, body, dateline
+			    toName, toEmail, fromName, fromEmail,
+			    subject, body, userid, globalid, dateline
 			) VALUES (
-			    ".bkstr($toName).",
-			    ".bkstr($toEmail).",
-			    ".bkstr($config->fromName).",
-			    ".bkstr($config->fromEmail).",
-			    ".bkstr($subject).",
-			    ".bkstr($body).",
+			    '".bkstr($mail->toName)."',
+			    '".bkstr($mail->toEmail)."',
+			    '".bkstr($mail->fromName)."',
+			    '".bkstr($mail->fromEmail)."',
+			    '".bkstr($mail->subject)."',
+			    '".bkstr($mail->body)."',
+			    ".intval($mail->userid).",
+			    '".bkstr($mail->globalid)."',
 			    ".intval(TIMENOW)."
 			)
 		";
         $db->query_write($sql);
 
         return $db->insert_id();
+    }
+
+    public static function MailSetSended(AbricosApplication $app, NotifyMail $mail){
+        $db = $app->db;
+        $sql = "
+			UPDATE ".$db->prefix."notify_mail
+			SET sendDate=".intval(TIMENOW)."
+			WHERE mailid=".intval($mail->id)."
+			LIMIT 1
+		";
+        $mail->sendDate = TIMENOW;
+        $db->query_write($sql);
     }
 }
 

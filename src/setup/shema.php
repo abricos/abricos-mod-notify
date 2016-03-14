@@ -152,6 +152,9 @@ if ($updateManager->isUpdate('0.1.4.1')){
             subject VARCHAR(255) NOT NULL DEFAULT '' COMMENT '',
 			body TEXT NOT NULL COMMENT '',
 
+			userid INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'User ID',
+            globalid VARCHAR(32) NOT NULL DEFAULT '' COMMENT '',
+
 			dateline INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Create Date',
 			sendDate INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Send Date',
 

@@ -21,11 +21,17 @@
     "body": {
       "type": "string"
     },
+    "userid": {
+      "type": "int"
+    },
     "dateline": {
       "type": "date"
     },
     "sendDate": {
       "type": "date"
+    },
+    "globalid": {
+      "type": "string"
     }
   }
 }

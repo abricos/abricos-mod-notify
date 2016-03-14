@@ -15,7 +15,7 @@
 class NotifyModule extends Ab_Module {
 
     function __construct(){
-        $this->version = "0.1.4";
+        $this->version = "0.1.4.1";
         $this->name = "notify";
 
         $this->permission = new NotifyPermission($this);

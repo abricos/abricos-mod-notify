@@ -430,6 +430,8 @@ class NotifyConfig extends AbricosModel {
  * @property string $body
  * @property int $dateline
  * @property int $sendDate
+ * @property int $userid
+ * @property string $globalid
  */
 class NotifyMail extends AbricosModel {
     protected $_structModule = 'notify';
