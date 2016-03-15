@@ -27,6 +27,10 @@
       "rolefn": "IsAdminRole",
       "type": "int"
     },
+    "SMTPAuth": {
+      "rolefn": "IsAdminRole",
+      "type": "bool"
+    },
     "SMTPUsername": {
       "rolefn": "IsAdminRole",
       "type": "string"

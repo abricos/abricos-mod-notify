@@ -28,13 +28,22 @@
     "userid": {
       "type": "int"
     },
+    "globalid": {
+      "type": "string"
+    },
+    "isDebug": {
+      "type": "bool"
+    },
     "dateline": {
       "type": "date"
     },
     "sendDate": {
       "type": "date"
     },
-    "globalid": {
+    "sendError": {
+      "type": "bool"
+    },
+    "sendErrorInfo": {
       "type": "string"
     }
   }

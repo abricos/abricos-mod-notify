@@ -256,25 +256,67 @@ class NotifyApp extends AbricosApplication {
     public function MailSend(NotifyMail $mail){
         $mail->id = intval($mail->id);
 
+        $config = $this->Config();
+
         if ($mail->id === 0){
+            $mail->isDebug = !!$config->totestfile;
             $mail->id = NotifyQuery::MailAppend($this, $mail);
+
+            if (!$config->totestfile){
+                return;
+            }
         }
 
         if ($mail->sendDate > 0){
             return;
         }
 
-        NotifyQuery::MailSetSended($this, $mail);
+        $this->manager->module->ScriptRequireOnce('includes/phpmailer/class.phpmailer.php');
 
         $config = $this->Config();
-        if (!$config->totestfile){
-            return;
+
+        $mailer = new PHPMailer();
+        $mailer->FromName = $mail->fromName;
+        $mailer->From = $mail->fromEmail;
+        $mailer->AltBody = "To view the message, please use an HTML compatible email viewer!";
+        $mailer->Priority = 3;
+        $mailer->CharSet = "utf-8";
+
+        if ($config->POPBefore){ // авторизация POP перед SMTP
+            $this->manager->module->ScriptRequireOnce('includes/phpmailer/class.pop3.php');
+            $pop = new POP3();
+            $pop->Authorise($config->POPHost, $config->POPPort, 30, $config->POPUsername, $config->POPPassword);
         }
 
-        // $utmf = Abricos::TextParser(true);
-        // NotifyQuery::MailAppend($this, )
+        if ($config->SMTP){ // использовать SMTP
+            $mailer->IsSMTP();
+            $mailer->Host = $config->SMTPHost;
+            if ($config->SMTPPort > 0){
+                $mailer->Port = $config->SMTPPort;
+            }
 
-        $this->manager->module->ScriptRequireOnce('includes/phpmailer/class.phpmailer.php');
+            if ($config->SMTPAuth){
+                $mailer->SMTPAuth = true;
+                $mailer->Username = $config->SMTPUsername;
+                $mailer->Password = $config->SMTPPassword;
+                $mailer->SMTPSecure = $config->SMTPSecure;
+            }
+        }
+
+        $mailer->Subject = $mail->subject;
+        $mailer->MsgHTML("<html><body>".$mail->body."</body></html>");
+        $mailer->AddAddress($mail->toEmail);
+
+        $mail->sendError = !$mailer->Send();
+
+        if (!$mail->sendError){
+            $mail->sendDate = TIMENOW;
+        }else{
+            $mail->sendDate = 0;
+            $mail->sendErrorInfo = $mailer->ErrorInfo;
+        }
+
+        NotifyQuery::MailSetSended($this, $mail);
     }
 
     public function MailListToJSON(){
@@ -298,6 +340,7 @@ class NotifyApp extends AbricosApplication {
         }
         return $list;
     }
+
 
 }
 

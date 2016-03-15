@@ -404,6 +404,7 @@ class NotifyNoticeList extends AbricosModelList {
  * @property bool $SMTP
  * @property string $SMTPHost
  * @property int $SMTPPort
+ * @property bool $SMTPAuth
  * @property string $SMTPUsername
  * @property string $SMTPPassword
  * @property string $SMTPSecure
@@ -428,10 +429,13 @@ class NotifyConfig extends AbricosModel {
  * @property string $toEmail
  * @property string $subject
  * @property string $body
- * @property int $dateline
- * @property int $sendDate
  * @property int $userid
  * @property string $globalid
+ * @property boolean $isDebug
+ * @property int $dateline
+ * @property int $sendDate
+ * @property boolean $sendError
+ * @property string $sendErrorInfo
  */
 class NotifyMail extends AbricosModel {
     protected $_structModule = 'notify';

@@ -368,16 +368,22 @@ class NotifyQuery {
         $sql = "
 			INSERT INTO ".$db->prefix."notify_mail (
 			    toName, toEmail, fromName, fromEmail,
-			    subject, body, userid, globalid, dateline
+			    subject, body,
+			    userid, globalid, isDebug,
+			    dateline
 			) VALUES (
 			    '".bkstr($mail->toName)."',
 			    '".bkstr($mail->toEmail)."',
 			    '".bkstr($mail->fromName)."',
 			    '".bkstr($mail->fromEmail)."',
+
 			    '".bkstr($mail->subject)."',
 			    '".bkstr($mail->body)."',
+
 			    ".intval($mail->userid).",
 			    '".bkstr($mail->globalid)."',
+			    ".($mail->isDebug ? 1 : 0).",
+
 			    ".intval(TIMENOW)."
 			)
 		";
@@ -390,7 +396,9 @@ class NotifyQuery {
         $db = $app->db;
         $sql = "
 			UPDATE ".$db->prefix."notify_mail
-			SET sendDate=".intval(TIMENOW)."
+			SET sendDate=".intval(TIMENOW).",
+			    sendError=".($mail->sendError ? 1 : 0).",
+			    sendErrorInfo='".bkstr($mail->sendErrorInfo)."'
 			WHERE mailid=".intval($mail->id)."
 			LIMIT 1
 		";

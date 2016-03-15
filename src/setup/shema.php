@@ -154,9 +154,12 @@ if ($updateManager->isUpdate('0.1.4.1')){
 
 			userid INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'User ID',
             globalid VARCHAR(32) NOT NULL DEFAULT '' COMMENT '',
+			isDebug TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT '',
 
 			dateline INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Create Date',
 			sendDate INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Send Date',
+			sendError TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT '',
+			sendErrorInfo TEXT NOT NULL COMMENT '',
 
             PRIMARY KEY (mailid)
         )".$charset
