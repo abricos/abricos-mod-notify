@@ -17,6 +17,13 @@ require_once 'app/subscribe.php';
  */
 class NotifyApp extends AbricosApplication {
 
+    protected function GetAppClasses(){
+        return array(
+            'Owner' => 'NotifyAppOwner',
+            'Subscribe' => 'NotifyAppSubscribe'
+        );
+    }
+
     protected function GetClasses(){
         return array(
             'Event' => 'NotifyEvent',

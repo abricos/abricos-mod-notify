@@ -14,7 +14,7 @@ $pfx = $db->prefix;
 
 if ($updateManager->isUpdate('0.1.4')){
 
-    Abricos::GetModule('notify')->permission->Install();
+    $updateManager->module->permission->Install();
 
     $db->query_write("
         CREATE TABLE ".$pfx."notify_owner (
