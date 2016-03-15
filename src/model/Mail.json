@@ -3,6 +3,10 @@
   "type": "model",
   "rolefn": "IsAdminRole",
   "fields": {
+    "id": {
+      "dbField": "mailid",
+      "type": "int"
+    },
     "fromName": {
       "type": "string"
     },

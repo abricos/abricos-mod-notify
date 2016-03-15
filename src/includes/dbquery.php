@@ -397,6 +397,17 @@ class NotifyQuery {
         $mail->sendDate = TIMENOW;
         $db->query_write($sql);
     }
+
+    public static function MailList(AbricosApplication $app){
+        $db = $app->db;
+        $sql = "
+			SELECT *
+			FROM ".$db->prefix."notify_mail
+			ORDER BY dateline DESC, mailid DESC
+			LIMIT 50
+		";
+        return $db->query_read($sql);
+    }
 }
 
 

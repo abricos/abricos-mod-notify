@@ -150,6 +150,14 @@ Component.entryPoint = function(NS){
         appItem: NS.Summary,
     });
 
+    NS.Mail = Y.Base.create('mail', SYS.AppModel, [], {
+        structureName: 'Mail',
+    }, {});
+
+    NS.MailList = Y.Base.create('mailList', SYS.AppModelList, [], {
+        appItem: NS.Mail,
+    });
+
     NS.Config = Y.Base.create('config', SYS.AppModel, [], {
         structureName: 'Config'
     });

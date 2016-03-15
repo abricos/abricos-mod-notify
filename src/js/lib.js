@@ -108,6 +108,7 @@ Component.entryPoint = function(NS){
             SubscribeList: {value: NS.SubscribeList},
             Summary: {value: NS.Summary},
             SummaryList: {value: NS.SummaryList},
+            MailList: {value: NS.MailList},
             Config: {value: NS.Config},
             ownerList: {
                 readOnly: true,
@@ -155,6 +156,10 @@ Component.entryPoint = function(NS){
                 attach: 'ownerBaseList,subscribeBaseList',
                 type: 'modelList:SummaryList',
             },
+            mailList: {
+                attribute: true,
+                type: 'modelList:MailList',
+            },
             config: {
                 attribute: true,
                 type: 'model:Config'
@@ -168,6 +173,11 @@ Component.entryPoint = function(NS){
             config: {
                 view: function(){
                     return this.getURL('ws') + 'config/ConfigWidget/'
+                }
+            },
+            mail: {
+                list: function(){
+                    return this.getURL('ws') + 'mailList/MailListWidget/'
                 }
             },
         }

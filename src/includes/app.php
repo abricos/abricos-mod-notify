@@ -46,6 +46,8 @@ class NotifyApp extends AbricosApplication {
         switch ($d->do){
             case 'summaryList':
                 return $this->SummaryListToJSON();
+            case 'mailList':
+                return $this->MailListToJSON();
             case "config":
                 return $this->ConfigToJSON();
             case "configSave":
@@ -273,6 +275,28 @@ class NotifyApp extends AbricosApplication {
         // NotifyQuery::MailAppend($this, )
 
         $this->manager->module->ScriptRequireOnce('includes/phpmailer/class.phpmailer.php');
+    }
+
+    public function MailListToJSON(){
+        $res = $this->MailList();
+        return $this->ResultToJSON('mailList', $res);
+    }
+
+    /**
+     * @return NotifyMailList
+     */
+    public function MailList(){
+        if (!$this->manager->IsAdminRole()){
+            return AbricosResponse::ERR_FORBIDDEN;
+        }
+
+        /** @var NotifyMailList $list */
+        $list = $this->InstanceClass('MailList');
+        $rows = NotifyQuery::MailList($this);
+        while (($d = $this->db->fetch_array($rows))){
+            $list->Add($this->models->InstanceClass('Mail', $d));
+        }
+        return $list;
     }
 
 }
