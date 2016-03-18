@@ -6,8 +6,8 @@
 
         <div class="btn-group pull-right">
             <a href="#" data-url="mail.list"
-                    data-wait="disable"
-                    class="btn btn-default btn-xs" type="button">
+               data-wait="disable"
+               class="btn btn-default btn-xs" type="button">
                 Вернуться к списку
             </a>
         </div>
@@ -21,6 +21,76 @@
     </div>
     <div class="panel-body">
 
+        <div class="form-horizontal">
+
+            <div class="form-group">
+                <label class="col-sm-2 control-label">
+                    Дата/время отправки
+                </label>
+                <div class="col-sm-10">
+                    <input id="{i#sendDate}" class="form-control" type="text">
+                </div>
+            </div>
+
+            <div id="{i#sendErrorViewPanel}" class="form-group hide">
+                <label class="col-sm-2 control-label text-danger">
+                    Не отправлено (текст&nbsp;ошибки)
+                </label>
+                <div class="col-sm-10">
+                    <textarea id="{i#sendErrorInfo}" class="form-control"
+                              rows="3">
+                    </textarea>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-2 control-label">
+                    От кого
+                </label>
+                <div class="col-sm-5">
+                    <input id="{i#fromName}" class="form-control" type="text">
+                </div>
+                <div class="col-sm-5">
+                    <input id="{i#fromEmail}" class="form-control" type="text">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-2 control-label">
+                    Кому
+                </label>
+                <div class="col-sm-5">
+                    <input id="{i#toName}" class="form-control" type="text">
+                </div>
+                <div class="col-sm-5">
+                    <input id="{i#toEmail}" class="form-control" type="text">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-2 control-label">
+                    Тема
+                </label>
+                <div class="col-sm-10">
+                    <input id="{i#subject}" class="form-control" type="text">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-2 control-label">
+                    Сообщение
+                </label>
+                <div class="col-sm-10">
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <div id="{i#body}"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
 
 
     </div>

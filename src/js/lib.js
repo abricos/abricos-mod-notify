@@ -108,6 +108,7 @@ Component.entryPoint = function(NS){
             SubscribeList: {value: NS.SubscribeList},
             Summary: {value: NS.Summary},
             SummaryList: {value: NS.SummaryList},
+            Mail: {value: NS.Mail},
             MailList: {value: NS.MailList},
             Config: {value: NS.Config},
             ownerList: {

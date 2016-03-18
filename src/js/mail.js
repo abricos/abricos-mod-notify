@@ -16,7 +16,6 @@ Component.entryPoint = function(NS){
 
             appInstance.mail(this.get('mailid'), function(err, result){
                 this.set('waiting', false);
-
                 if (!err){
                     this.set('mail', result.mail);
                 }
@@ -32,6 +31,14 @@ Component.entryPoint = function(NS){
             if (!mail){
                 return;
             }
+
+            var attrs = mail.toJSON();
+            tp.setHTML(attrs);
+            tp.setValue(attrs);
+            tp.setValue({
+                sendDate: Brick.dateExt.convert(attrs.sendDate)
+            });
+            tp.toggleView(attrs.sendError, 'sendErrorViewPanel');
         },
     }, {
         ATTRS: {
