@@ -48,6 +48,8 @@ class NotifyApp extends AbricosApplication {
                 return $this->SummaryListToJSON();
             case 'mailList':
                 return $this->MailListToJSON();
+            case 'mail':
+                return $this->MailToJSON($d->mailid);
             case "config":
                 return $this->ConfigToJSON();
             case "configSave":
@@ -285,10 +287,15 @@ class NotifyApp extends AbricosApplication {
         if ($config->POPBefore){ // авторизация POP перед SMTP
             $this->manager->module->ScriptRequireOnce('includes/phpmailer/class.pop3.php');
             $pop = new POP3();
-            $pop->Authorise($config->POPHost, $config->POPPort, 30, $config->POPUsername, $config->POPPassword);
+
+            $authResult = @$pop->Authorise($config->POPHost, $config->POPPort, 30, $config->POPUsername, $config->POPPassword);
+            if (!$authResult){
+                $mail->sendError = true;
+                $mail->sendErrorInfo = 'POP authorise error';
+            }
         }
 
-        if ($config->SMTP){ // использовать SMTP
+        if (!$mail->sendError && $config->SMTP){ // использовать SMTP
             $mailer->IsSMTP();
             $mailer->Host = $config->SMTPHost;
             if ($config->SMTPPort > 0){
@@ -311,7 +318,7 @@ class NotifyApp extends AbricosApplication {
 
         if (!$mail->sendError){
             $mail->sendDate = TIMENOW;
-        }else{
+        } else {
             $mail->sendDate = 0;
             $mail->sendErrorInfo = $mailer->ErrorInfo;
         }
@@ -341,6 +348,30 @@ class NotifyApp extends AbricosApplication {
         return $list;
     }
 
+    public function MailToJSON($mailid){
+        $res = $this->Mail($mailid);
+        return $this->ResultToJSON('mail', $res);
+    }
+
+    /**
+     * @param $mailid
+     * @return NotifyMail
+     */
+    public function Mail($mailid){
+        if (!$this->manager->IsAdminRole()){
+            return AbricosResponse::ERR_FORBIDDEN;
+        }
+
+        $d = NotifyQuery::Mail($this, $mailid);
+
+        if (empty($d)){
+            return AbricosResponse::ERR_BAD_REQUEST;
+        }
+
+        /** @var NotifyMail $mail */
+        $mail = $this->InstanceClass('Mail', $d);
+        return $mail;
+    }
 
 }
 

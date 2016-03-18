@@ -416,6 +416,16 @@ class NotifyQuery {
 		";
         return $db->query_read($sql);
     }
+
+    public static function Mail(AbricosApplication $app, $mailid){
+        $db = $app->db;
+        $sql = "
+			SELECT *
+			FROM ".$db->prefix."notify_mail
+			WHERE mailid=".intval($mailid)."
+		";
+        return $db->query_first($sql);
+    }
 }
 
 

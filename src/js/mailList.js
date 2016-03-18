@@ -41,18 +41,20 @@ Component.entryPoint = function(NS){
                 var attrs = mail.toJSON();
                 lst += tp.replace('row', [
                     attrs, {
-                        date: Brick.dateExt.convert(attrs.dateline)
+                        date: Brick.dateExt.convert(attrs.dateline),
+                        sendErrorFlag: attrs.sendError ? tp.replace('sendErrorFlag') : '',
                     }
                 ]);
             });
             tp.gel('list').innerHTML = tp.replace('list', {
                 'rows': lst
             });
+            this.appURLUpdate();
         }
     }, {
         ATTRS: {
             component: {value: COMPONENT},
-            templateBlockName: {value: 'widget,list,row'}
+            templateBlockName: {value: 'widget,list,row,sendErrorFlag'}
         },
         CLICKS: {
             reloadMailList: 'reloadMailList',

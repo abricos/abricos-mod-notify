@@ -33,6 +33,7 @@
         <th>Кому</th>
         <th>Тема</th>
         <th></th>
+        <th></th>
     </tr>
     </thead>
     <tbody>
@@ -46,12 +47,18 @@
     <td>{v#date}</td>
     <td>{v#toEmail}</td>
     <td>{v#subject}</td>
+    <td>{v#sendErrorFlag}</td>
     <td>
-        <button data-click="mailView" data-id="{v#id}"
+        <a href="#" data-url="mail.view({v#id})" data-id="{v#id}"
                 data-wait="disable"
                 class="btn btn-default btn-xs"
                 type="button">
             Просмотреть
-        </button>
+        </a>
     </td>
 </tr>
+
+<!--{sendErrorFlag}-->
+<span class="text-danger" title="Уведомление не отправлено">
+    Не отправлено
+</span>

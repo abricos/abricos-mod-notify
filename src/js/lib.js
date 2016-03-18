@@ -160,6 +160,11 @@ Component.entryPoint = function(NS){
                 attribute: true,
                 type: 'modelList:MailList',
             },
+            mail: {
+                attribute: false,
+                args: ['mailid'],
+                type: 'model:Mail',
+            },
             config: {
                 attribute: true,
                 type: 'model:Config'
@@ -176,8 +181,11 @@ Component.entryPoint = function(NS){
                 }
             },
             mail: {
+                view: function(mailid){
+                    return this.getURL('ws') + 'mail/MailViewWidget/' + (mailid | 0) + '/';
+                },
                 list: function(){
-                    return this.getURL('ws') + 'mailList/MailListWidget/'
+                    return this.getURL('ws') + 'mailList/MailListWidget/';
                 }
             },
         }
