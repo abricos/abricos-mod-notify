@@ -266,7 +266,7 @@ class NotifyApp extends AbricosApplication {
             $mail->isDebug = !!$config->totestfile;
             $mail->id = NotifyQuery::MailAppend($this, $mail);
 
-            if (!$config->totestfile){
+            if ($mail->isDebug){
                 return;
             }
         }
