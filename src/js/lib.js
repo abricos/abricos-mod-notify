@@ -19,11 +19,9 @@ Component.entryPoint = function(NS){
     SYS.Application.build(COMPONENT, {}, {
         initializer: function(){
             var instance = this;
-            // this.ownerBaseList(function(){
             NS.roles.load(function(){
                 instance.initCallbackFire();
             });
-            // }, this);
         },
         registerOwner: function(owner){
             if (!owner || !Y.Lang.isFunction(owner.get) || owner.get('isBase')){
@@ -166,6 +164,11 @@ Component.entryPoint = function(NS){
                 args: ['mailid'],
                 type: 'model:Mail',
             },
+            mailTestSend: {
+                attribute: false,
+                args: ['email'],
+                type: 'model:Mail',
+            },
             config: {
                 attribute: true,
                 type: 'model:Config'
@@ -187,6 +190,9 @@ Component.entryPoint = function(NS){
                 },
                 list: function(){
                     return this.getURL('ws') + 'mailList/MailListWidget/';
+                },
+                test: function(){
+                    return this.getURL('ws') + 'mailTest/MailTestWidget/';
                 }
             },
         }

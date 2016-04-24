@@ -1,0 +1,56 @@
+<!--{widget}-->
+<div class="mailTest panel panel-default">
+    <div class="panel-heading text-center">
+
+        <h3 class="panel-title pull-left">Отправка тествого письма</h3>
+
+        <div class="btn-group pull-right">
+            <a href="#" data-url="mail.list"
+               data-wait="disable"
+               class="btn btn-default btn-xs" type="button">
+                Вернуться к списку
+            </a>
+        </div>
+
+        <span data-wait="show">
+            <img src="/images/loading.gif"/> Загрузка...
+        </span>
+
+        <div class="clearfix"></div>
+
+    </div>
+    <div class="panel-body">
+
+        <div class="form-horizontal">
+
+            <div class="form-group">
+                <label class="col-sm-2 control-label">
+                    E-mail
+                </label>
+                <div class="col-sm-10">
+                    <input id="{i#email}" class="form-control" type="text">
+                </div>
+            </div>
+
+        </div>
+
+        <hr />
+
+        <div class="btn-toolbar pull-right">
+            <span data-wait="show">
+                <img src="/images/loading.gif"/> Загрузка...
+            </span>
+            <button data-click="send" type="button" class="btn btn-default" data-wait="disable">
+                Отправить
+            </button>
+        </div>
+        <div class="clearfix"></div>
+
+        <div id="{i#resultPanel}" class="hide">
+
+            <hr />
+            <div id="{i#resultMail}"></div>
+        </div>
+
+    </div>
+</div>

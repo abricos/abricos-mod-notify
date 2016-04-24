@@ -50,6 +50,8 @@ class NotifyApp extends AbricosApplication {
                 return $this->MailListToJSON();
             case 'mail':
                 return $this->MailToJSON($d->mailid);
+            case 'mailTestSend':
+                return $this->MailTestSendToJSON($d->email);
             case "config":
                 return $this->ConfigToJSON();
             case "configSave":
@@ -370,6 +372,42 @@ class NotifyApp extends AbricosApplication {
 
         /** @var NotifyMail $mail */
         $mail = $this->InstanceClass('Mail', $d);
+        return $mail;
+    }
+
+    public function MailTestSendToJSON($email){
+        $res = $this->MailTestSend($email);
+        return $this->ResultToJSON('mailTestSend', $res);
+    }
+
+    public function MailTestSend($email){
+        if (!$this->manager->IsAdminRole()){
+            return AbricosResponse::ERR_FORBIDDEN;
+        }
+
+        $user = Abricos::$user;
+
+        $host = "http://".($_SERVER['HTTP_HOST'] ? $_SERVER['HTTP_HOST'] : $_ENV['HTTP_HOST']);
+
+        $notifyBrick = Brick::$builder->LoadBrickS("notify", "notifyTest");
+        $v = &$notifyBrick->param->var;
+
+        $config = $this->Config();
+
+        $mail = $this->MailByFields(
+            $email,
+            $v['subject'],
+            Brick::ReplaceVarByData($notifyBrick->content, array(
+                "fromEmail" => $config->fromEmail,
+                "email" => $email,
+                "host" => $host,
+                "username" => $user->username,
+                "sitename" => SystemModule::$instance->GetPhrases()->Get('site_name')
+            ))
+        );
+
+        $this->MailSend($mail);
+
         return $mail;
     }
 

@@ -12,6 +12,13 @@ Component.entryPoint = function(NS){
 
     NS.MailViewWidget = Y.Base.create('mailViewWidget', SYS.AppWidget, [], {
         onInitAppWidget: function(err, appInstance, options){
+            var mail = this.get('mail');
+
+            if (mail){
+                this._renderMail();
+                return;
+            }
+
             this.set('waiting', true);
 
             appInstance.mail(this.get('mailid'), function(err, result){
