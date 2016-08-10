@@ -78,6 +78,7 @@ Component.entryPoint = function(NS){
             return !!this._cronThread;
         },
         cronStart: function(){
+            return;
             if (this.cronIsStart()){
                 return;
             }
@@ -92,6 +93,7 @@ Component.entryPoint = function(NS){
             }, 1000 * 60 * 5);
         },
         cronStop: function(){
+            return;
             if (!this.cronIsStart()){
                 return;
             }
