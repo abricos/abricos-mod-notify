@@ -166,5 +166,3 @@ if ($updateManager->isUpdate('0.1.4.1')){
     );
 
 }
-
-?>

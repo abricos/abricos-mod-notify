@@ -353,5 +353,3 @@ class NotifyAppOwner extends AbricosApplication {
     }
 
 }
-
-?>

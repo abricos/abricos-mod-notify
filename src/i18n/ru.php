@@ -2,4 +2,3 @@
 return array(
     "title" => "Уведомления"
 );
-?>

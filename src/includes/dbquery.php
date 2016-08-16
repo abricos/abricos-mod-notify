@@ -427,6 +427,3 @@ class NotifyQuery {
         return $db->query_first($sql);
     }
 }
-
-
-?>

@@ -260,5 +260,3 @@ class NotifyAppSubscribe extends AbricosApplication {
     }
 
 }
-
-?>

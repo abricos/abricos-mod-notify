@@ -99,5 +99,3 @@ class NotifyManager extends Ab_ModuleManager {
     }
     /**/
 }
-
-?>

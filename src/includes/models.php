@@ -451,5 +451,3 @@ class NotifyMail extends AbricosModel {
 class NotifyMailList extends AbricosModelList {
 
 }
-
-?>

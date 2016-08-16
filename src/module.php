@@ -45,7 +45,7 @@ class NotifyAction {
 
 class NotifyPermission extends Ab_UserPermission {
 
-    public function NotifyPermission(NotifyModule $module){
+    public function __construct(NotifyModule $module){
         $defRoles = array(
             new Ab_UserRole(NotifyAction::VIEW, Ab_UserGroup::REGISTERED),
             new Ab_UserRole(NotifyAction::VIEW, Ab_UserGroup::ADMIN),
@@ -68,4 +68,3 @@ class NotifyPermission extends Ab_UserPermission {
 }
 
 Abricos::ModuleRegister(new NotifyModule());
-?>

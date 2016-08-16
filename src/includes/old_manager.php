@@ -259,6 +259,3 @@ class NotifyMailer extends PHPMailer {
         return parent::Send();
     }
 }
-
-
-?>
