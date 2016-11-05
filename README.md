@@ -6,7 +6,6 @@ This module is required to send messages to email.
 Links
 -----
   * [Home Page](http://abricos.org/mods/notify/)
-  * [Home Page (Russian)](http://ru.abricos.org/mods/notify/)
 
 Configuration
 -----
