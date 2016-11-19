@@ -370,6 +370,7 @@ class NotifyQuery {
 			    toName, toEmail, fromName, fromEmail,
 			    subject, body,
 			    userid, globalid, isDebug,
+			    sendDate, sendError, sendErrorInfo,
 			    dateline
 			) VALUES (
 			    '".bkstr($mail->toName)."',
@@ -383,6 +384,7 @@ class NotifyQuery {
 			    ".intval($mail->userid).",
 			    '".bkstr($mail->globalid)."',
 			    ".($mail->isDebug ? 1 : 0).",
+			    0, 0, '',
 
 			    ".intval(TIMENOW)."
 			)
