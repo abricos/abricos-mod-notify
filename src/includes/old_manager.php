@@ -186,7 +186,7 @@ class NotifyAbricos {
     private $host = "";
     private $password = "";
 
-    public function NotifyAbricos(){
+    public function __construct(){
 
         $this->from = SystemModule::$instance->GetPhrases()->Get('admin_mail');
         $this->fromName = SystemModule::$instance->GetPhrases()->Get('site_name');
@@ -239,7 +239,7 @@ class NotifyAbricos {
 
 class NotifyMailer extends PHPMailer {
 
-    public function NotifyMailer(){
+    public function __construct(){
         $this->FromName = SystemModule::$instance->GetPhrases()->Get('site_name');
         $this->From = SystemModule::$instance->GetPhrases()->Get('admin_mail');
         $this->AltBody = "To view the message, please use an HTML compatible email viewer!";
